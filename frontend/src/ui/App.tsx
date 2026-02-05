@@ -1,12 +1,14 @@
 import { HashRouter, Outlet, Route, Routes } from "react-router-dom";
 import pages from "./pages";
-import { ThemeToggle } from "./components/theme-toggle";
+import Navbar from "./components/Navbar";
 
 function Layout() {
     return (
-        <main className="border-red-500 border-8">
-            <ThemeToggle />
-            <Outlet />
+        <main className="min-h-screen flex flex-col">
+            <Navbar />
+            <div className="flex-1">
+                <Outlet />
+            </div>
         </main>
     );
 }
