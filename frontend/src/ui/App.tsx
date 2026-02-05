@@ -1,18 +1,27 @@
-import "./App.css";
-import { Button } from "./components/ui/button";
+import { HashRouter, Outlet, Route, Routes } from "react-router-dom";
+import pages from "./pages";
+import { ThemeToggle } from "./components/theme-toggle";
+
+function Layout() {
+    return (
+        <main className="border-red-500 border-8">
+            <ThemeToggle />
+            <Outlet />
+        </main>
+    );
+}
 
 function App() {
     return (
-        <>
-            <Button
-                onClick={() => {
-                    window.alert("AUTOCODERZ");
-                }}
-            >
-                test button
-            </Button>
-            <div className="border-4 p-16 border-green-500">Test</div>
-        </>
+        <HashRouter>
+            <Routes>
+                <Route element={<Layout />}>
+                    {pages.map(({ path, component: Component }) => (
+                        <Route key={path} path={path} element={<Component />} />
+                    ))}
+                </Route>
+            </Routes>
+        </HashRouter>
     );
 }
 
