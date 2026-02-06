@@ -12,6 +12,7 @@ dist
 dist-react
 dist-electron
 *.local
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
