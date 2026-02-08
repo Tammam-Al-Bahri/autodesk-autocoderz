@@ -24,3 +24,8 @@ dist-electron
 *.njsproj
 *.sln
 *.sw?
+
+# Keep environment variables out of version control
+.env
+
+/backend/src/generated/
