@@ -24,7 +24,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   useEffect(() => {
     setTimeout(() => {
       setLoading(false)
-    }, 1000)
+    }, 500)
   }, [])
 
   if (loading) {
