@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils"
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react"
+import { SkeletonForm } from "./skeleton-form";
 import {
   Card,
   CardContent,
@@ -20,6 +22,21 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false)
+    }, 500)
+  }, [])
+  if (loading) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <SkeletonForm />
+      </div>
+    )
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>

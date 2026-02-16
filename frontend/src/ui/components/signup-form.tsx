@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react"
+import { SkeletonForm } from "./skeleton-form";
 import {
   Card,
   CardContent,
@@ -16,6 +18,23 @@ import {
 import { Input } from "@/components/ui/input"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false)
+    }, 1000)
+  }, [])
+
+  if (loading) {
+    return (
+      <Card className="p-6 w-full" {...props}>
+        <SkeletonForm />
+      </Card>
+    )
+  }
+
   return (
     <Card {...props}>
       <CardHeader>
