@@ -43,6 +43,12 @@ export default function Navbar() {
 
           <NavigationMenuItem>
             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+              <Link to="/receptionist">Receptionist Dashboard</Link>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
+            <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
               <Link to="/test">Test</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
