@@ -10,6 +10,8 @@ import SignupPage from "./pages/signup";
 import About from "./pages/About";
 import Apply from "./pages/Apply";
 import Dashboard from "./pages/Dashboard";
+import Applications from "./pages/Application";
+import Tickets from "./pages/Tickets";
 
 function PublicLayout() {
     return (
@@ -54,6 +56,8 @@ function App() {
 
                 <Route element={<ManagerLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/applications" element={<Applications />} />
+                    <Route path="/tickets" element={<Tickets />} />
                 </Route>
 
             </Routes>

@@ -6,7 +6,7 @@ export default function Dashboard() {
     const hotel_db = [
         { 
             id: "hotel_1", 
-            name: "Grand Marina Resort", 
+            name: "Hotel 1", 
             check_ins: 12, 
             check_outs: 8, 
             occ: "82%", 
@@ -14,7 +14,7 @@ export default function Dashboard() {
         },
         { 
             id: "hotel_2", 
-            name: "Downtown Plaza", 
+            name: "Hotel 2", 
             check_ins: 45, 
             check_outs: 30, 
             occ: "95%", 
@@ -22,7 +22,7 @@ export default function Dashboard() {
         },
         { 
             id: "hotel_3", 
-            name: "Riverside Lodge", 
+            name: "Hotel 3", 
             check_ins: 5, 
             check_outs: 2, 
             occ: "45%", 
