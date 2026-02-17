@@ -14,10 +14,8 @@ export default function ManagerNavbar() {
   return (
     <nav className="h-16 border-b-2 flex items-center justify-between px-4">
       
-      <div className="text-2xl font-bold flex items-center gap-2">Autocoderz 
-        <span 
-        className="text-sm font-normal text-slate-500 border-l-2 pl-2">Manager
-        </span>
+      <div className="text-2xl font-bold flex items-center gap-2">
+        Autocoderz <span className="text-sm font-normal text-slate-500 border-l-2 pl-2">Manager</span>
       </div>
 
       <NavigationMenu>
@@ -25,25 +23,19 @@ export default function ManagerNavbar() {
           
           <NavigationMenuItem>
             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/dashboard">Portfolio</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
 
           <NavigationMenuItem>
             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-              <Link to="/models">3D Models</Link>
+              <Link to="/applications">Applications</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
 
           <NavigationMenuItem>
             <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-              <Link to="/maintenance">Maintenance</Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-              <Link to="/staff">Staff</Link>
+              <Link to="/tickets">Tickets</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
 
@@ -60,7 +52,6 @@ export default function ManagerNavbar() {
         <Button asChild variant="outline">
           <Link to="/">Logout</Link>
         </Button>
-        
         <ThemeToggle />
       </div>
     </nav>
