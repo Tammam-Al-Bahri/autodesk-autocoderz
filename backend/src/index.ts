@@ -1,7 +1,7 @@
 import * as express from "express";
 import * as cors from "cors";
-import usersRouter from "./routes/users.route";
-import { Request, Response, NextFunction } from "express";
+import usersRouter from "./routes/users";
+import { Response } from "express";
 
 const app = express();
 
@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use("/api/users", usersRouter);
 
-app.use((error: unknown, request: Request, response: Response, next: NextFunction) => {
+app.use((error: unknown, response: Response) => {
     console.error(error);
     response.status(500).json({ error: "Internal server error" });
 });

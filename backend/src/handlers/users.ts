@@ -6,6 +6,7 @@ export async function getUsers(request: Request, response: Response) {
 }
 
 export async function createUser(request: Request<{}, {}>, response: Response) {
-    response.send("");
+    console.log("test");
+    response.send("test");
     return;
 }

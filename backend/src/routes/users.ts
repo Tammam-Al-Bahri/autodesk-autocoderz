@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { createUser, getUsers } from "../handlers/users.handler";
+import { createUser, getUsers } from "../handlers/users";
 import { validate } from "../lib/validate";
-import { createUserSchema } from "../schemas/user.schema";
+import { createUserSchema } from "../schemas/user";
 
 const router = Router();
 
