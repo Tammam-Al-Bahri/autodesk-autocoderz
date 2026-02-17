@@ -61,9 +61,6 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
-                <Button variant="outline" type="button">
-                  Login with Google
-                </Button>
                 <FieldDescription className="text-center">
                   Don't have an account?
                   <Link to="/signup" className="underline underline-offset-4 hover:text-primary">
