@@ -4,6 +4,7 @@ import pages from "./pages";
 import Navbar from "./components/Navbar";
 import ManagerNavbar from "./components/ManagerNavbar";
 import ManagerSidebar from "./components/ManagerSidebar";
+import ApplicantNavbar from "./components/ApplicantNavbar";
 
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
@@ -21,6 +22,17 @@ function PublicLayout() {
                 <Outlet />
             </div>
         </main>
+    );
+}
+
+function ApplicantLayout() {
+    return (
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+            <ApplicantNavbar />
+            <div className="flex-1">
+                <Outlet />
+            </div>
+        </div>
     );
 }
 
@@ -47,11 +59,14 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
                     <Route path="/about" element={<About />} />
-                    <Route path="/apply" element={<Apply />} />
-
+                    
                     {pages.map(({ path, component: Component }) => (
                         <Route key={path} path={path} element={<Component />} />
                     ))}
+                </Route>
+
+                <Route element={<ApplicantLayout />}>
+                    <Route path="/apply" element={<Apply />} />
                 </Route>
 
                 <Route element={<ManagerLayout />}>
