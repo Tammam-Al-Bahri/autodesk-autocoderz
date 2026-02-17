@@ -10,7 +10,6 @@ export default function Home() {
     return (
         <div className="max-w-6xl mx-auto px-4 mt-12 mb-20">
             
-            {/* Top section */}
             <div className="text-center mb-16">
                 
                 <Badge variant="secondary" className="mb-4">
