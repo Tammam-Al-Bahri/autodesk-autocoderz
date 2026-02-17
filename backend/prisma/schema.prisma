@@ -7,11 +7,22 @@ datasource db {
   provider = "mysql"
 }
 
-model Test {
+// model Test {
+//   id String @id @default(cuid())
+
+//   name String?
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+model User {
   id String @id @default(cuid())
 
-  name String?
+  email String @unique
+  passwordHash String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  firstName String
+  middleName String?
+  lastName String
 }
