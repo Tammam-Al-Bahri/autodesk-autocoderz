@@ -6,8 +6,8 @@ export const validate = (schema: ZodType) => (req: Request, res: Response, next:
 
     if (!result.success) {
         res.status(400).json({
-            message: "Validation failed",
-            errors: result.error.issues,
+            title: `Validation failed - ${result.error.issues[0].path}`,
+            description: `${result.error.issues[0].message}`,
         });
         return;
     }
