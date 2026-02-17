@@ -1,6 +1,11 @@
 import { HashRouter, Outlet, Route, Routes } from "react-router-dom";
 import pages from "./pages";
 import Navbar from "./components/Navbar";
+import LoginPage from "./pages/login";
+import SignupPage from "./pages/signup";
+import About from "./pages/About";
+import Apply from "./pages/Apply";
+import Dashboard from "./pages/Dashboard";
 
 function Layout() {
     return (
@@ -18,6 +23,12 @@ function App() {
         <HashRouter>
             <Routes>
                 <Route element={<Layout />}>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/apply" element={<Apply />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+
                     {pages.map(({ path, component: Component }) => (
                         <Route key={path} path={path} element={<Component />} />
                     ))}
