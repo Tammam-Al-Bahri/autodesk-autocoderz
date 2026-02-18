@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,111 +5,130 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function Home() {
-    const navigate = useNavigate();
 
-    function go_to_test() {
-        console.log("navigating to test page...");
-        alert("Going to test page"); 
-        navigate("/test");
-    }
+  const navigate = useNavigate();
 
-    return (
-        <div className="max-w-6xl mx-auto px-4 mt-16 mb-24">
-            
-            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-                
-                <Badge variant="outline" style={{ marginBottom: '24px', padding: '4px 16px', border: '1px solid #cbd5e1' }}>
-                    Powered by Autodesk
-                </Badge>
+  function goToTest() {
+    navigate("/test");
+  }
 
-                <h1 style={{ fontSize: '48px', fontWeight: '900', letterSpacing: '-2px', lineHeight: '1.1', marginBottom: '24px' }}>
-                    Autocoderz <br className="hidden md:block"/>
-                    <span style={{ color: 'gray', fontWeight: 'normal', fontSize: '36px' }}>3D Property Management</span>
-                </h1>
-                
-                <p className="text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-                    The central hub for hotel staff to monitor room statuses, manage live maintenance tickets, and explore properties using interactive 3D floor plans.
-                </p>
-                
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                    <Button size="lg" style={{ padding: '0 32px', fontWeight: 'bold' }} onClick={() => navigate('/signup')}>
-                        Register Staff
-                    </Button>
-                    
-                    <Button asChild variant="outline" size="lg" className="px-8 font-bold border-2">
-                        <Link to="/login">System Login</Link>
-                    </Button>
+  return (
+    <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
 
-                    <Button variant="ghost" size="lg" onClick={go_to_test} style={{ color: '#94a3b8' }}>
-                        Test Page
-                    </Button>
-                </div>
-            </div>
+      <div className="text-center mb-12">
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-                <Card style={{ boxShadow: 'none', border: '2px solid #e2e8f0' }}>
-                    <CardHeader>
-                        <CardTitle className="text-xl font-bold uppercase tracking-wide">3D Floor Plans</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p style={{ color: 'gray', lineHeight: '1.4' }}>
-                            Uses Autodesk Forge to render exact 3D models. Click rooms within the model to check occupancy or see if they need cleaning.
-                        </p>
-                    </CardContent>
-                </Card>
+        <Badge variant="outline" className="mb-4">
+          Autodesk Integration
+        </Badge>
 
-                <Card style={{ boxShadow: 'none', border: '2px solid #e2e8f0' }}>
-                    <CardHeader>
-                        <CardTitle className="text-xl font-bold uppercase tracking-wide">Fault Tracking</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p style={{ color: 'gray', lineHeight: '1.4' }}>
-                            Log physical issues like broken AC units or leaks. Managers can track these tickets and dispatch maintenance staff instantly.
-                        </p>
-                    </CardContent>
-                </Card>
+        <h1 className="text-4xl font-bold mb-4">
+          Autocoderz
+        </h1>
 
-                <Card style={{ boxShadow: 'none', border: '2px solid #e2e8f0' }}>
-                    <CardHeader>
-                        <CardTitle className="text-xl font-bold uppercase tracking-wide">Manager Portal</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p style={{ color: 'gray', lineHeight: '1.4' }}>
-                            A high-level overview of the entire chain. Monitor total bookings, staff availability, and urgent alerts from one place.
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
+        <p className="text-gray-500 max-w-xl mx-auto mb-6">
+          A property management system for hotel staff. 
+          Includes room tracking, maintenance tickets and 3D building models.
+        </p>
 
-            <div className="max-w-2xl mx-auto border-t pt-16">
-                <h3 style={{ fontSize: '30px', fontWeight: '900', marginBottom: '32px', textAlign: 'center', textTransform: 'uppercase' }}>System FAQ</h3>
-                
-                <Accordion type="single" collapsible className="w-full">
-                    
-                    <AccordionItem value="item-1">
-                        <AccordionTrigger style={{ fontWeight: 'bold' }}>How does the 3D viewer work?</AccordionTrigger>
-                        <AccordionContent style={{ color: 'gray' }}>
-                            We use the Autodesk Forge API to render Revit or IFC models. This allows you to visually locate where maintenance issues are in real-time.
-                        </AccordionContent>
-                    </AccordionItem>
-                    
-                    <AccordionItem value="item-2">
-                        <AccordionTrigger style={{ fontWeight: 'bold' }}>How are maintenance tickets assigned?</AccordionTrigger>
-                        <AccordionContent style={{ color: 'gray' }}>
-                            Faults appear on the manager's dashboard. The manager can assign them to a staff member, who will see it on their portal.
-                        </AccordionContent>
-                    </AccordionItem>
-                    
-                    <AccordionItem value="item-3">
-                        <AccordionTrigger style={{ fontWeight: 'bold' }}>Can I manage multiple hotels?</AccordionTrigger>
-                        <AccordionContent style={{ color: 'gray' }}>
-                            Yes. Managers can select different properties from the dropdown to load specific 3D models and data for that site.
-                        </AccordionContent>
-                    </AccordionItem>
+        <div className="flex flex-col sm:flex-row justify-center gap-3">
 
-                </Accordion>
-            </div>
+          <Button onClick={() => navigate("/signup")}>
+            Register
+          </Button>
+
+          <Button asChild variant="outline">
+            <Link to="/login">Login</Link>
+          </Button>
+
+          <Button variant="ghost" onClick={goToTest}>
+            Test Page
+          </Button>
 
         </div>
-    );
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6 mb-16">
+
+        <Card>
+          <CardHeader>
+            <CardTitle>3D Floor Plans</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600">
+              Uses Autodesk Forge to show the building in 3D. 
+              Staff can click rooms to check their status.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Maintenance Tracking</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600">
+              Staff can report issues like leaks or broken items.
+              Managers can then mark them as resolved.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Manager View</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600">
+              Overview page showing bookings and open problems
+              across different hotel locations.
+            </p>
+          </CardContent>
+        </Card>
+
+      </div>
+
+      <div className="max-w-2xl mx-auto">
+
+        <h3 className="text-2xl font-bold mb-6 text-center">
+          FAQ
+        </h3>
+
+        <Accordion type="single" collapsible>
+
+          <AccordionItem value="1">
+            <AccordionTrigger>
+              How does the 3D model work?
+            </AccordionTrigger>
+            <AccordionContent>
+              The system connects to Autodesk Forge and loads 
+              a building model file so users can view it in the browser.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="2">
+            <AccordionTrigger>
+              Who handles maintenance tickets?
+            </AccordionTrigger>
+            <AccordionContent>
+              Managers see open tickets and assign them to staff.
+              Once fixed, they can mark them as resolved.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="3">
+            <AccordionTrigger>
+              Can this be used for multiple hotels?
+            </AccordionTrigger>
+            <AccordionContent>
+              Yes, managers can switch between properties 
+              and view their individual data.
+            </AccordionContent>
+          </AccordionItem>
+
+        </Accordion>
+
+      </div>
+
+    </div>
+  );
 }
