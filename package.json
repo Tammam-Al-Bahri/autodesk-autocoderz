@@ -4,7 +4,8 @@
     "scripts": {
         "dev:backend": "npm --prefix backend run prisma && npm --prefix backend run dev",
         "dev:frontend": "npm --prefix frontend run dev",
-        "dev": "npm-run-all --parallel dev:frontend dev:backend"
+        "dev": "npm-run-all --parallel dev:frontend dev:backend",
+        "db": "npm --prefix backend run db"
     },
     "devDependencies": {
         "npm-run-all": "^4.1.5"
