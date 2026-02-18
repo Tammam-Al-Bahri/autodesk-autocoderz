@@ -1,0 +1,6 @@
+{
+    "watch": ["./", "prisma/schema.prisma", "prisma.config.ts", ".env"],
+    "ext": "ts, js, prisma",
+    "ignore": ["node_modules", "dist", "src/generated"],
+    "exec": "npm run prisma && ts-node ./src/index.ts"
+}
