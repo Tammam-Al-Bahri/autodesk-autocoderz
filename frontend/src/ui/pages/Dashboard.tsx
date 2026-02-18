@@ -12,24 +12,58 @@ export default function Dashboard() {
   const viewerRef = useRef<HTMLDivElement | null>(null);
   const viewerInstance = useRef<any>(null);
 
-  // ---------------------------------------------------------
-  // config values
-  // ---------------------------------------------------------
-  // 1. access teokn
-  const ACCESS_TOKEN = "YOUR_ACCESS_TOKEN_HERE"; 
+  // State to hold the token once we fetch it
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  // encoded base64 "clientid:clientsecret"
+  const ENCODED_STRING = "QVJyWHYxUk8xVjEyVVJyMkhuNWd6YjZWMlZBbjJpczNUQmZtMzVqc1ViRzZhUE1WOjBFVG9VR0k3VFFqNWVjUTNVeHBIYU11ZlJ2YUpCYzBoRklaVnFWWWpabm40WFltMFBPY2dNSjUwbkdRYkFBTGI=";
   
-  // 2. urn token
-  const MODEL_URN = "urn:YOUR_BASE64_URN_HERE"; 
+  // The URN of the model you want to load
+  const MODEL_URN = "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dHJhbnN1cmJhbi10ZXN0L3JhY19iYXNpY19zYW1wbGVfcHJvamVjdC5ydnQ"; 
   // ---------------------------------------------------------
 
-  useEffect(() => {
-    if (!viewerRef.current) return;
 
-    // 1. Define Autodesk CDN URLs
+  // get a brand new access token when the code starts running so its not expired or old
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const response = await fetch("https://developer.api.autodesk.com/authentication/v2/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": `Basic ${ENCODED_STRING}`,
+          },
+          // We request a 'client_credentials' grant with read scope
+          body: new URLSearchParams({
+            grant_type: "client_credentials",
+            scope: "data:read viewables:read",
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Auth failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("got token:", data.access_token);
+        setAccessToken(data.access_token);
+      } catch (error) {
+        console.error("error fetching token (check console):", error);
+      }
+    };
+
+    fetchToken();
+  }, []);
+
+
+  // initialize viewer
+  useEffect(() => {
+    // dont start until we have a token and the ref exists
+    if (!accessToken || !viewerRef.current) return;
+
     const viewerScript = "https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js";
     const viewerStyle = "https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css";
 
-    // 2. Helper to load CSS/JS from CDN
     const loadAssets = async () => {
       if (!document.querySelector(`link[href="${viewerStyle}"]`)) {
         const link = document.createElement("link");
@@ -49,53 +83,36 @@ export default function Dashboard() {
       }
     };
 
-    // 3. Initialize Viewer & Load Model
     const initViewer = async () => {
       await loadAssets();
 
-      if (!window.Autodesk) {
-        console.error("Autodesk Viewer failed to load scripts");
-        return;
-      }
+      if (!window.Autodesk) return;
 
       const options = {
         env: "AutodeskProduction",
-        accessToken: ACCESS_TOKEN,
+        accessToken: accessToken, // <--- Using the dynamic token here
         api: "derivativeV2",
       };
 
       window.Autodesk.Viewing.Initializer(options, () => {
-        // Prevent duplicate initialization
         if (viewerInstance.current) return;
 
-        const viewerDiv = viewerRef.current;
-        if (!viewerDiv) return;
-
-        // Create the Viewer instance
-        const viewer = new window.Autodesk.Viewing.GuiViewer3D(viewerDiv);
+        const viewer = new window.Autodesk.Viewing.GuiViewer3D(viewerRef.current);
         viewer.start();
         viewerInstance.current = viewer;
-
-        // Setting a light theme usually looks better in dashboards
         viewer.setTheme("light-theme");
 
-        // load model based off urn token
+        // Load the Model URN
         const documentId = MODEL_URN.startsWith("urn:") ? MODEL_URN : "urn:" + MODEL_URN;
-
+        
         window.Autodesk.Viewing.Document.load(
           documentId,
           (doc: any) => {
-            // Model data found
             const defaultModel = doc.getRoot().getDefaultGeometry();
-            viewer.loadDocumentNode(doc, defaultModel).then((model: any) => {
-                console.log("Model loaded successfully");
-            });
+            viewer.loadDocumentNode(doc, defaultModel);
           },
           (errorCode: any, errorMsg: any) => {
-            // Error Callback
-            console.error("Loading error:", errorCode, errorMsg);
-            // error 401: token is invalid/expired
-            // error 404: URN is wrong
+            console.error("Viewer Error:", errorCode, errorMsg);
           }
         );
       });
@@ -110,15 +127,15 @@ export default function Dashboard() {
         viewerInstance.current = null;
       }
     };
-  }, []); // Run once on mount
+  }, [accessToken]); // This effect runs whenever accessToken changes
 
-  // mock data
+  
+  // UI DATA
   const hotel_db = [
     { id: "hotel_1", name: "Grand Marina Resort", check_ins: 12, check_outs: 8, occ: "82%", tickets: 3 },
     { id: "hotel_2", name: "Downtown Plaza", check_ins: 45, check_outs: 30, occ: "95%", tickets: 14 },
     { id: "hotel_3", name: "Riverside Lodge", check_ins: 5, check_outs: 2, occ: "45%", tickets: 1 }
   ];
-
   const [active_id, set_id] = useState("hotel_1");
   const current = hotel_db.find((h) => h.id === active_id) || hotel_db[0];
 
@@ -127,11 +144,8 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold">Manager Overview</h1>
-          <p className="text-slate-500 mt-1">
-            Select a property to view live stats and 3D models.
-          </p>
+          <p className="text-slate-500 mt-1">Select a property to view live stats and 3D models.</p>
         </div>
-
         <div className="flex flex-col gap-1 min-w-[200px]">
           <label className="text-xs font-bold text-slate-500 uppercase">Current Property</label>
           <select
@@ -139,9 +153,7 @@ export default function Dashboard() {
             onChange={(e) => set_id(e.target.value)}
             className="p-2 border rounded bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 font-medium cursor-pointer"
           >
-            {hotel_db.map((h) => (
-              <option key={h.id} value={h.id}>{h.name}</option>
-            ))}
+            {hotel_db.map((h) => (<option key={h.id} value={h.id}>{h.name}</option>))}
           </select>
         </div>
       </div>
@@ -154,14 +166,12 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* VIEWER CARD */}
         <Card className="lg:col-span-2 flex flex-col min-h-[500px] border-2 border-dashed bg-slate-50 dark:bg-slate-900 overflow-hidden">
             <div className="w-full h-full relative" style={{ minHeight: "500px" }}>
-                {/* The Viewer attaches here */}
+                {!accessToken && <div className="absolute inset-0 flex items-center justify-center text-slate-400">Loading Token...</div>}
                 <div ref={viewerRef} className="absolute inset-0 w-full h-full z-0" />
             </div>
         </Card>
-
         <Card className="flex flex-col">
           <CardHeader><CardTitle className="text-lg">Recent Tickets</CardTitle></CardHeader>
           <CardContent>
