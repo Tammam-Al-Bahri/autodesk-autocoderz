@@ -7,6 +7,7 @@ import ManagerSidebar from "./components/ManagerSidebar";
 import ApplicantNavbar from "./components/ApplicantNavbar";
 import ReceptionistNavbar from "./components/ReceptionistNavbar";
 import ReceptionistSidebar from "./components/ReceptionistSidebar";
+import StaffNavbar from "./components/StaffNavbar"; 
 
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
@@ -21,6 +22,10 @@ import Tickets from "./pages/Tickets";
 import GuestList from "./pages/Guestlist";
 import WalkIn from "./pages/Walkin";
 import Receptionist from "./pages/Receptionist";
+import UploadGuide from "./pages/Guide";
+import StaffTasks from "./pages/StaffTasks"; 
+import StaffGuide from "./pages/Staffguide";
+import GuestPortal from "./pages/GuestPortal";
 
 function PublicLayout() {
     return (
@@ -57,6 +62,7 @@ function ReceptionistLayout() {
         </div>
     );
 }
+
 function ManagerLayout() {
     return (
         <div className="min-h-screen flex flex-col">
@@ -66,6 +72,28 @@ function ManagerLayout() {
                 <main className="flex-1 bg-slate-50 dark:bg-slate-950 p-4">
                     <Outlet />
                 </main>
+            </div>
+        </div>
+    );
+}
+
+function StaffLayout() {
+    return (
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+            <StaffNavbar />
+            <div className="flex-1">
+                <Outlet />
+            </div>
+        </div>
+    );
+}
+
+function GuestLayout() {
+    return (
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
+            <Navbar /> 
+            <div className="flex-1">
+                <Outlet />
             </div>
         </div>
     );
@@ -89,6 +117,7 @@ function App() {
 
                 <Route element={<ApplicantLayout />}>
                     <Route path="/apply" element={<Apply />} />
+                    <Route path="/guide" element={<UploadGuide />} />
                 </Route>
 
                 <Route element={<ReceptionistLayout />}>
@@ -101,6 +130,15 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/applications" element={<Applications />} />
                     <Route path="/tickets" element={<Tickets />} />
+                </Route>
+
+                <Route element={<StaffLayout />}>
+                    <Route path="/stafftasks" element={<StaffTasks />} />
+                    <Route path="/staffguide" element={<StaffGuide />} />
+                </Route>
+
+                <Route element={<GuestLayout />}>
+                    <Route path="/guestportal" element={<GuestPortal />} />
                 </Route>
 
             </Routes>
