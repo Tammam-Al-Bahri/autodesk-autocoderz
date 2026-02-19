@@ -13,7 +13,7 @@ import {
 export default function Navbar() {
   return (
     <nav className="h-16 border-b-2 flex items-center justify-between px-4">
-      <div className="text-2xl font-bold">Autocoderz</div>
+      <div className="text-2xl font-bold"><Link to="/"> Autocoderz </Link></div>
 
       <NavigationMenu>
         <NavigationMenuList>
