@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { createUserSchema } from "./user.js";
+import { baseUserSchema } from "./user.js";
 
-export const loginUserSchema = createUserSchema.pick({
+export const loginUserSchema = baseUserSchema.pick({
     email: true,
     password: true,
 });

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const createUserSchema = z.object({
+export const baseUserSchema = z.object({
     email: z.email({ message: "Please enter a valid email address" }),
     firstName: z
         .string()
@@ -21,17 +21,33 @@ export const createUserSchema = z.object({
         .max(64, { message: "Password must be at most 64 characters" }),
 });
 
-export type CreateUser = z.infer<typeof createUserSchema>;
+export type BaseUser = z.infer<typeof baseUserSchema>;
 
-export const safeUserSchema = createUserSchema
-    .pick({
-        email: true,
-        firstName: true,
-        middleName: true,
-        lastName: true,
+export const safeUserSchema = baseUserSchema
+    .omit({
+        password: true,
     })
     .extend({
         id: z.string(),
     });
 
 export type SafeUser = z.infer<typeof safeUserSchema>;
+
+export const createUserSchema = baseUserSchema
+    .extend({
+        confirmPassword: z
+            .string()
+            .min(6, { message: "Password must be at least 6 characters" })
+            .max(64, { message: "Password must be at most 64 characters" }),
+    })
+    .superRefine((data, ctx) => {
+        if (data.password !== data.confirmPassword) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["confirmPassword"],
+                message: "Passwords do not match",
+            });
+        }
+    });
+
+export type CreateUser = z.infer<typeof createUserSchema>;
