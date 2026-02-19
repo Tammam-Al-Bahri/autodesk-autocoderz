@@ -17,6 +17,8 @@ app.use(
 app.use(express.json());
 app.use(
     session({
+        store: undefined,
+        name: "sid",
         secret: process.env.SESSION_SECRET ?? "",
         saveUninitialized: false,
         resave: false,
