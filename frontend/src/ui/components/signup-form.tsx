@@ -1,31 +1,57 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { SkeletonForm } from "./skeleton-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-// import { Controller, useForm } from "react-hook-form";
+import { createUserSchema as formSchema, type CreateUser as FormFields } from "@autocoderz/shared";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
+import { baseApiUrl } from "@/lib/utils";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
 
-export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-    const [loading, setLoading] = useState(true);
+export function SignupForm() {
+    const form = useForm<FormFields>({ resolver: zodResolver(formSchema) });
+    const { handleSubmit } = form;
+    const [isUpdating, setIsUpdating] = useState(false);
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 500);
-    }, []);
+    const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
+        try {
+            const method = "POST";
 
-    if (loading) {
+            setIsUpdating(true);
+            const response = await fetch(`${baseApiUrl}/api/users`, {
+                method: method,
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" },
+            });
+            setIsUpdating(false);
+            if (response.ok) {
+                const json = await response.json();
+                toast.success("SUCCESS MESSAGE", {
+                    description: JSON.stringify(json, null, 2),
+                });
+                navigate("/", { replace: false });
+            } else {
+                toast.error("ERROR MESSAGE FROM API");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    if (isUpdating) {
         return (
-            <Card className="p-6 w-full" {...props}>
+            <Card className="p-6 w-full">
                 <SkeletonForm />
             </Card>
         );
     }
 
     return (
-        <Card {...props}>
+        <Card>
             <CardHeader>
                 <CardTitle>Create an account</CardTitle>
                 <CardDescription>
@@ -33,46 +59,125 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <form>
-                    <FieldGroup>
-                        <Field>
-                            <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                            <Input id="name" type="text" placeholder="John Doe" required />
-                        </Field>
-                        <Field>
-                            <FieldLabel htmlFor="email">Email</FieldLabel>
-                            <Input id="email" type="email" placeholder="m@example.com" required />
-                            <FieldDescription>
-                                We&apos;ll use this to contact you. We will not share your email
-                                with anyone else.
-                            </FieldDescription>
-                        </Field>
-                        <Field>
-                            <FieldLabel htmlFor="password">Password</FieldLabel>
-                            <Input id="password" type="password" required />
-                            <FieldDescription>Must be at least 8 characters long.</FieldDescription>
-                        </Field>
-                        <Field>
-                            <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-                            <Input id="confirm-password" type="password" required />
-                            <FieldDescription>Please confirm your password.</FieldDescription>
-                        </Field>
-                        <FieldGroup>
+                <Form {...form}>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="firstName"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>First Name</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="middleName"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Middle Name</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            value={field.value ?? ""}
+                                            onChange={(e) => field.onChange(e.target.value || null)}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="lastName"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Last Name</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button>Create Account</Button>
+                        {/* <FieldGroup>
                             <Field>
-                                <Button type="submit">Create Account</Button>
-                                <FieldDescription className="px-6 text-center">
-                                    Already have an account?
-                                    <Link
-                                        to="/login"
-                                        className="underline underline-offset-4 hover:text-primary"
-                                    >
-                                        Sign in
-                                    </Link>
+                                <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                                <Input id="name" type="text" placeholder="John Doe" required />
+                            </Field>
+                            <Field>
+                                <FieldLabel htmlFor="email">Email</FieldLabel>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="m@example.com"
+                                    required
+                                />
+                                <FieldDescription>
+                                    We&apos;ll use this to contact you. We will not share your email
+                                    with anyone else.
                                 </FieldDescription>
                             </Field>
-                        </FieldGroup>
-                    </FieldGroup>
-                </form>
+                            <Field>
+                                <FieldLabel htmlFor="password">Password</FieldLabel>
+                                <Input id="password" type="password" required />
+                                <FieldDescription>
+                                    Must be at least 8 characters long.
+                                </FieldDescription>
+                            </Field>
+                            <Field>
+                                <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+                                <Input id="confirm-password" type="password" required />
+                                <FieldDescription>Please confirm your password.</FieldDescription>
+                            </Field>
+                            <FieldGroup>
+                                <Field>
+                                    <Button type="submit">Create Account</Button>
+                                    <FieldDescription className="px-6 text-center">
+                                        Already have an account?
+                                        <Link
+                                            to="/login"
+                                            className="underline underline-offset-4 hover:text-primary"
+                                        >
+                                            Sign in
+                                        </Link>
+                                    </FieldDescription>
+                                </Field>
+                            </FieldGroup>
+                        </FieldGroup> */}
+                    </form>
+                </Form>
             </CardContent>
         </Card>
     );
