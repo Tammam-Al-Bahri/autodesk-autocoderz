@@ -24,6 +24,7 @@ export function SignupForm() {
             setIsUpdating(true);
             const response = await fetch(`${baseApiUrl}/api/users`, {
                 method: method,
+                credentials: "include",
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" },
             });
@@ -68,7 +69,11 @@ export function SignupForm() {
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input
+                                            type="text"
+                                            placeholder="your@email.com"
+                                            {...field}
+                                        />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -81,7 +86,7 @@ export function SignupForm() {
                                 <FormItem>
                                     <FormLabel>First Name</FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input type="text" placeholder="John" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -95,6 +100,8 @@ export function SignupForm() {
                                     <FormLabel>Middle Name</FormLabel>
                                     <FormControl>
                                         <Input
+                                            type="text"
+                                            placeholder="Adam"
                                             {...field}
                                             value={field.value ?? ""}
                                             onChange={(e) => field.onChange(e.target.value || null)}
@@ -111,7 +118,7 @@ export function SignupForm() {
                                 <FormItem>
                                     <FormLabel>Last Name</FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input type="text" placeholder="Doe" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -124,13 +131,58 @@ export function SignupForm() {
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input type="password" placeholder="" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <Button>Create Account</Button>
+                        {/* <FieldGroup>
+                            <Field>
+                                <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                                <Input id="name" type="text" placeholder="John Doe" required />
+                            </Field>
+                            <Field>
+                                <FieldLabel htmlFor="email">Email</FieldLabel>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="m@example.com"
+                                    required
+                                />
+                                <FieldDescription>
+                                    We&apos;ll use this to contact you. We will not share your email
+                                    with anyone else.
+                                </FieldDescription>
+                            </Field>
+                            <Field>
+                                <FieldLabel htmlFor="password">Password</FieldLabel>
+                                <Input id="password" type="password" required />
+                                <FieldDescription>
+                                    Must be at least 8 characters long.
+                                </FieldDescription>
+                            </Field>
+                            <Field>
+                                <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+                                <Input id="confirm-password" type="password" required />
+                                <FieldDescription>Please confirm your password.</FieldDescription>
+                            </Field>
+                            <FieldGroup>
+                                <Field>
+                                    <Button type="submit">Create Account</Button>
+                                    <FieldDescription className="px-6 text-center">
+                                        Already have an account?
+                                        <Link
+                                            to="/login"
+                                            className="underline underline-offset-4 hover:text-primary"
+                                        >
+                                            Sign in
+                                        </Link>
+                                    </FieldDescription>
+                                </Field>
+                            </FieldGroup>
+                        </FieldGroup> */}
                     </form>
                 </Form>
             </CardContent>

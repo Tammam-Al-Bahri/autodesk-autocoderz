@@ -3,6 +3,10 @@ import * as cors from "cors";
 import usersRouter from "./routes/users";
 import * as session from "express-session";
 
+interface SessionData {
+    userId?: string;
+}
+
 const PORT = parseInt(process.env.PORT ?? "3000");
 const COOKIE_MAX_AGE_DAYS = parseInt(process.env.COOKIE_MAX_AGE_DAYS ?? "7");
 
@@ -11,22 +15,29 @@ const app = express();
 app.use(
     cors({
         origin: true,
-        credentials: false,
+        credentials: true,
     }),
 );
+
 app.use(express.json());
 app.use(
     session({
-        store: undefined,
+        // store: ,
         name: "sid",
         secret: process.env.SESSION_SECRET ?? "",
         saveUninitialized: false,
         resave: false,
         cookie: {
             maxAge: COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
+            secure: false,
+            httpOnly: true,
+            sameSite: "lax",
         },
     }),
 );
+
+app.use("/api/users", usersRouter);
+
 app.use(
     (
         error: unknown,
@@ -38,8 +49,6 @@ app.use(
         response.status(500).json({ error: "Internal server error" });
     },
 );
-
-app.use("/api/users", usersRouter);
 
 app.listen(PORT, () => {
     console.log(`Running on port ${PORT}`);

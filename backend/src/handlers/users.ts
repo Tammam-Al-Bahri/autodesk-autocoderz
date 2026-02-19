@@ -10,12 +10,10 @@ export async function getUsers(request: Request, response: Response) {
 export async function createUser(request: Request<{}, {}, CreateUser>, response: Response) {
     const data = request.body;
 
-    console.log(request.session);
-    console.log(request.session.id);
-
     try {
         const user = await createUserDB(data);
-        response.status(201).json(user);
+        request.session.userId = user.id;
+        response.status(201).json({ success: true });
         return;
     } catch (error) {
         response.status(500).json(error);
