@@ -21,3 +21,21 @@ export async function createUser(data: CreateUser) {
         throw handlePrismaError(error);
     }
 }
+
+export async function getUserByEmail(email: string) {
+    try {
+        const user = prisma.user.findUnique({ where: { email } });
+        return user;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}
+
+export async function getUserById(id: string) {
+    try {
+        const user = prisma.user.findUnique({ where: { id } });
+        return user;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}

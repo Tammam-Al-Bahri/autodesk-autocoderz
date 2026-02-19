@@ -22,3 +22,16 @@ export const createUserSchema = z.object({
 });
 
 export type CreateUser = z.infer<typeof createUserSchema>;
+
+export const safeUserSchema = createUserSchema
+    .pick({
+        email: true,
+        firstName: true,
+        middleName: true,
+        lastName: true,
+    })
+    .extend({
+        id: z.string(),
+    });
+
+export type SafeUser = z.infer<typeof safeUserSchema>;

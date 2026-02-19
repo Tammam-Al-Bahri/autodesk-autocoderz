@@ -1,11 +1,8 @@
 import * as express from "express";
 import * as cors from "cors";
 import usersRouter from "./routes/users";
+import authRouter from "./routes/auth";
 import * as session from "express-session";
-
-interface SessionData {
-    userId?: string;
-}
 
 const PORT = parseInt(process.env.PORT ?? "3000");
 const COOKIE_MAX_AGE_DAYS = parseInt(process.env.COOKIE_MAX_AGE_DAYS ?? "7");
@@ -37,6 +34,7 @@ app.use(
 );
 
 app.use("/api/users", usersRouter);
+app.use("/api/auth", authRouter);
 
 app.use(
     (

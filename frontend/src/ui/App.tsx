@@ -7,12 +7,12 @@ import ManagerSidebar from "./components/ManagerSidebar";
 import ApplicantNavbar from "./components/ApplicantNavbar";
 import ReceptionistNavbar from "./components/ReceptionistNavbar";
 import ReceptionistSidebar from "./components/ReceptionistSidebar";
-import StaffNavbar from "./components/StaffNavbar"; 
+import StaffNavbar from "./components/StaffNavbar";
 
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
 import About from "./pages/About";
-import Home from "./pages/Home"; 
+import Home from "./pages/Home";
 import Apply from "./pages/Apply";
 
 import Dashboard from "./pages/Dashboard";
@@ -23,9 +23,11 @@ import GuestList from "./pages/Guestlist";
 import WalkIn from "./pages/Walkin";
 import Receptionist from "./pages/Receptionist";
 import UploadGuide from "./pages/Guide";
-import StaffTasks from "./pages/StaffTasks"; 
+import StaffTasks from "./pages/StaffTasks";
 import StaffGuide from "./pages/Staffguide";
 import GuestPortal from "./pages/GuestPortal";
+import { useAuth } from "./context/AuthContext";
+import { Loader } from "lucide-react";
 
 function PublicLayout() {
     return (
@@ -91,7 +93,7 @@ function StaffLayout() {
 function GuestLayout() {
     return (
         <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
-            <Navbar /> 
+            <Navbar />
             <div className="flex-1">
                 <Outlet />
             </div>
@@ -100,16 +102,27 @@ function GuestLayout() {
 }
 
 function App() {
+    const { user, loading } = useAuth();
+
+    console.log(user);
+
+    if (loading) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center h-screen">
+                <Loader className="animate-spin" />
+            </div>
+        );
+    }
+
     return (
         <HashRouter>
             <Routes>
-                
                 <Route element={<PublicLayout />}>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
                     <Route path="/about" element={<About />} />
-                    
+
                     {pages.map(({ path, component: Component }) => (
                         <Route key={path} path={path} element={<Component />} />
                     ))}
@@ -140,7 +153,6 @@ function App() {
                 <Route element={<GuestLayout />}>
                     <Route path="/guestportal" element={<GuestPortal />} />
                 </Route>
-
             </Routes>
         </HashRouter>
     );
