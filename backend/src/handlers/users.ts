@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { CreateUser } from "../schemas/user";
+import { CreateUser } from "@autocoderz/shared";
 import { createUser as createUserDB } from "../db/user";
 
 export async function getUsers(request: Request, response: Response) {
@@ -12,7 +12,8 @@ export async function createUser(request: Request<{}, {}, CreateUser>, response:
 
     try {
         const user = await createUserDB(data);
-        response.status(201).json(user);
+        request.session.userId = user.id;
+        response.status(201).json({ success: true });
         return;
     } catch (error) {
         response.status(500).json(error);

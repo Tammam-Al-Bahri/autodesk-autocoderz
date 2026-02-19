@@ -11,13 +11,17 @@ export function handlePrismaError(error: unknown) {
                 "Duplicate entry detected";
 
             return {
-                title: kind,
-                description: originalMessage,
+                error: {
+                    title: "Database error",
+                    description: "An error occurred",
+                },
             };
         }
     }
     return {
-        title: "Database error",
-        description: "An error occurred",
+        error: {
+            title: "Database error",
+            description: "An error occurred",
+        },
     };
 }
