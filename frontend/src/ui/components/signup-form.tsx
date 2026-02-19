@@ -33,7 +33,7 @@ export function SignupForm() {
                 toast.success("SUCCESS MESSAGE", {
                     description: JSON.stringify(json, null, 2),
                 });
-                navigate("/", { replace: false });
+                navigate("/", { replace: true });
             } else {
                 toast.error("ERROR MESSAGE FROM API");
             }
