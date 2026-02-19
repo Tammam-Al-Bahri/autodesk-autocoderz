@@ -45,6 +45,18 @@ export default function ManagerNavbar() {
             </NavigationMenuLink>
           </NavigationMenuItem>
           
+          
+          <NavigationMenuItem>
+            <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+              <Link to="/staff">Staff</Link>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          
+
+          
+
+
+
         </NavigationMenuList>
       </NavigationMenu>
 

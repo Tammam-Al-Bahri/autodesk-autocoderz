@@ -31,6 +31,22 @@ export default function ManagerSidebar() {
                     <span className="font-bold">Maintenance Tickets</span>
                 </Link>
 
+
+
+
+                <Link
+                     to="/staff"
+                     className="flex items-center gap-3 px-3 py-2 rounded-md text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                 <Wrench size={20} />
+                <span className="font-bold">Staff Management</span>
+  
+                  </Link>
+             
+
+
+
+
             </div>
             
         </aside>
