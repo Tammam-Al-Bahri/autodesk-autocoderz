@@ -1,7 +1,7 @@
 import { handlePrismaError } from "../lib/handlePrismaError";
 import { hashPassword } from "../lib/hashPassword";
 import { prisma } from "../lib/prisma";
-import { CreateUser } from "../schemas/user";
+import { CreateUser } from "@autocoderz/shared";
 
 export async function createUser(data: CreateUser) {
     try {

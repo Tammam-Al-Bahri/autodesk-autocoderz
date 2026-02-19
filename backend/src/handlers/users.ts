@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { CreateUser } from "../schemas/user";
+import { CreateUser } from "@autocoderz/shared";
 import { createUser as createUserDB } from "../db/user";
 
 export async function getUsers(request: Request, response: Response) {
