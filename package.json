@@ -6,7 +6,8 @@
         "dev:frontend": "npm --prefix frontend run dev",
         "dev:shared": "npm --prefix packages/shared run dev",
         "dev": "concurrently -k -n BACKEND,FRONTEND,SHARED -c blue,green,yellow \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:shared\"",
-        "db": "npm --prefix backend run db"
+        "db": "npm --prefix backend run db",
+        "install": "npm  --prefix packages/shared i && npm --prefix packages/shared run build && concurrently -n BACKEND,FRONTEND -c blue,green \"npm --prefix backend i\" \"npm --prefix frontend i\""
     },
     "devDependencies": {
         "concurrently": "^9.2.1"
