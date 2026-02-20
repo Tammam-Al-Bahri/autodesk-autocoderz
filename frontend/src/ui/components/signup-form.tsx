@@ -10,12 +10,14 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import { baseApiUrl } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
+import { useAuth } from "@/context/AuthContext";
 
 export function SignupForm() {
     const form = useForm<FormFields>({ resolver: zodResolver(formSchema) });
     const { handleSubmit } = form;
     const [isUpdating, setIsUpdating] = useState(false);
     const navigate = useNavigate();
+    const { refreshUser } = useAuth();
 
     const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
         try {
@@ -34,6 +36,7 @@ export function SignupForm() {
                 toast.success("SUCCESS MESSAGE", {
                     description: JSON.stringify(json, null, 2),
                 });
+                await refreshUser();
                 navigate("/", { replace: true });
             } else {
                 toast.error("ERROR MESSAGE FROM API");

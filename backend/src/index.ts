@@ -3,6 +3,8 @@ import * as cors from "cors";
 import usersRouter from "./routes/users";
 import authRouter from "./routes/auth";
 import * as session from "express-session";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import { prisma } from "./lib/prisma";
 
 const PORT = parseInt(process.env.PORT ?? "3000");
 const COOKIE_MAX_AGE_DAYS = parseInt(process.env.COOKIE_MAX_AGE_DAYS ?? "7");
@@ -19,7 +21,11 @@ app.use(
 app.use(express.json());
 app.use(
     session({
-        // store: ,
+        store: new PrismaSessionStore(prisma, {
+            checkPeriod: 2 * 60 * 1000,
+            dbRecordIdIsSessionId: true,
+            dbRecordIdFunction: undefined,
+        }),
         name: "sid",
         secret: process.env.SESSION_SECRET ?? "",
         saveUninitialized: false,

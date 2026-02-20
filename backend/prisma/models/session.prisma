@@ -1,14 +1,10 @@
 model Session {
-  id           String   @id @default(cuid())
-  sid          String   @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  lastActiveAt DateTime
-  expiresAt    DateTime
-  userAgent    String?
-  ipAddress    String?
-
-  @@map("session_")
+  id        String   @id @default(cuid())
+  sid       String   @unique
+  data      String
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@index([expiresAt])
 }

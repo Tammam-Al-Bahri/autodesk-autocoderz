@@ -14,18 +14,20 @@ export default function Test() {
         try {
             const method = "GET";
 
-            const response = await fetch(`${baseApiUrl}/api/auth/test`, {
+            const response = await fetch(`${baseApiUrl}/api/auth/me`, {
                 method: method,
                 credentials: "include",
             });
 
+            const json = await response.json();
             if (response.ok) {
-                const json = await response.json();
                 toast.success("SUCCESS MESSAGE", {
                     description: JSON.stringify(json, null, 2),
                 });
             } else {
-                toast.error("ERROR MESSAGE FROM API");
+                toast.error("ERROR MESSAGE FROM API", {
+                    description: JSON.stringify(json, null, 2),
+                });
             }
         } catch (error) {
             console.log(error);
@@ -58,7 +60,7 @@ export default function Test() {
                     <LogoutButton />
                 </>
             )}
-            <Button onClick={onSubmit}>This needs a user to be logged in</Button>
+            <Button onClick={onSubmit}>Test</Button>
         </div>
     );
 }
