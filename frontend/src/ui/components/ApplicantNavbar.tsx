@@ -15,7 +15,7 @@ export default function ApplicantNavbar() {
     <nav className="h-16 border-b-2 flex items-center justify-between px-4">
       
       <div className="text-2xl font-bold flex items-center gap-2">
-        Autocoderz <span className="text-sm font-normal text-slate-500 border-l-2 pl-2">Applicant Portal</span>
+        <Link to="/"> Autocoderz </Link> <span className="text-sm font-normal text-slate-500 border-l-2 pl-2">Applicant Portal</span>
       </div>
 
       <NavigationMenu>
