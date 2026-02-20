@@ -5,6 +5,7 @@ import authRouter from "./routes/auth";
 import * as session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { prisma } from "./lib/prisma";
+import { authRoutes, usersRoutes } from "@autocoderz/shared";
 
 const PORT = parseInt(process.env.PORT ?? "3000");
 const COOKIE_MAX_AGE_DAYS = parseInt(process.env.COOKIE_MAX_AGE_DAYS ?? "7");
@@ -39,8 +40,8 @@ app.use(
     }),
 );
 
-app.use("/api/users", usersRouter);
-app.use("/api/auth", authRouter);
+app.use(usersRoutes.base, usersRouter);
+app.use(authRoutes.base, authRouter);
 
 app.use(
     (

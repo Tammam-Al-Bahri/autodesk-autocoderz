@@ -4,7 +4,11 @@ import { useState } from "react";
 import { SkeletonForm } from "./skeleton-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createUserSchema as formSchema, type CreateUser as FormFields } from "@autocoderz/shared";
+import {
+    createUserSchema as formSchema,
+    usersRoutes,
+    type CreateUser as FormFields,
+} from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,12 +28,15 @@ export function SignupForm() {
             const method = "POST";
 
             setIsUpdating(true);
-            const response = await fetch(`${baseApiUrl}/api/users`, {
-                method: method,
-                credentials: "include",
-                body: JSON.stringify(data),
-                headers: { "Content-Type": "application/json" },
-            });
+            const response = await fetch(
+                `${baseApiUrl}${usersRoutes.base}${usersRoutes.createUser}`,
+                {
+                    method: method,
+                    credentials: "include",
+                    body: JSON.stringify(data),
+                    headers: { "Content-Type": "application/json" },
+                },
+            );
             setIsUpdating(false);
             if (response.ok) {
                 const json = await response.json();
