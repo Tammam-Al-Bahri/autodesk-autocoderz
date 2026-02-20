@@ -67,24 +67,3 @@ export async function me(request: Request, response: Response, next: NextFunctio
         next(error);
     }
 }
-
-export async function test(request: Request, response: Response, next: NextFunction) {
-    try {
-        const userId = request.session.userId;
-        if (!userId) {
-            response.status(401).json({ error: "Not logged in" });
-            return;
-        }
-
-        const test = await prisma.test.create({ data: { ownerId: userId } });
-
-        if (!test) {
-            response.status(500).json({ error: "Test not created" });
-            return;
-        }
-        response.status(200).json({ test });
-        return;
-    } catch (error) {
-        next(error);
-    }
-}
