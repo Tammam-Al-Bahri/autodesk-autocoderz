@@ -39,3 +39,7 @@ export async function getUserById(id: string) {
         throw handlePrismaError(error);
     }
 }
+
+export async function userExists(id: string) {
+    return !!prisma.user.findFirst({ where: { id } });
+}

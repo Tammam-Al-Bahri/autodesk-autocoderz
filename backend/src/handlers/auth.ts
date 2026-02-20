@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express-serve-static-core";
 import { loginUser } from "../lib/loginUser";
 import { loginUserSchema, safeUserSchema } from "@autocoderz/shared";
 import { getUserById } from "../db/user";
+import { prisma } from "../lib/prisma";
 
 export async function login(request: Request, response: Response, next: NextFunction) {
     try {
@@ -43,7 +44,8 @@ export async function logout(request: Request, response: Response, next: NextFun
 
 export async function me(request: Request, response: Response, next: NextFunction) {
     try {
-        const userId = request.session.id;
+        const userId = request.session.userId;
+        console.log(userId);
         if (!userId) {
             response.status(401).json({ error: "Not logged in" });
             return;
@@ -54,12 +56,33 @@ export async function me(request: Request, response: Response, next: NextFunctio
             response.status(404).json({ error: "User not found" });
             return;
         }
-        const safeUser = safeUserSchema.safeParse(request.user);
+        const safeUser = safeUserSchema.safeParse(user);
         if (safeUser.success) {
             response.status(200).json({ user: safeUser.data });
             return;
         }
         response.status(500).json({ error: "User data error" });
+        return;
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function test(request: Request, response: Response, next: NextFunction) {
+    try {
+        const userId = request.session.userId;
+        if (!userId) {
+            response.status(401).json({ error: "Not logged in" });
+            return;
+        }
+
+        const test = await prisma.test.create({ data: { ownerId: userId } });
+
+        if (!test) {
+            response.status(500).json({ error: "Test not created" });
+            return;
+        }
+        response.status(200).json({ test });
         return;
     } catch (error) {
         next(error);
