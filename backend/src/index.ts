@@ -2,6 +2,7 @@ import * as express from "express";
 import * as cors from "cors";
 import usersRouter from "./routes/users";
 import authRouter from "./routes/auth";
+import autodeskRouter from "./routes/autodesk";
 import * as session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { prisma } from "./lib/prisma";
@@ -42,6 +43,7 @@ app.use(
 
 app.use(usersRoutes.base, usersRouter);
 app.use(authRoutes.base, authRouter);
+app.use(authRoutes.base, autodeskRouter);
 
 app.use(
     (

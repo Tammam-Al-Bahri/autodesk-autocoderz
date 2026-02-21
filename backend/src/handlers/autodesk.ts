@@ -1,0 +1,36 @@
+import { Request, Response, NextFunction } from "express";
+
+const BASIC_AUTH = process.env.APS_BASIC_AUTH;
+
+if (!BASIC_AUTH) {
+    throw new Error("APS_BASIC_AUTH is not defined");
+}
+
+export async function getAutodeskToken(request: Request, response: Response, next: NextFunction) {
+    try {
+        const params = new URLSearchParams();
+        params.append("grant_type", "client_credentials");
+        params.append("scope", "data:read data:write data:create bucket:create bucket:read");
+
+        const autodeskResponse = await fetch(
+            "https://developer.api.autodesk.com/authentication/v2/token",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    Authorization: `Basic ${BASIC_AUTH}`,
+                },
+                body: params,
+            },
+        );
+
+        if (!autodeskResponse.ok) {
+            throw new Error(`Autodesk auth failed: ${autodeskResponse.status}`);
+        }
+
+        const data = await autodeskResponse.json();
+        response.json(data);
+    } catch (error) {
+        next(error);
+    }
+}
