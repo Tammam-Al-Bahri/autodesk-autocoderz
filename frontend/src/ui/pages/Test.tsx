@@ -5,21 +5,29 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { baseApiUrl } from "@/lib/utils";
 import { toast } from "sonner";
+import { authRoutes } from "@autocoderz/shared";
+import AutodeskViewer from "@/components/AutodeskViewer";
+import { useState } from "react";
 
 export default function Test() {
+    const SNOWDON_URN =
+        "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6YXV0b2NvZGVyel9wZXJtYW5lbnRfc3RvcmFnZS9Tbm93ZG9uX1Rvd2Vyc19GaW5hbC5ydnQ";
+
     const { user } = useAuth();
+    const [autodeskToken, setAutodeskToken] = useState("");
 
     const onSubmit = async () => {
         try {
             const method = "GET";
 
-            const response = await fetch(`${baseApiUrl}/api/auth/me`, {
+            const response = await fetch(`${baseApiUrl}${authRoutes.base}/autodesk`, {
                 method: method,
                 credentials: "include",
             });
 
             const json = await response.json();
             if (response.ok) {
+                setAutodeskToken(json.access_token);
                 toast.success("SUCCESS MESSAGE", {
                     description: JSON.stringify(json, null, 2),
                 });
@@ -51,7 +59,8 @@ export default function Test() {
                     <LogoutButton />
                 </>
             )}
-            <Button onClick={onSubmit}>Test</Button>
+            <Button onClick={onSubmit}>Autodesk Viewer</Button>
+            {autodeskToken && <AutodeskViewer urn={SNOWDON_URN} token={autodeskToken} />}
         </div>
     );
 }
