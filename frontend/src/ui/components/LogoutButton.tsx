@@ -3,5 +3,9 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function LogoutButton() {
     const { logout } = useAuth();
-    return <Button onClick={logout}>Logout</Button>;
+    return (
+        <Button variant="outline" onClick={logout}>
+            Logout
+        </Button>
+    );
 }
