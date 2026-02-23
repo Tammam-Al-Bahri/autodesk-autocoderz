@@ -2,5 +2,5 @@
     "watch": ["src"],
     "ext": "ts",
     "ignore": ["node_modules", "dist", "src/generated"],
-    "exec": "npm run build && npm install --prefix ../../backend && npm install --prefix ../../frontend"
+    "exec": "npm run build"
 }

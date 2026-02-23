@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { SafeUser } from "@autocoderz/shared";
-import { loginUserSchema } from "@autocoderz/shared";
+import { authRoutes, loginUserSchema } from "@autocoderz/shared";
 import { baseApiUrl } from "@/lib/utils";
 
 interface AuthContextType {
@@ -8,6 +8,7 @@ interface AuthContextType {
     loading: boolean;
     login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => Promise<void>;
+    refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const fetchUser = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${baseApiUrl}/api/auth/me`, {
+            const res = await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.me}`, {
                 method: "GET",
                 credentials: "include",
             });
@@ -28,8 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 return null;
             }
             const data = await res.json();
-            setUser(data.safeUser ?? null);
-            return data.safeUser ?? null;
+            setUser(data.user ?? null);
+            return data.user ?? null;
         } finally {
             setLoading(false);
         }
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = async (email: string, password: string) => {
         try {
             loginUserSchema.parse({ email, password });
-            const res = await fetch(`${baseApiUrl}/api/auth/login`, {
+            const res = await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.login}`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = async () => {
         try {
-            await fetch(`${baseApiUrl}/api/auth/logout`, {
+            await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.logout}`, {
                 method: "POST",
                 credentials: "include",
             });
@@ -73,8 +74,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const refreshUser = async () => {
+        await fetchUser();
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
             {children}
         </AuthContext.Provider>
     );

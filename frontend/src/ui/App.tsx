@@ -27,7 +27,7 @@ import StaffTasks from "./pages/StaffTasks";
 import StaffGuide from "./pages/Staffguide";
 import GuestPortal from "./pages/GuestPortal";
 import { useAuth } from "./context/AuthContext";
-import { Loader } from "lucide-react";
+import LoadingPage from "./components/LoadingPage";
 
 function PublicLayout() {
     return (
@@ -106,13 +106,7 @@ function App() {
 
     console.log(user);
 
-    if (loading) {
-        return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center h-screen">
-                <Loader className="animate-spin" />
-            </div>
-        );
-    }
+    if (loading) return <LoadingPage />;
 
     return (
         <HashRouter>

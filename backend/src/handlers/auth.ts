@@ -43,7 +43,7 @@ export async function logout(request: Request, response: Response, next: NextFun
 
 export async function me(request: Request, response: Response, next: NextFunction) {
     try {
-        const userId = request.session.id;
+        const userId = request.session.userId;
         if (!userId) {
             response.status(401).json({ error: "Not logged in" });
             return;
@@ -54,7 +54,7 @@ export async function me(request: Request, response: Response, next: NextFunctio
             response.status(404).json({ error: "User not found" });
             return;
         }
-        const safeUser = safeUserSchema.safeParse(request.user);
+        const safeUser = safeUserSchema.safeParse(user);
         if (safeUser.success) {
             response.status(200).json({ user: safeUser.data });
             return;
