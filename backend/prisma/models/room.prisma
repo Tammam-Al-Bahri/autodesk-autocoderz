@@ -1,0 +1,20 @@
+model Room {
+  id String @id @default(cuid())
+
+  building   Building @relation(fields: [buildingId], references: [id])
+  buildingId String
+
+  number String
+  type   RoomType
+  status RoomStatus
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+}
+
+enum RoomStatus {
+  OCCUPIED
+  AVAILABLE
+}

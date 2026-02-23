@@ -7,4 +7,6 @@ model User {
   firstName  String
   middleName String?
   lastName   String
+
+  buildingGroups BuildingGroup[]
 }

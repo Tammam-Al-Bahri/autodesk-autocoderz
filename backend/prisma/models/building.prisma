@@ -1,0 +1,21 @@
+model Building {
+  id String @id @default(cuid())
+
+  name    String
+  address String
+  urn     String?
+
+  status BuildingStatus
+  type   BuildingType
+
+  rooms Room[]
+}
+
+enum BuildingStatus {
+  PENDING
+  ACTIVE
+}
+
+enum BuildingType {
+  HOTEL
+}
