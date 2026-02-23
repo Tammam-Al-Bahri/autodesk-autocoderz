@@ -36,15 +36,15 @@ export function SignupForm() {
                 headers: { "Content-Type": "application/json" },
             });
             setIsUpdating(false);
+            const resData = await response.json();
             if (response.ok) {
-                const json = await response.json();
                 toast.success("SUCCESS MESSAGE", {
-                    description: JSON.stringify(json, null, 2),
+                    description: JSON.stringify(resData, null, 2),
                 });
                 await refreshUser();
                 navigate("/", { replace: true });
             } else {
-                toast.error("ERROR MESSAGE FROM API");
+                toast.error("ERROR MESSAGE FROM API", resData.error);
             }
         } catch (error) {
             console.log(error);
