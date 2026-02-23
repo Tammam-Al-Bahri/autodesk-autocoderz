@@ -4,3 +4,4 @@ export * from "./schemas/auth.js";
 
 export * from "./routes/auth.js";
 export * from "./routes/users.js";
+export * from "./routes/aps.js";

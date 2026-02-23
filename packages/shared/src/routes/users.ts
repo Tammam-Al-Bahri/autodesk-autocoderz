@@ -1,5 +1,6 @@
+export const userBase = "/api/users";
+
 export const usersRoutes = {
-    base: "/api/users",
     getUsers: "/",
     createUser: "/",
 } as const;

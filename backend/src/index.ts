@@ -2,11 +2,11 @@ import * as express from "express";
 import * as cors from "cors";
 import usersRouter from "./routes/users";
 import authRouter from "./routes/auth";
-import autodeskRouter from "./routes/autodesk";
+import apsRouter from "./routes/aps";
 import * as session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { prisma } from "./lib/prisma";
-import { authRoutes, usersRoutes } from "@autocoderz/shared";
+import { apsBase, authBase, authRoutes, userBase, usersRoutes } from "@autocoderz/shared";
 
 const PORT = parseInt(process.env.PORT ?? "3000");
 const COOKIE_MAX_AGE_DAYS = parseInt(process.env.COOKIE_MAX_AGE_DAYS ?? "7");
@@ -41,9 +41,9 @@ app.use(
     }),
 );
 
-app.use(usersRoutes.base, usersRouter);
-app.use(authRoutes.base, authRouter);
-app.use(authRoutes.base, autodeskRouter);
+app.use(userBase, usersRouter);
+app.use(authBase, authRouter);
+app.use(apsBase, apsRouter);
 
 app.use(
     (

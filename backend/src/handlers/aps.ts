@@ -6,7 +6,7 @@ if (!BASIC_AUTH) {
     throw new Error("APS_BASIC_AUTH is not defined");
 }
 
-export async function getAutodeskToken(request: Request, response: Response, next: NextFunction) {
+export async function getApsViewerToken(request: Request, response: Response, next: NextFunction) {
     try {
         const params = new URLSearchParams();
         params.append("grant_type", "client_credentials");

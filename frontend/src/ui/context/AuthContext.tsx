@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { SafeUser } from "@autocoderz/shared";
-import { authRoutes, loginUserSchema } from "@autocoderz/shared";
+import { authBase, authRoutes, loginUserSchema } from "@autocoderz/shared";
 import { baseApiUrl } from "@/lib/utils";
 
 interface AuthContextType {
@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const fetchUser = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.me}`, {
+            const res = await fetch(`${baseApiUrl}${authBase}${authRoutes.me}`, {
                 method: "GET",
                 credentials: "include",
             });
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = async (email: string, password: string) => {
         try {
             loginUserSchema.parse({ email, password });
-            const res = await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.login}`, {
+            const res = await fetch(`${baseApiUrl}${authBase}${authRoutes.login}`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = async () => {
         try {
-            await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.logout}`, {
+            await fetch(`${baseApiUrl}${authBase}${authRoutes.logout}`, {
                 method: "POST",
                 credentials: "include",
             });
