@@ -2,9 +2,9 @@ model Session {
   id        String   @id @default(cuid())
   sid       String   @unique
   data      String
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([expiresAt])
 }
