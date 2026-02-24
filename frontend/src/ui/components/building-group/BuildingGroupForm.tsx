@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { SkeletonForm } from "./skeleton-form";
+import { SkeletonForm } from "../skeleton-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,15 +13,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import { baseApiUrl } from "@/lib/utils";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
-import { useAuth } from "@/context/AuthContext";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 
 export function BuildingGroupForm() {
     const form = useForm<FormFields>({ resolver: zodResolver(formSchema) });
     const { handleSubmit } = form;
     const [isUpdating, setIsUpdating] = useState(false);
-    const navigate = useNavigate();
-    const { refreshUser } = useAuth();
 
     const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
         try {
@@ -32,7 +28,7 @@ export function BuildingGroupForm() {
             const response = await fetch(
                 `${baseApiUrl}${buildingGroupsBase}${buildingGroupsRoutes.root}`,
                 {
-                    method: method,
+                    method,
                     credentials: "include",
                     body: JSON.stringify(data),
                     headers: { "Content-Type": "application/json" },
@@ -41,11 +37,9 @@ export function BuildingGroupForm() {
             setIsUpdating(false);
             const resData = await response.json();
             if (response.ok) {
-                toast.success("SUCCESS MESSAGE", {
+                toast.success(`Building Group ${data.name} created`, {
                     description: JSON.stringify(resData, null, 2),
                 });
-                await refreshUser();
-                navigate("/", { replace: true });
             } else {
                 const { title, description } = resData.error;
                 toast.error(title, { description });

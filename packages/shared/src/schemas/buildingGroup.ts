@@ -12,3 +12,10 @@ export const createBuildingGroupSchema = z.object({
 });
 
 export type CreateBuildingGroup = z.infer<typeof createBuildingGroupSchema>;
+
+export const buildingGroupSchema = createBuildingGroupSchema.extend({
+    id: z.string(),
+    ownerId: z.string(),
+});
+
+export type BuildingGroup = z.infer<typeof buildingGroupSchema>;

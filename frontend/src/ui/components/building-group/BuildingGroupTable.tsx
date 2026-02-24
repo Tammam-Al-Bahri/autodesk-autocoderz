@@ -1,0 +1,49 @@
+import { columns } from "./columns";
+import { buildingGroupsBase, buildingGroupsRoutes, type BuildingGroup } from "@autocoderz/shared";
+import { DataTable } from "../ui/data-table";
+import { baseApiUrl } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { Card } from "../ui/card";
+import { SkeletonForm } from "../skeleton-form";
+import { toast } from "sonner";
+
+export default function BuildingGroupTable() {
+    const [data, setData] = useState<BuildingGroup[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const method = "GET";
+                const response = await fetch(
+                    `${baseApiUrl}${buildingGroupsBase}${buildingGroupsRoutes.root}`,
+                    {
+                        method,
+                        credentials: "include",
+                    },
+                );
+                const resData = await response.json();
+                if (response.ok) {
+                    setData(resData.buildingGroups);
+                } else {
+                    const { title, description } = resData.error;
+                    toast.error(title, { description });
+                }
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <Card className="p-6 w-full">
+                <SkeletonForm />
+            </Card>
+        );
+    }
+    return <DataTable columns={columns} data={data} />;
+}

@@ -30,7 +30,7 @@ export function SignupForm() {
 
             setIsUpdating(true);
             const response = await fetch(`${baseApiUrl}${usersBase}${usersRoutes.createUser}`, {
-                method: method,
+                method,
                 credentials: "include",
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" },

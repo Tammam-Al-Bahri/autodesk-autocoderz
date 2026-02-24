@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import { apsBase, apsRoutes } from "@autocoderz/shared";
 import AutodeskViewer from "@/components/AutodeskViewer";
 import { useState } from "react";
-import { BuildingGroupForm } from "@/components/BuildingGroupForm";
+import { BuildingGroupForm } from "@/components/building-group/BuildingGroupForm";
+import BuildingGroupTable from "@/components/building-group/BuildingGroupTable";
 
 export default function Test() {
     const BUILDING_URN =
@@ -22,7 +23,7 @@ export default function Test() {
             const method = "GET";
 
             const response = await fetch(`${baseApiUrl}${apsBase}${apsRoutes.viewerToken}`, {
-                method: method,
+                method,
                 credentials: "include",
             });
 
@@ -62,6 +63,7 @@ export default function Test() {
             <Button onClick={onSubmit}>Autodesk Viewer</Button>
             {autodeskToken && <AutodeskViewer urn={BUILDING_URN} token={autodeskToken} />}
             <BuildingGroupForm />
+            <BuildingGroupTable />
         </div>
     );
 }

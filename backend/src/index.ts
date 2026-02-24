@@ -63,14 +63,14 @@ app.use(
     ) => {
         console.error(error);
 
-    const maybeError = error as any;
+        const maybeError = error as any;
 
-    const title =
-      maybeError?.error?.title ?? "Internal Server Error";
+        const status = maybeError?.status ?? maybeError?.statusCode ?? 500;
 
-    const description =
-      maybeError?.error?.description ?? "Something went wrong.";
-        response.status(500).json({ error: { title, description } });
+        const title = maybeError?.error?.title ?? "Internal Server Error";
+
+        const description = maybeError?.error?.description ?? "Something went wrong.";
+        response.status(status).json({ error: { title, description } });
     },
 );
 

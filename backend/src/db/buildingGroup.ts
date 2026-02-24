@@ -17,3 +17,16 @@ export async function createBuildingGroup(ownerId: string, data: CreateBuildingG
         throw handlePrismaError(error);
     }
 }
+
+export async function getBuildingGroups(ownerId: string) {
+    try {
+        const buildingGroups = await prisma.buildingGroup.findMany({
+            where: {
+                ownerId,
+            },
+        });
+        return buildingGroups;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}
