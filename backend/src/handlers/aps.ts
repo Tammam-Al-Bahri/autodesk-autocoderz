@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { getUploadToken } from "../lib/apsTokenService";
 
 const BASIC_AUTH = process.env.APS_BASIC_AUTH;
 
@@ -10,7 +11,7 @@ export async function getApsViewerToken(request: Request, response: Response, ne
     try {
         const params = new URLSearchParams();
         params.append("grant_type", "client_credentials");
-        params.append("scope", "data:read data:write data:create bucket:create bucket:read");
+        params.append("scope", "viewables:read");
 
         const autodeskResponse = await fetch(
             "https://developer.api.autodesk.com/authentication/v2/token",
@@ -32,5 +33,14 @@ export async function getApsViewerToken(request: Request, response: Response, ne
         response.json(data);
     } catch (error) {
         next(error);
+    }
+}
+
+export async function getUploadTokenHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const token = await getUploadToken();
+        res.json({ access_token: token });
+    } catch (err) {
+        next(err);
     }
 }

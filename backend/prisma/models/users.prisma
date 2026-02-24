@@ -5,7 +5,7 @@ model User {
   passwordHash String
 
   firstName  String
-  middleName String?
+  middleName String
   lastName   String
 
   buildingGroups BuildingGroup[]

@@ -11,15 +11,11 @@ export const baseUserSchema = z.object({
         .string()
         .min(3, { message: "First name must be at least 3 characters" })
         .max(15, { message: "First name must be at most 15 characters" }),
-    middleName: z
-        .string()
-        .min(3, { message: "Middle name must be at least 3 characters" })
-        .max(15, { message: "First name must be at most 15 characters" })
-        .nullable(),
+    middleName: z.string().max(15, { message: "Middle name must be at most 15 characters" }),
     lastName: z
         .string()
         .min(3, { message: "Last name must be at least 3 characters" })
-        .max(15, { message: "First name must be at most 15 characters" }),
+        .max(15, { message: "Last name must be at most 15 characters" }),
     password: passwordSchema,
 });
 

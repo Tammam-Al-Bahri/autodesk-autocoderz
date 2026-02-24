@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import {
     createUserSchema as formSchema,
-    userBase,
+    usersBase,
     usersRoutes,
     type CreateUser as FormFields,
 } from "@autocoderz/shared";
@@ -29,7 +29,7 @@ export function SignupForm() {
             const method = "POST";
 
             setIsUpdating(true);
-            const response = await fetch(`${baseApiUrl}${userBase}${usersRoutes.createUser}`, {
+            const response = await fetch(`${baseApiUrl}${usersBase}${usersRoutes.createUser}`, {
                 method: method,
                 credentials: "include",
                 body: JSON.stringify(data),

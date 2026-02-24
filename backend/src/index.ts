@@ -3,10 +3,18 @@ import * as cors from "cors";
 import usersRouter from "./routes/users";
 import authRouter from "./routes/auth";
 import apsRouter from "./routes/aps";
+import buildingGroupsRouter from "./routes/buildingGroups";
 import * as session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { prisma } from "./lib/prisma";
-import { apsBase, authBase, authRoutes, userBase, usersRoutes } from "@autocoderz/shared";
+import {
+    apsBase,
+    authBase,
+    authRoutes,
+    buildingGroupsBase,
+    usersBase,
+    usersRoutes,
+} from "@autocoderz/shared";
 
 const PORT = parseInt(process.env.PORT ?? "3000");
 const COOKIE_MAX_AGE_DAYS = parseInt(process.env.COOKIE_MAX_AGE_DAYS ?? "7");
@@ -41,9 +49,10 @@ app.use(
     }),
 );
 
-app.use(userBase, usersRouter);
+app.use(usersBase, usersRouter);
 app.use(authBase, authRouter);
 app.use(apsBase, apsRouter);
+app.use(buildingGroupsBase, buildingGroupsRouter);
 
 app.use(
     (
