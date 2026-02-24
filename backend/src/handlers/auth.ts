@@ -7,7 +7,7 @@ export async function login(request: Request, response: Response, next: NextFunc
     try {
         const result = loginUserSchema.safeParse(request.body);
         if (!result.success) {
-            response.status(400).json({ error: "Invalid input" });
+            response.status(400).json({ error: { title: "Invalid input", description: "" } });
             return;
         }
 
@@ -15,7 +15,7 @@ export async function login(request: Request, response: Response, next: NextFunc
 
         const user = await loginUser(email, password);
         if (!user) {
-            response.status(401).json({ error: "Invalid credentials" });
+            response.status(401).json({ error: { title: "Invalid credentials", description: "" } });
             return;
         }
 
@@ -45,13 +45,13 @@ export async function me(request: Request, response: Response, next: NextFunctio
     try {
         const userId = request.session.userId;
         if (!userId) {
-            response.status(401).json({ error: "Not logged in" });
+            response.status(401).json({ error: { title: "Not logged in", description: "" } });
             return;
         }
 
         const user = await getUserById(userId);
         if (!user) {
-            response.status(404).json({ error: "User not found" });
+            response.status(404).json({ error: { title: "User not found", description: "" } });
             return;
         }
         const safeUser = safeUserSchema.safeParse(user);
@@ -59,7 +59,7 @@ export async function me(request: Request, response: Response, next: NextFunctio
             response.status(200).json({ user: safeUser.data });
             return;
         }
-        response.status(500).json({ error: "User data error" });
+        response.status(500).json({ error: { title: "User data error", description: "" } });
         return;
     } catch (error) {
         next(error);

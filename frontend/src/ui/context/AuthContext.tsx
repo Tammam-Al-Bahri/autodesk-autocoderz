@@ -6,7 +6,10 @@ import { baseApiUrl } from "@/lib/utils";
 interface AuthContextType {
     user: SafeUser | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    login: (
+        email: string,
+        password: string,
+    ) => Promise<{ success: boolean; error?: { title: string; description: string } }>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }
@@ -59,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 return { success: false, error: data.error };
             }
         } catch {
-            return { success: false, error: "An error occurred" };
+            return { success: false, error: { title: "An error occurred", description: "" } };
         }
     };
 

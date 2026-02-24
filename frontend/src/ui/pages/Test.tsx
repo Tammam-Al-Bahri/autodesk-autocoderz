@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { baseApiUrl } from "@/lib/utils";
 import { toast } from "sonner";
-import { apsBase, apsRoutes, authRoutes } from "@autocoderz/shared";
+import { apsBase, apsRoutes } from "@autocoderz/shared";
 import AutodeskViewer from "@/components/AutodeskViewer";
 import { useState } from "react";
 import { BuildingGroupForm } from "@/components/BuildingGroupForm";
@@ -26,16 +26,15 @@ export default function Test() {
                 credentials: "include",
             });
 
-            const json = await response.json();
+            const resData = await response.json();
             if (response.ok) {
-                setAutodeskToken(json.access_token);
+                setAutodeskToken(resData.access_token);
                 toast.success("SUCCESS MESSAGE", {
-                    description: JSON.stringify(json, null, 2),
+                    description: JSON.stringify(resData, null, 2),
                 });
             } else {
-                toast.error("ERROR MESSAGE FROM API", {
-                    description: JSON.stringify(json, null, 2),
-                });
+                const { title, description } = resData.error;
+                toast.error(title, { description });
             }
         } catch (error) {
             console.log(error);

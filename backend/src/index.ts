@@ -62,7 +62,15 @@ app.use(
         next: express.NextFunction,
     ) => {
         console.error(error);
-        response.status(500).json({ error: "Internal server error" });
+
+    const maybeError = error as any;
+
+    const title =
+      maybeError?.error?.title ?? "Internal Server Error";
+
+    const description =
+      maybeError?.error?.description ?? "Something went wrong.";
+        response.status(500).json({ error: { title, description } });
     },
 );
 

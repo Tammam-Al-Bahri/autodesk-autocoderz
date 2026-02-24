@@ -1,13 +1,17 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { CreateUser } from "@autocoderz/shared";
 import { createUser as createUserDB } from "../db/user";
 
-export async function getUsers(request: Request, response: Response) {
+export async function getUsers(request: Request, response: Response, next: NextFunction) {
     response.send("hello");
     return;
 }
 
-export async function createUser(request: Request<{}, {}, CreateUser>, response: Response) {
+export async function createUser(
+    request: Request<{}, {}, CreateUser>,
+    response: Response,
+    next: NextFunction,
+) {
     const data = request.body;
 
     try {
@@ -16,7 +20,6 @@ export async function createUser(request: Request<{}, {}, CreateUser>, response:
         response.status(201).json({ success: true });
         return;
     } catch (error) {
-        response.status(500).json(error);
-        return;
+        next(error);
     }
 }

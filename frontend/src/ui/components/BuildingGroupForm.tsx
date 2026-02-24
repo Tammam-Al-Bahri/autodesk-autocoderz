@@ -47,7 +47,8 @@ export function BuildingGroupForm() {
                 await refreshUser();
                 navigate("/", { replace: true });
             } else {
-                toast.error("ERROR MESSAGE FROM API", resData.error);
+                const { title, description } = resData.error;
+                toast.error(title, { description });
             }
         } catch (error) {
             console.log(error);

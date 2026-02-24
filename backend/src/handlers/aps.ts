@@ -40,7 +40,7 @@ export async function getUploadTokenHandler(req: Request, res: Response, next: N
     try {
         const token = await getUploadToken();
         res.json({ access_token: token });
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        next(error);
     }
 }

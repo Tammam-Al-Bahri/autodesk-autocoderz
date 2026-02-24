@@ -38,13 +38,12 @@ export function SignupForm() {
             setIsUpdating(false);
             const resData = await response.json();
             if (response.ok) {
-                toast.success("SUCCESS MESSAGE", {
-                    description: JSON.stringify(resData, null, 2),
-                });
+                toast.success(`Welcome, ${data.firstName}`);
                 await refreshUser();
                 navigate("/", { replace: true });
             } else {
-                toast.error("ERROR MESSAGE FROM API", resData.error);
+                const { title, description } = resData.error
+                toast.error(title, {description});
             }
         } catch (error) {
             console.log(error);
