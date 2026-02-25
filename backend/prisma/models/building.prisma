@@ -1,6 +1,9 @@
 model Building {
   id String @id @default(cuid())
 
+  buildingGroup   BuildingGroup @relation(fields: [buildingGroupId], references: [id], onDelete: Cascade)
+  buildingGroupId String
+
   name    String
   address String
   urn     String?
