@@ -4,36 +4,46 @@ import { useState } from "react";
 import { SkeletonForm } from "./skeleton-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createUserSchema as formSchema, type CreateUser as FormFields } from "@autocoderz/shared";
+import {
+    createUserSchema as formSchema,
+    usersRoutes,
+    type CreateUser as FormFields,
+} from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import { baseApiUrl } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
+import { useAuth } from "@/context/AuthContext";
 
 export function SignupForm() {
     const form = useForm<FormFields>({ resolver: zodResolver(formSchema) });
     const { handleSubmit } = form;
     const [isUpdating, setIsUpdating] = useState(false);
     const navigate = useNavigate();
+    const { refreshUser } = useAuth();
 
     const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
         try {
             const method = "POST";
 
             setIsUpdating(true);
-            const response = await fetch(`${baseApiUrl}/api/users`, {
-                method: method,
-                credentials: "include",
-                body: JSON.stringify(data),
-                headers: { "Content-Type": "application/json" },
-            });
+            const response = await fetch(
+                `${baseApiUrl}${usersRoutes.base}${usersRoutes.createUser}`,
+                {
+                    method: method,
+                    credentials: "include",
+                    body: JSON.stringify(data),
+                    headers: { "Content-Type": "application/json" },
+                },
+            );
             setIsUpdating(false);
             if (response.ok) {
                 const json = await response.json();
                 toast.success("SUCCESS MESSAGE", {
                     description: JSON.stringify(json, null, 2),
                 });
+                await refreshUser();
                 navigate("/", { replace: true });
             } else {
                 toast.error("ERROR MESSAGE FROM API");

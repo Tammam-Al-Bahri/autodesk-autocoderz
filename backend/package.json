@@ -1,6 +1,7 @@
 {
     "name": "backend",
     "version": "1.0.0",
+    "type": "commonjs",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -17,7 +18,7 @@
         "@autocoderz/shared": "file:../packages/shared",
         "@prisma/adapter-mariadb": "^7.4.0",
         "@prisma/client": "^7.3.0",
-        "axios": "^1.13.5",
+        "@quixo3/prisma-session-store": "^3.1.19",
         "bcrypt": "^6.0.0",
         "cors": "^2.8.6",
         "dotenv": "^17.3.1",
