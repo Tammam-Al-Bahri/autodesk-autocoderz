@@ -1,4 +1,4 @@
-import { HashRouter, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import pages from "./pages";
 
 import Navbar from "./components/Navbar";
@@ -24,7 +24,7 @@ function App() {
     if (loading) return <LoadingPage />;
 
     return (
-        <HashRouter>
+        <BrowserRouter>
             <Routes>
                 <Route element={<Layout />}>
                     {pages.map(({ path, component: Component }) => (
@@ -32,7 +32,7 @@ function App() {
                     ))}
                 </Route>
             </Routes>
-        </HashRouter>
+        </BrowserRouter>
     );
 }
 
