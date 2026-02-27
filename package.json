@@ -7,7 +7,11 @@
         "dev:shared": "npm --prefix packages/shared run dev",
         "dev": "concurrently -k -n BACKEND,FRONTEND,SHARED -c blue,green,yellow \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:shared\"",
         "db:view": "npm --prefix backend run db:view",
-        "install": "npm  --prefix packages/shared i && npm --prefix packages/shared run build && concurrently -n BACKEND,FRONTEND -c blue,green \"npm --prefix backend i\" \"npm --prefix frontend i\""
+        "install": "npm  --prefix packages/shared i && npm run build:shared && concurrently -n BACKEND,FRONTEND -c blue,green \"npm --prefix backend i\" \"npm --prefix frontend i\"",
+        "build:frontend": "npm --prefix frontend run build",
+        "build:backend": "npm --prefix backend run build",
+        "build:shared": "npm --prefix packages/shared run build",
+        "build": "npm run build:shared && concurrently -n BACKEND,FRONTEND -c blue,green \"npm run build:backend\" \"npm run build:frontend\""
     },
     "devDependencies": {
         "concurrently": "^9.2.1"
