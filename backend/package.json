@@ -5,11 +5,10 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "prisma": "npx prisma generate && npx prisma db push --accept-data-loss || npx prisma db push --force-reset",
-        "db": "npx prisma studio",
+        "db:view": "npx prisma studio",
         "build": "tsc --build --verbose",
         "start": "node ./dist/src/index.js",
-        "dev": "concurrently -k -n EXPRESS,PRISMA -c blue,green \"nodemon\" \"nodemon --config nodemon.prisma.json\""
+        "dev": "concurrently -k -n EXPRESS,PRISMA,ENV -c blue,green,white \"nodemon\" \"nodemon --config nodemon.prisma.json\" \"nodemon --config nodemon.env.json\""
     },
     "keywords": [],
     "author": "",
