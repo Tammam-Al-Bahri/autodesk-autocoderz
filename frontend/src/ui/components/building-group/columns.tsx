@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export const columns: ColumnDef<BuildingGroup>[] = [
     {
         accessorKey: "name",
-        header: "Building Group",
+        header: "Company",
         cell: ({ row }) => {
             const id = row.original.id;
             return (

@@ -42,8 +42,8 @@ export function SignupForm() {
                 await refreshUser();
                 navigate("/", { replace: true });
             } else {
-                const { title, description } = resData.error
-                toast.error(title, {description});
+                const { title, description } = resData.error;
+                toast.error(title, { description });
             }
         } catch (error) {
             console.log(error);
@@ -106,13 +106,7 @@ export function SignupForm() {
                                 <FormItem>
                                     <FormLabel>Middle Name</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="Adam"
-                                            {...field}
-                                            value={field.value ?? ""}
-                                            onChange={(e) => field.onChange(e.target.value || null)}
-                                        />
+                                        <Input type="text" placeholder="Adam" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

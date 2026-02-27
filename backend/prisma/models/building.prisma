@@ -15,10 +15,12 @@ model Building {
 }
 
 enum BuildingStatus {
-  PENDING
+  DRAFT
   ACTIVE
+  INACTIVE
 }
 
 enum BuildingType {
   HOTEL
+  OTHER
 }

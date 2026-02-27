@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const userId = z.cuid().brand<"UserId">();
+export type UserId = z.infer<typeof userId>;
+
 const passwordSchema = z
     .string()
     .min(6, { message: "Password must be at least 6 characters" })
@@ -26,7 +29,7 @@ export const safeUserSchema = baseUserSchema
         password: true,
     })
     .extend({
-        id: z.string(),
+        id: userId,
     });
 
 export type SafeUser = z.infer<typeof safeUserSchema>;

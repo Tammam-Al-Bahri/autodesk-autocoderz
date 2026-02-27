@@ -4,7 +4,7 @@ model BuildingGroup {
   owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId String
 
-  name        String @unique
+  name        String
   description String
 
   buildings Building[]

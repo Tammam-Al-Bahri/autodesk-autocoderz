@@ -12,10 +12,6 @@ router.post(
     validate(createBuildingGroupSchema),
     createBuildingGroup,
 );
-router.get(
-    buildingGroupsRoutes.root,
-    requireAuth,
-    getBuildingGroups,
-);
+router.get(buildingGroupsRoutes.root, requireAuth, getBuildingGroups);
 
 export default router;

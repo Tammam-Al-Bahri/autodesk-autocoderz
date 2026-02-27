@@ -1,4 +1,8 @@
 import { z } from "zod";
+import { userId } from "./user.js";
+
+export const buildingGroupId = z.cuid().brand<"BuildingGroupId">();
+export type BuildingGroupId = z.infer<typeof buildingGroupId>;
 
 export const createBuildingGroupSchema = z.object({
     name: z
@@ -14,8 +18,8 @@ export const createBuildingGroupSchema = z.object({
 export type CreateBuildingGroup = z.infer<typeof createBuildingGroupSchema>;
 
 export const buildingGroupSchema = createBuildingGroupSchema.extend({
-    id: z.string(),
-    ownerId: z.string(),
+    id: buildingGroupId,
+    ownerId: userId,
 });
 
 export type BuildingGroup = z.infer<typeof buildingGroupSchema>;

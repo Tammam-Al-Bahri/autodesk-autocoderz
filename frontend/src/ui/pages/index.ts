@@ -1,15 +1,20 @@
 import type { ReactNode } from "react";
+import type { NavbarView } from "@/components/Navbar";
+
 import About from "./About";
 import Home from "./Home";
 import LoginPage from "./login";
 import Test from "./Test";
-import type { NavbarView } from "@/components/Navbar";
 import StaffTasks from "./StaffTasks";
 import Receptionist from "./Receptionist";
 import SignupPage from "./signup";
 import Dashboard from "./Dashboard";
 import Applications from "./Application";
 import Tickets from "./Tickets";
+import MyBuildingGroups from "./building-group/MyBuildingGroups";
+import BuildingGroup from "./building-group/BuildingGroup";
+import GuestPortal from "./GuestPortal";
+import Building from "./building/Building";
 
 type Page = {
     path: string;
@@ -43,7 +48,7 @@ const pages: Page[] = [
     {
         path: "/guestportal",
         title: "Guest Portal",
-        component: Tickets,
+        component: GuestPortal,
         navbarView: ["Guest"],
     },
     {
@@ -57,6 +62,12 @@ const pages: Page[] = [
         title: "Receptionist Dashboard",
         component: Receptionist,
         navbarView: ["Staff"],
+    },
+    {
+        path: "/building-groups",
+        title: "My Portfolio",
+        component: MyBuildingGroups,
+        navbarView: ["Manage"],
     },
     {
         path: "/dashboard",
@@ -81,6 +92,16 @@ const pages: Page[] = [
         title: "Test",
         component: Test,
         navbarView: ["Guest", "Staff", "Manage"],
+    },
+    {
+        path: "/building-groups/:buildingGroupId",
+        title: "Company",
+        component: BuildingGroup,
+    },
+    {
+        path: "/building-groups/:buildingGroupId/buildings/:buildingId",
+        title: "Building",
+        component: Building,
     },
 ] as const;
 

@@ -1,22 +1,25 @@
 import { columns } from "./columns";
-import { buildingGroupsBase, buildingGroupsRoutes, type BuildingGroup } from "@autocoderz/shared";
+import { buildingsBase, buildingsRoutes, type Building } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
 import { baseApiUrl } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Card } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
 import { toast } from "sonner";
+import { useParams } from "react-router-dom";
 
-export default function BuildingGroupTable() {
-    const [data, setData] = useState<BuildingGroup[]>([]);
+export default function BuildingTable() {
+    const [data, setData] = useState<Building[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const { buildingGroupId } = useParams();
 
     useEffect(() => {
         async function fetchData() {
             try {
                 const method = "GET";
                 const response = await fetch(
-                    `${baseApiUrl}${buildingGroupsBase}${buildingGroupsRoutes.root}`,
+                    `${baseApiUrl}${buildingsBase}${buildingsRoutes.root}?buildingGroupId=${buildingGroupId}`,
                     {
                         method,
                         credentials: "include",

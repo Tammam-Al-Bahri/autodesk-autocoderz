@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express-serve-static-core";
 import { loginUser } from "../lib/loginUser";
-import { loginUserSchema, safeUserSchema } from "@autocoderz/shared";
+import { loginUserSchema, safeUserSchema, UserId } from "@autocoderz/shared";
 import { getUserById } from "../db/user";
 
 export async function login(request: Request, response: Response, next: NextFunction) {
@@ -19,7 +19,7 @@ export async function login(request: Request, response: Response, next: NextFunc
             return;
         }
 
-        request.session.userId = user.id;
+        request.session.userId = user.id as UserId;
 
         const safeUser = safeUserSchema.parse(user);
         response.status(200).json({ token: request.session.id, safeUser });

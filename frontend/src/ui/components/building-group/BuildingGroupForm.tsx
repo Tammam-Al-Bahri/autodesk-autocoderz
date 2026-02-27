@@ -60,9 +60,10 @@ export function BuildingGroupForm() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Create a building group</CardTitle>
+                <CardTitle>Create Company</CardTitle>
                 <CardDescription>
-                    Enter your information below to create your account
+                    Add a new company to your portfolio. You can manage its buildings and operations
+                    after creation.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -107,7 +108,7 @@ use Autodesk software & services instead.
                                 </FormItem>
                             )}
                         />
-                        <Button>Create Building Group</Button>
+                        <Button>Create Company</Button>
                     </form>
                 </Form>
             </CardContent>

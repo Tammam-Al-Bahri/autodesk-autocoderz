@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { CreateBuildingGroup } from "@autocoderz/shared";
 import {
     createBuildingGroup as createBuildingGroupDB,
-    getBuildingGroups as getBuildingGroupsDB,
+    getBuildingGroupsFromUserId,
 } from "../db/buildingGroup";
 
 export async function createBuildingGroup(
@@ -25,7 +25,7 @@ export async function createBuildingGroup(
 
     try {
         const buildingGroup = await createBuildingGroupDB(userId, data);
-        response.status(201).json({ success: true, buildingGroup });
+        response.status(201).json({ success: true, data: buildingGroup });
         return;
     } catch (error) {
         next(error);
@@ -46,8 +46,8 @@ export async function getBuildingGroups(request: Request, response: Response, ne
     }
 
     try {
-        const buildingGroups = await getBuildingGroupsDB(userId);
-        response.status(201).json({ success: true, buildingGroups });
+        const buildingGroups = await getBuildingGroupsFromUserId(userId);
+        response.status(200).json({ success: true, data: buildingGroups });
         return;
     } catch (error) {
         next(error);

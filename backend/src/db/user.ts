@@ -1,7 +1,7 @@
 import { handlePrismaError } from "../lib/handlePrismaError";
 import { hashPassword } from "../lib/hashPassword";
 import { prisma } from "../lib/prisma";
-import { CreateUser } from "@autocoderz/shared";
+import { CreateUser, UserId } from "@autocoderz/shared";
 
 export async function createUser(data: CreateUser) {
     try {
@@ -31,7 +31,7 @@ export async function getUserByEmail(email: string) {
     }
 }
 
-export async function getUserById(id: string) {
+export async function getUserById(id: UserId) {
     try {
         const user = prisma.user.findUnique({ where: { id } });
         return user;
@@ -40,6 +40,6 @@ export async function getUserById(id: string) {
     }
 }
 
-export async function userExists(id: string) {
+export async function userExists(id: UserId) {
     return !!prisma.user.findFirst({ where: { id } });
 }
