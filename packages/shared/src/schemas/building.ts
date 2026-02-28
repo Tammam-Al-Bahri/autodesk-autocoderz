@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { buildingGroupId } from "./buildingGroup.js";
+import { urn } from "./aps.js";
 
 export const buildingId = z.cuid().brand<"BuildingId">();
 export type BuildingId = z.infer<typeof buildingId>;
@@ -24,7 +25,7 @@ export type CreateBuilding = z.infer<typeof createBuildingSchema>;
 
 export const buildingSchema = createBuildingSchema.extend({
     id: buildingId,
-    urn: z.base64().optional(),
+    urn,
 });
 
 export type Building = z.infer<typeof buildingSchema>;

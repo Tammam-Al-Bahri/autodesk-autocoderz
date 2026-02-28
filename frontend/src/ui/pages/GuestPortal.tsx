@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AutodeskViewer from "@/components/AutodeskViewer";
-import { baseApiUrl } from "@/lib/utils";
+import { apiUrl } from "@/lib/utils";
 import { apsBase, apsRoutes } from "@autocoderz/shared";
 
 const SNOWDON_URN =
@@ -17,7 +17,7 @@ export default function GuestPortal() {
     const roomNumber = "204";
 
     useEffect(() => {
-        fetch(`${baseApiUrl}${apsBase}${apsRoutes.viewerToken}`)
+        fetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`)
             .then((res) => res.json())
             .then((data) => {
                 setApsToken(data.access_token);

@@ -4,6 +4,7 @@ import {
     createBuilding as createBuildingDB,
     getBuildingsFromBuildingGroupId,
 } from "../db/building";
+import * as multer from "multer";
 
 export async function createBuilding(
     request: Request<{}, {}, CreateBuilding>,
@@ -44,4 +45,12 @@ export async function getBuildings(
     } catch (error) {
         next(error);
     }
+}
+
+export async function uploadBuildingModel(
+    request: Request<{}, {}, {}, { buildingGroupId: string }>,
+    response: Response,
+    next: NextFunction,
+) {
+    
 }

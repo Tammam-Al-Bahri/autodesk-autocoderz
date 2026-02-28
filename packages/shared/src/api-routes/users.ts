@@ -1,4 +1,4 @@
-export const usersBase = "/api/users";
+export const usersBase = "/users";
 
 export const usersRoutes = {
     getUsers: "/",

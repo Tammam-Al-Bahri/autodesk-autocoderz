@@ -4,13 +4,7 @@ import * as session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { prisma } from "./lib/prisma";
 
-import {
-    apsBase,
-    authBase,
-    buildingGroupsBase,
-    buildingsBase,
-    usersBase,
-} from "@autocoderz/shared";
+import { base } from "@autocoderz/shared";
 import usersRouter from "./routes/users";
 import authRouter from "./routes/auth";
 import apsRouter from "./routes/aps";
@@ -51,11 +45,11 @@ app.use(
     }),
 );
 
-app.use(usersBase, usersRouter);
-app.use(authBase, authRouter);
-app.use(apsBase, apsRouter);
-app.use(buildingGroupsBase, buildingGroupsRouter);
-app.use(buildingsBase, buildingsRouter);
+app.use(base, usersRouter);
+app.use(base, authRouter);
+app.use(base, apsRouter);
+app.use(base, buildingGroupsRouter);
+app.use(base, buildingsRouter);
 
 app.use(
     (

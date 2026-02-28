@@ -1,7 +1,7 @@
 import { columns } from "./columns";
 import { buildingGroupsBase, buildingGroupsRoutes, type BuildingGroup } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
-import { baseApiUrl } from "@/lib/utils";
+import { apiUrl } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Card } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
@@ -15,13 +15,10 @@ export default function BuildingGroupTable() {
         async function fetchData() {
             try {
                 const method = "GET";
-                const response = await fetch(
-                    `${baseApiUrl}${buildingGroupsBase}${buildingGroupsRoutes.root}`,
-                    {
-                        method,
-                        credentials: "include",
-                    },
-                );
+                const response = await fetch(`${apiUrl}${buildingGroupsBase}`, {
+                    method,
+                    credentials: "include",
+                });
                 const resData = await response.json();
                 if (response.ok) {
                     setData(resData.data);

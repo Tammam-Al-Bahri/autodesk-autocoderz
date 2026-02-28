@@ -35,12 +35,3 @@ export async function getApsViewerToken(request: Request, response: Response, ne
         next(error);
     }
 }
-
-export async function getUploadTokenHandler(req: Request, res: Response, next: NextFunction) {
-    try {
-        const token = await getUploadToken();
-        res.json({ access_token: token });
-    } catch (error) {
-        next(error);
-    }
-}

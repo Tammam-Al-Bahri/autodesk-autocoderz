@@ -12,7 +12,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
-import { baseApiUrl } from "@/lib/utils";
+import { apiUrl } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 
 export function BuildingGroupForm() {
@@ -25,15 +25,12 @@ export function BuildingGroupForm() {
             const method = "POST";
 
             setIsUpdating(true);
-            const response = await fetch(
-                `${baseApiUrl}${buildingGroupsBase}${buildingGroupsRoutes.root}`,
-                {
-                    method,
-                    credentials: "include",
-                    body: JSON.stringify(data),
-                    headers: { "Content-Type": "application/json" },
-                },
-            );
+            const response = await fetch(`${apiUrl}${buildingGroupsBase}`, {
+                method,
+                credentials: "include",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" },
+            });
             setIsUpdating(false);
             const resData = await response.json();
             if (response.ok) {

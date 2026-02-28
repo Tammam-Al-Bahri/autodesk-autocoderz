@@ -1,4 +1,4 @@
-export const authBase = "/api/auth";
+export const authBase = "/auth";
 
 export const authRoutes = {
     login: "/login",
