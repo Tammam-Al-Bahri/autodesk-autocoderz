@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const userId = z.cuid().brand<"UserId">();
+export const userId = z.cuid().brand<"userId">();
 export type UserId = z.infer<typeof userId>;
 
 const passwordSchema = z

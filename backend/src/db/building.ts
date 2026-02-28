@@ -1,4 +1,4 @@
-import { BuildingGroupId, CreateBuilding } from "@autocoderz/shared";
+import { BuildingGroupId, BuildingId, CreateBuilding, URN } from "@autocoderz/shared";
 import { prisma } from "../lib/prisma";
 import { handlePrismaError } from "../lib/handlePrismaError";
 
@@ -28,6 +28,34 @@ export async function getBuildingsFromBuildingGroupId(buildingGroupId: BuildingG
             },
         });
         return buildings;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}
+
+export async function getBuildingFromId(buildingId: BuildingId) {
+    try {
+        const building = await prisma.building.findFirst({
+            where: {
+                id: buildingId,
+            },
+        });
+        return building;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}
+
+export async function updateBuildingUrn(buildingId: BuildingId, urn: URN) {
+    try {
+        const building = await prisma.building.update({
+            where: {
+                id: buildingId,
+            },
+            data: {
+                urn: urn,
+            },
+        });
     } catch (error) {
         throw handlePrismaError(error);
     }

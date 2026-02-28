@@ -6,13 +6,10 @@ import { useEffect, useState } from "react";
 import { Card } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
 import { toast } from "sonner";
-import { useParams } from "react-router-dom";
 
-export default function BuildingTable() {
+export default function BuildingTable({ buildingGroupId }: { buildingGroupId: string }) {
     const [data, setData] = useState<Building[]>([]);
     const [loading, setLoading] = useState(true);
-
-    const { buildingGroupId } = useParams();
 
     useEffect(() => {
         async function fetchData() {

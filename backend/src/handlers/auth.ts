@@ -32,7 +32,7 @@ export async function login(request: Request, response: Response, next: NextFunc
 export async function logout(request: Request, response: Response, next: NextFunction) {
     try {
         request.session.destroy((error) => {
-            if (error) return next(error);
+            if (error) next(error);
             response.clearCookie("sid");
             response.status(200).json({ message: "Logged out" });
         });

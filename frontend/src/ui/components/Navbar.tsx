@@ -52,6 +52,7 @@ export default function Navbar() {
                     <DropdownMenuContent>
                         {views.map((view) => (
                             <DropdownMenuItem
+                                key={view.value}
                                 className="justify-center"
                                 onClick={() => {
                                     setCurrentView(view.value);

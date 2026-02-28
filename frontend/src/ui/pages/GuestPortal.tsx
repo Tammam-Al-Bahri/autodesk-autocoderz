@@ -80,7 +80,7 @@ export default function GuestPortal() {
                     </CardHeader>
 
                     <CardContent className="p-0">
-                        <div className="h-[500px] w-full bg-gray-100 relative">
+                        <div className="h-125 w-full bg-gray-100 relative">
                             {apsToken ? (
                                 <AutodeskViewer urn={SNOWDON_URN} token={apsToken} />
                             ) : (

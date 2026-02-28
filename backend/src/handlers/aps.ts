@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { getUploadToken } from "../lib/apsTokenService";
 
 const BASIC_AUTH = process.env.APS_BASIC_AUTH;
 
@@ -31,6 +30,7 @@ export async function getApsViewerToken(request: Request, response: Response, ne
 
         const data = await autodeskResponse.json();
         response.json(data);
+        return;
     } catch (error) {
         next(error);
     }

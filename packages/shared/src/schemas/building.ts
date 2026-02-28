@@ -2,7 +2,7 @@ import { z } from "zod";
 import { buildingGroupId } from "./buildingGroup.js";
 import { urn } from "./aps.js";
 
-export const buildingId = z.cuid().brand<"BuildingId">();
+export const buildingId = z.cuid().brand<"buildingId">();
 export type BuildingId = z.infer<typeof buildingId>;
 
 export const buildingFormSchema = z.object({

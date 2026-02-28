@@ -4,11 +4,14 @@ import { useParams } from "react-router-dom";
 
 export default function BuildingGroup() {
     const { buildingGroupId } = useParams();
+
+    if (!buildingGroupId) return <>buildingGroupId not found</>;
+
     return (
         <>
             building group id: {buildingGroupId}
-            <BuildingForm />
-            <BuildingTable />
+            <BuildingForm buildingGroupId={buildingGroupId} />
+            <BuildingTable buildingGroupId={buildingGroupId} />
         </>
     );
 }

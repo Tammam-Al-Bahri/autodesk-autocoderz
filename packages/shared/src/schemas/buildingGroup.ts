@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { userId } from "./user.js";
 
-export const buildingGroupId = z.cuid().brand<"BuildingGroupId">();
+export const buildingGroupId = z.cuid().brand<"buildingGroupId">();
 export type BuildingGroupId = z.infer<typeof buildingGroupId>;
 
 export const createBuildingGroupSchema = z.object({

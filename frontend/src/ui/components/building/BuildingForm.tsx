@@ -4,7 +4,6 @@ import { SkeletonForm } from "../skeleton-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-    buildingsRoutes,
     buildingsBase,
     buildingFormSchema as formSchema,
     type BuildingForm as FormFields,
@@ -17,9 +16,8 @@ import { toast } from "sonner";
 import { apiUrl, formatEnum } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { useParams } from "react-router-dom";
 
-export function BuildingForm() {
+export function BuildingForm({ buildingGroupId }: { buildingGroupId: string }) {
     const form = useForm<FormFields>({
         resolver: zodResolver(formSchema),
         // defaultValues: {
@@ -31,8 +29,6 @@ export function BuildingForm() {
     });
     const { handleSubmit } = form;
     const [isUpdating, setIsUpdating] = useState(false);
-
-    const { buildingGroupId } = useParams();
 
     const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
         try {
