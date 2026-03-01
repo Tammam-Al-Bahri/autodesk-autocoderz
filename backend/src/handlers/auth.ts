@@ -65,3 +65,56 @@ export async function me(request: Request, response: Response, next: NextFunctio
         next(error);
     }
 }
+
+export async function getUploadProgress(request: Request, response: Response, next: NextFunction) {
+    try {
+        if (!request.session.activeUploads) {
+            request.session.activeUploads = {};
+            response.json({ uploads: {} });
+            return;
+        }
+
+        const now = Date.now();
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000; // 86,400,000 ms
+        const FINISHED_GRACE_PERIOD_MS = 30 * 60 * 1000; // 30 minutes
+
+        // Clean up finished or very old jobs
+        for (const jobId in request.session.activeUploads) {
+            const job = request.session.activeUploads[jobId];
+
+            const isFinished = job.percent >= 100 && now - job.createdAt > FINISHED_GRACE_PERIOD_MS;
+            const isStale = now - job.createdAt > ONE_DAY_MS;
+
+            if (isFinished || isStale) {
+                delete request.session.activeUploads[jobId];
+            }
+        }
+
+        const { jobId } = request.query;
+
+        if (!jobId) {
+            // Return all remaining active uploads
+            response.json({
+                uploads: request.session.activeUploads || {},
+            });
+            return;
+        }
+
+        // Specific job requested
+        const job = request.session.activeUploads?.[jobId as string];
+
+        if (!job) {
+            response.status(404).json({
+                error: {
+                    title: "Job not found or already finished",
+                    description: "",
+                },
+            });
+            return;
+        }
+
+        response.json({ job });
+    } catch (error) {
+        next(error);
+    }
+}
