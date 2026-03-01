@@ -11,9 +11,7 @@ import {
     getBuildingsFromBuildingGroupId,
     updateBuildingUrn,
 } from "../db/building";
-import { getUploadToken } from "../lib/apsTokenService";
 import { randomUUID } from "node:crypto";
-import { UploadJob } from "../types/express-session";
 import saveSession from "../lib/saveSession";
 import { processApsUpload } from "../lib/processApsUpload";
 
@@ -113,6 +111,8 @@ export async function uploadBuildingModel(
             file: request.file,
             buildingId: parsedId.data,
             session: request.session,
+        }).catch((error) => {
+            console.error("Upload error:", error);
         });
     } catch (error) {
         next(error);

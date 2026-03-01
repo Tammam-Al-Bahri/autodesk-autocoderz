@@ -26,6 +26,7 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
         try {
             const formData = new FormData();
             formData.append("file", file);
+            setFile(null);
 
             const response = await fetch(
                 `${apiUrl}${buildingsBase}${buildingsRoutes.upload}?buildingId=${buildingId}`,
@@ -97,7 +98,9 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
                     if (job.percent >= 100) {
                         clearInterval(interval);
                         setLoading(false);
-                        toast.success("Model processing complete!");
+                        toast.success("Model processing complete!", {
+                            description: job.message,
+                        });
                         setFile(null);
                     }
                 } else if (data.uploads) {
@@ -110,7 +113,9 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
                         if (job.percent >= 100 || job.status === "success") {
                             clearInterval(interval);
                             setLoading(false);
-                            toast.success("Model processing complete!");
+                            toast.success("Model processing complete!", {
+                                description: job.message,
+                            });
                             setFile(null);
                         }
                     } else {
@@ -156,7 +161,17 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
                 accept=".rvt,.ifc,.dwg"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
-            <Button onClick={handleUpload}>Upload Model</Button>
+            <Button
+                onClick={
+                    file
+                        ? handleUpload
+                        : () => {
+                              toast.error("No file selected");
+                          }
+                }
+            >
+                Upload Building Model
+            </Button>
         </div>
     );
 }

@@ -1,5 +1,6 @@
 import AutodeskViewer from "@/components/AutodeskViewer";
 import { UploadBuildingModel } from "@/components/building/UploadBuildingModel";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { apiUrl } from "@/lib/utils";
 import { apsBase, apsRoutes, buildingsBase } from "@autocoderz/shared";
 import { useEffect, useState } from "react";
@@ -62,12 +63,19 @@ export default function Building() {
     }, [buildingId]);
 
     return (
-        <>
+        <div className="flex-col">
             building id: {buildingId}
             <UploadBuildingModel buildingId={buildingId} />
             {autodeskToken && buildingUrn && (
-                <AutodeskViewer urn={buildingUrn} token={autodeskToken} />
+                <Card className="w-300">
+                    <CardTitle>View model</CardTitle>
+                    <CardContent>
+                        <div className="relative h-150">
+                            <AutodeskViewer urn={buildingUrn} token={autodeskToken} />
+                        </div>
+                    </CardContent>
+                </Card>
             )}
-        </>
+        </div>
     );
 }
