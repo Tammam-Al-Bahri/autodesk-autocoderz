@@ -3,6 +3,7 @@ import "express-session";
 
 declare type UploadJob = {
     status: string;
+    message: string;
     percent: number;
     createdAt: number;
 };

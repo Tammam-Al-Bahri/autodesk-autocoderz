@@ -77,6 +77,7 @@ export async function uploadBuildingModel(
             ...(request.session.activeUploads || {}),
             [jobId]: {
                 status: "preparing",
+                message: "",
                 percent: 0,
                 createdAt,
             },

@@ -18,12 +18,13 @@ export async function processApsUpload(params: {
         });
     }
 
-    async function update(status: string, percent: number) {
+    async function update(status: string, message: string, percent: number) {
         session.activeUploads = {
             ...session.activeUploads,
             [jobId]: {
                 ...session.activeUploads?.[jobId],
                 status,
+                message,
                 percent,
                 createdAt,
             },
@@ -32,7 +33,7 @@ export async function processApsUpload(params: {
     }
 
     try {
-        await update("uploading", 5);
+        await update("uploading", "Preparing upload", 5);
 
         const token = await getUploadToken();
         const bucketKey = process.env.APS_BUCKET_KEY;
@@ -58,6 +59,8 @@ export async function processApsUpload(params: {
         }
 
         const initiateUrl = `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectName}/signeds3upload?${queryParams}`;
+
+        await update("uploading", "Requesting signed upload URLs", 8);
 
         const initiateRes = await fetch(initiateUrl, {
             headers: { Authorization: `Bearer ${token}` },
@@ -91,7 +94,9 @@ export async function processApsUpload(params: {
 
             const chunk = file.buffer.subarray(chunkStart, chunkEnd);
 
-            await update("uploading", Math.round(((i + 1) / actualParts) * 70));
+            // Pre-upload feedback
+            const basePercent = Math.round((i / actualParts) * 65) + 10;
+            await update("uploading", `Uploading part ${i + 1}/${actualParts}`, basePercent);
 
             const uploadRes = await fetch(signedData.urls[i], {
                 method: "PUT",
@@ -111,10 +116,14 @@ export async function processApsUpload(params: {
             eTag = eTag.replace(/^"|"$/g, "");
             partETags[i] = eTag;
 
+            // Post-upload confirmation
+            const afterPercent = Math.round(((i + 1) / actualParts) * 70) + 5;
+            await update("uploading", `Uploaded part ${i + 1}/${actualParts}`, afterPercent);
+
             chunkStart = chunkEnd;
         }
 
-        await update("uploaded", 75);
+        await update("uploaded", "Completing multipart upload", 75);
 
         const completeRes = await fetch(
             `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectName}/signeds3upload`,
@@ -135,12 +144,14 @@ export async function processApsUpload(params: {
             throw new Error(`Upload completion failed: ${completeRes.status}`);
         }
 
+        await update("uploaded", "Upload completed - storing URN", 78);
+
         const rawUrn = `urn:adsk.objects:os.object:${bucketKey}/${objectName}`;
         const encodedUrn = Buffer.from(rawUrn).toString("base64url") as URN;
 
-        void updateBuildingUrn(buildingId, encodedUrn); // save urn to db, then translate
+        void updateBuildingUrn(buildingId, encodedUrn);
 
-        await update("translating", 80);
+        await update("translating", "URN stored - submitting translation job", 80);
 
         const translateRes = await fetch(
             "https://developer.api.autodesk.com/modelderivative/v2/designdata/job",
@@ -172,6 +183,8 @@ export async function processApsUpload(params: {
             );
         }
 
+        await update("translating", "Translation job queued - waiting for Autodesk", 82);
+
         // Poll translation status
         let done = false;
         const manifestUrl = `https://developer.api.autodesk.com/modelderivative/v2/designdata/${encodedUrn}/manifest`;
@@ -191,25 +204,36 @@ export async function processApsUpload(params: {
 
             if (manifest.status === "success") {
                 done = true;
+                await update("success", "Translation complete - model is ready", 100);
             } else if (manifest.status === "failed" || manifest.status === "timeout") {
-                await update("error", 100);
+                await update(
+                    "error",
+                    `Translation ${manifest.status} - ${manifest.progress || "check logs"}`,
+                    100,
+                );
                 throw new Error(
                     `Translation ${manifest.status}: ${manifest.progress || "unknown reason"}`,
                 );
             } else {
-                // Try to use real progress if available
                 let progress = 85;
+                let message = "Processing model on Autodesk servers";
+
                 if (manifest.progress && typeof manifest.progress === "string") {
                     const match = manifest.progress.match(/(\d+)%/);
-                    if (match) progress = 80 + Math.floor(parseInt(match[1]) * 0.15);
+                    if (match) {
+                        const p = parseInt(match[1], 10);
+                        progress = 80 + Math.floor(p * 0.18); // stretch to ~98%
+                        message = `Autodesk translation progress: ${manifest.progress}`;
+                    }
                 }
-                await update("translating", Math.min(progress, 95));
+
+                await update("translating", message, Math.min(progress, 98));
             }
         }
 
-        await update("success", 100);
+        await updateBuildingUrn(buildingId, encodedUrn); // ensure it's saved (idempotent)
     } catch (error) {
-        await update("error", 100);
+        await update("error", "Processing failed - please try again", 100);
         console.error("APS upload/translation error:", error);
         throw error;
     }
