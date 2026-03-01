@@ -26,7 +26,6 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
         try {
             const formData = new FormData();
             formData.append("file", file);
-            setFile(null);
 
             const response = await fetch(
                 `${apiUrl}${buildingsBase}${buildingsRoutes.upload}?buildingId=${buildingId}`,
@@ -104,6 +103,7 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
                         setFile(null);
                     }
                 } else if (data.uploads) {
+                    setFile(null);
                     const job = data.uploads[jobId];
                     if (job) {
                         setProgress(job.percent);
