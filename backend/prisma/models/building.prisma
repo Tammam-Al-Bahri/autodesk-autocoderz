@@ -1,0 +1,26 @@
+model Building {
+  id String @id @default(cuid())
+
+  buildingGroup   BuildingGroup @relation(fields: [buildingGroupId], references: [id], onDelete: Cascade)
+  buildingGroupId String
+
+  name    String
+  address String
+  urn     String?
+
+  status BuildingStatus
+  type   BuildingType
+
+  rooms Room[]
+}
+
+enum BuildingStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+enum BuildingType {
+  HOTEL
+  OTHER
+}

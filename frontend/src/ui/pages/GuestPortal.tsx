@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AutodeskViewer from "@/components/AutodeskViewer";
-import { baseApiUrl } from "@/lib/utils";
-import { authRoutes } from "@autocoderz/shared";
+import { apiUrl } from "@/lib/utils";
+import { apsBase, apsRoutes } from "@autocoderz/shared";
 
 const SNOWDON_URN =
     "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6YXV0b2NvZGVyel9wZXJtYW5lbnRfc3RvcmFnZS9Tbm93ZG9uX1Rvd2Vyc19GaW5hbC5ydnQ";
@@ -17,7 +17,7 @@ export default function GuestPortal() {
     const roomNumber = "204";
 
     useEffect(() => {
-        fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.autodesk}`)
+        fetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`)
             .then((res) => res.json())
             .then((data) => {
                 setApsToken(data.access_token);
@@ -80,7 +80,7 @@ export default function GuestPortal() {
                     </CardHeader>
 
                     <CardContent className="p-0">
-                        <div className="h-[500px] w-full bg-gray-100 relative">
+                        <div className="h-125 w-full bg-gray-100 relative">
                             {apsToken ? (
                                 <AutodeskViewer urn={SNOWDON_URN} token={apsToken} />
                             ) : (

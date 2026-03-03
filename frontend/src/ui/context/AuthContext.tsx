@@ -1,12 +1,15 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { SafeUser } from "@autocoderz/shared";
-import { authRoutes, loginUserSchema } from "@autocoderz/shared";
-import { baseApiUrl } from "@/lib/utils";
+import { authBase, authRoutes, loginUserSchema } from "@autocoderz/shared";
+import { apiUrl } from "@/lib/utils";
 
 interface AuthContextType {
     user: SafeUser | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    login: (
+        email: string,
+        password: string,
+    ) => Promise<{ success: boolean; error?: { title: string; description: string } }>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }
@@ -20,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const fetchUser = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.me}`, {
+            const res = await fetch(`${apiUrl}${authBase}${authRoutes.me}`, {
                 method: "GET",
                 credentials: "include",
             });
@@ -43,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = async (email: string, password: string) => {
         try {
             loginUserSchema.parse({ email, password });
-            const res = await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.login}`, {
+            const res = await fetch(`${apiUrl}${authBase}${authRoutes.login}`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -59,13 +62,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 return { success: false, error: data.error };
             }
         } catch {
-            return { success: false, error: "An error occurred" };
+            return { success: false, error: { title: "An error occurred", description: "" } };
         }
     };
 
     const logout = async () => {
         try {
-            await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.logout}`, {
+            await fetch(`${apiUrl}${authBase}${authRoutes.logout}`, {
                 method: "POST",
                 credentials: "include",
             });

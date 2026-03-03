@@ -6,13 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import {
     createUserSchema as formSchema,
+    usersBase,
     usersRoutes,
     type CreateUser as FormFields,
 } from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
-import { baseApiUrl } from "@/lib/utils";
+import { apiUrl } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
 import { useAuth } from "@/context/AuthContext";
 
@@ -28,25 +29,21 @@ export function SignupForm() {
             const method = "POST";
 
             setIsUpdating(true);
-            const response = await fetch(
-                `${baseApiUrl}${usersRoutes.base}${usersRoutes.createUser}`,
-                {
-                    method: method,
-                    credentials: "include",
-                    body: JSON.stringify(data),
-                    headers: { "Content-Type": "application/json" },
-                },
-            );
+            const response = await fetch(`${apiUrl}${usersBase}${usersRoutes.createUser}`, {
+                method,
+                credentials: "include",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" },
+            });
             setIsUpdating(false);
+            const resData = await response.json();
             if (response.ok) {
-                const json = await response.json();
-                toast.success("SUCCESS MESSAGE", {
-                    description: JSON.stringify(json, null, 2),
-                });
+                toast.success(`Welcome, ${data.firstName}`);
                 await refreshUser();
                 navigate("/", { replace: true });
             } else {
-                toast.error("ERROR MESSAGE FROM API");
+                const { title, description } = resData.error;
+                toast.error(title, { description });
             }
         } catch (error) {
             console.log(error);
@@ -109,13 +106,7 @@ export function SignupForm() {
                                 <FormItem>
                                     <FormLabel>Middle Name</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="Adam"
-                                            {...field}
-                                            value={field.value ?? ""}
-                                            onChange={(e) => field.onChange(e.target.value || null)}
-                                        />
+                                        <Input type="text" placeholder="Adam" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

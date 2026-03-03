@@ -3,14 +3,16 @@ import { SignupForm } from "@/components/signup-form";
 import LogoutButton from "@/components/LogoutButton";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { baseApiUrl } from "@/lib/utils";
+import { apiUrl } from "@/lib/utils";
 import { toast } from "sonner";
-import { authRoutes } from "@autocoderz/shared";
+import { apsBase, apsRoutes } from "@autocoderz/shared";
 import AutodeskViewer from "@/components/AutodeskViewer";
 import { useState } from "react";
+import { BuildingGroupForm } from "@/components/building-group/BuildingGroupForm";
+import BuildingGroupTable from "@/components/building-group/BuildingGroupTable";
 
 export default function Test() {
-    const SNOWDON_URN =
+    const BUILDING_URN =
         "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6YXV0b2NvZGVyel9wZXJtYW5lbnRfc3RvcmFnZS9Tbm93ZG9uX1Rvd2Vyc19GaW5hbC5ydnQ";
 
     const { user } = useAuth();
@@ -20,21 +22,20 @@ export default function Test() {
         try {
             const method = "GET";
 
-            const response = await fetch(`${baseApiUrl}${authRoutes.base}/autodesk`, {
-                method: method,
+            const response = await fetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`, {
+                method,
                 credentials: "include",
             });
 
-            const json = await response.json();
+            const resData = await response.json();
             if (response.ok) {
-                setAutodeskToken(json.access_token);
+                setAutodeskToken(resData.access_token);
                 toast.success("SUCCESS MESSAGE", {
-                    description: JSON.stringify(json, null, 2),
+                    description: JSON.stringify(resData, null, 2),
                 });
             } else {
-                toast.error("ERROR MESSAGE FROM API", {
-                    description: JSON.stringify(json, null, 2),
-                });
+                const { title, description } = resData.error;
+                toast.error(title, { description });
             }
         } catch (error) {
             console.log(error);
@@ -60,7 +61,9 @@ export default function Test() {
                 </>
             )}
             <Button onClick={onSubmit}>Autodesk Viewer</Button>
-            {autodeskToken && <AutodeskViewer urn={SNOWDON_URN} token={autodeskToken} />}
+            {autodeskToken && <AutodeskViewer urn={BUILDING_URN} token={autodeskToken} />}
+            <BuildingGroupForm />
+            <BuildingGroupTable />
         </div>
     );
 }

@@ -27,10 +27,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
             const result = await login(data.email, data.password);
             setIsUpdating(false);
             if (result.success) {
-                toast.success("Logged in successfully");
                 navigate("/", { replace: true });
-            } else {
-                toast.error("Login failed");
+            }
+            if (result.error) {
+                const { title, description } = result.error;
+                toast.error(title, { description });
             }
         } catch (error) {
             console.log(error);
