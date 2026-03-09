@@ -1,4 +1,4 @@
-import { BrowserRouter, Outlet, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import pages from "./pages";
 
 import Navbar from "./components/Navbar";
@@ -37,9 +37,9 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route element={<Layout />}>
-                    {/* {pages.map(({ path, component: Component }) => (
+                    {pages.map(({ path, component: Component }) => (
                         <Route key={path} path={path} element={<Component />} />
-                    ))} */}
+                    ))}
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Routes>
