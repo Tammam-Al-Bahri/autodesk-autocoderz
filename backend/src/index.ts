@@ -74,6 +74,10 @@ app.use((error: unknown, request: Request, response: Response, next: NextFunctio
     response.status(status).json({ error: { title, description } });
 });
 
+app.use((req: Request, res: Response) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
+});
+
 app.listen(PORT, () => {
     console.log(`Running on port ${PORT}`);
 });
