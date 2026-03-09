@@ -1,9 +1,10 @@
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import pages from "./pages";
 
 import Navbar from "./components/Navbar";
 import { useAuth } from "./context/AuthContext";
 import LoadingPage from "./components/LoadingPage";
+import { Bot } from "lucide-react";
 
 function Layout() {
     return (
@@ -13,6 +14,15 @@ function Layout() {
                 <Outlet />
             </div>
         </main>
+    );
+}
+
+function NotFound() {
+    return (
+        <div className="flex flex-col min-h-screen justify-center items-center">
+            <Bot size={96} />
+            <div className="text-5xl font-semibold">Page not found</div>
+        </div>
     );
 }
 
@@ -27,9 +37,10 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route element={<Layout />}>
-                    {pages.map(({ path, component: Component }) => (
+                    {/* {pages.map(({ path, component: Component }) => (
                         <Route key={path} path={path} element={<Component />} />
-                    ))}
+                    ))} */}
+                    <Route path="*" element={<NotFound />} />
                 </Route>
             </Routes>
         </BrowserRouter>

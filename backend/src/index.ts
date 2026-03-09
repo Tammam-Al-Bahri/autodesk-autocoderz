@@ -21,8 +21,6 @@ const COOKIE_MAX_AGE_DAYS = parseInt(process.env.COOKIE_MAX_AGE_DAYS ?? "7");
 
 const frontendPath = path.join(process.cwd(), "../frontend/dist-react");
 
-console.log(__dirname);
-
 const app = express();
 
 app.use(
