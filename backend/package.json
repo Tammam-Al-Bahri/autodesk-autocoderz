@@ -6,7 +6,7 @@
     "main": "index.js",
     "scripts": {
         "db:view": "npx prisma studio",
-        "build": "tsc --build --verbose",
+        "build": "npx prisma generate && tsc --build --verbose",
         "start": "node ./dist/src/index.js",
         "dev": "concurrently -k -n EXPRESS,PRISMA,ENV -c blue,green,white \"nodemon\" \"nodemon --config nodemon.prisma.json\" \"nodemon --config nodemon.env.json\""
     },
