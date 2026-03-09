@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export const apiUrl: string = `${import.meta.env.VITE_API_BASE_URL}${base}`;
+export const apiUrl: string = `${import.meta.env.VITE_API_BASE_URL ?? ""}${base}`;
 
 export function formatEnum(value: string) {
     return value
