@@ -1,5 +1,5 @@
 import { columns } from "./columns";
-import { buildingGroupsBase, buildingGroupsRoutes, type BuildingGroup } from "@autocoderz/shared";
+import { buildingGroupsBase, type BuildingGroup } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
 import { apiUrl } from "@/lib/utils";
 import { useEffect, useState } from "react";
