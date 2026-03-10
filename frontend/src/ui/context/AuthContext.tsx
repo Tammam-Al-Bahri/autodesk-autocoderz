@@ -56,6 +56,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const data = await res.json();
 
             if (res.ok) {
+                if (import.meta.env.VITE_BUILD_TARGET === "electron") {
+                    await window.electron.setCookie({
+                        url: import.meta.env.VITE_API_BASE_URL,
+                        name: "sid",
+                        value: data.token,
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "no_restriction",
+                    });
+                }
                 setUser(data.safeUser);
                 return { success: true };
             } else {
@@ -72,6 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 method: "POST",
                 credentials: "include",
             });
+            if (import.meta.env.VITE_BUILD_TARGET === "electron") {
+                await window.electron.removeCookie(import.meta.env.VITE_API_BASE_URL, "sid");
+            }
         } finally {
             setUser(null);
         }
