@@ -16,6 +16,8 @@ import apsRouter from "./routes/aps";
 import buildingGroupsRouter from "./routes/buildingGroups";
 import buildingsRouter from "./routes/buildings";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const PORT = parseInt(process.env.PORT ?? "3000");
 const COOKIE_MAX_AGE_DAYS = parseInt(process.env.COOKIE_MAX_AGE_DAYS ?? "7");
 
@@ -47,8 +49,8 @@ app.use(
         cookie: {
             maxAge: COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
             secure: false,
-            httpOnly: true,
-            sameSite: "lax",
+            httpOnly: isProd,
+            sameSite: isProd ? "none" : "lax",
         },
     }),
 );

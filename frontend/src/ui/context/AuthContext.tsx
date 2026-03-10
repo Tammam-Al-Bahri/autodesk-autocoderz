@@ -57,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (res.ok) {
                 if (import.meta.env.VITE_BUILD_TARGET === "electron") {
+                    await window.electron.removeCookie(import.meta.env.VITE_API_BASE_URL, "sid");
                     await window.electron.setCookie({
                         url: import.meta.env.VITE_API_BASE_URL,
                         name: "sid",
