@@ -1,25 +1,26 @@
-import type { ReactNode } from "react";
+import { lazy } from "react";
 import type { NavbarView } from "@/components/Navbar";
+import type { ComponentType } from "react";
 
-import About from "./About";
-import Home from "./Home";
-import LoginPage from "./login";
-import Test from "./Test";
-import StaffTasks from "./StaffTasks";
-import Receptionist from "./Receptionist";
-import SignupPage from "./signup";
-import Dashboard from "./Dashboard";
-import Applications from "./Application";
-import Tickets from "./Tickets";
-import MyBuildingGroups from "./building-group/MyBuildingGroups";
-import BuildingGroup from "./building-group/BuildingGroup";
-import GuestPortal from "./GuestPortal";
-import Building from "./building/Building";
+const About = lazy(() => import("./About"));
+const Home = lazy(() => import("./Home"));
+const LoginPage = lazy(() => import("./login"));
+const Test = lazy(() => import("./Test"));
+const StaffTasks = lazy(() => import("./StaffTasks"));
+const Receptionist = lazy(() => import("./Receptionist"));
+const SignupPage = lazy(() => import("./signup"));
+const Dashboard = lazy(() => import("./Dashboard"));
+const Applications = lazy(() => import("./Application"));
+const Tickets = lazy(() => import("./Tickets"));
+const MyBuildingGroups = lazy(() => import("./building-group/MyBuildingGroups"));
+const BuildingGroup = lazy(() => import("./building-group/BuildingGroup"));
+const GuestPortal = lazy(() => import("./GuestPortal"));
+const Building = lazy(() => import("./building/Building"));
 
 type Page = {
     path: string;
     title: string;
-    component: () => ReactNode;
+    component: ComponentType;
     navbarView?: NavbarView[];
 };
 

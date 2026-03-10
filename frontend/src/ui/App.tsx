@@ -1,10 +1,12 @@
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, HashRouter, Outlet, Route, Routes } from "react-router-dom";
 import pages from "./pages";
 
 import Navbar from "./components/Navbar";
 import { useAuth } from "./context/AuthContext";
 import LoadingPage from "./components/LoadingPage";
 import { Bot } from "lucide-react";
+
+const Router = import.meta.env.VITE_BUILD_TARGET === "electron" ? HashRouter : BrowserRouter;
 
 function Layout() {
     return (
@@ -34,7 +36,7 @@ function App() {
     if (loading) return <LoadingPage />;
 
     return (
-        <BrowserRouter>
+        <Router>
             <Routes>
                 <Route element={<Layout />}>
                     {pages.map(({ path, component: Component }) => (
@@ -43,7 +45,7 @@ function App() {
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Routes>
-        </BrowserRouter>
+        </Router>
     );
 }
 
