@@ -3,7 +3,7 @@ import { SignupForm } from "@/components/signup-form";
 import LogoutButton from "@/components/LogoutButton";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { apiUrl } from "@/lib/utils";
+import { apiFetch, apiUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { apsBase, apsRoutes } from "@autocoderz/shared";
 import AutodeskViewer from "@/components/AutodeskViewer";
@@ -22,7 +22,7 @@ export default function Test() {
         try {
             const method = "GET";
 
-            const response = await fetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`, {
+            const response = await apiFetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`, {
                 method,
                 credentials: "include",
             });

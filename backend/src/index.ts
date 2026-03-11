@@ -2,6 +2,7 @@ import * as express from "express";
 import * as cors from "cors";
 import * as session from "express-session";
 import * as path from "path";
+import * as signature from "cookie-signature";
 
 import { Request, Response, NextFunction } from "express";
 
@@ -15,6 +16,7 @@ import authRouter from "./routes/auth";
 import apsRouter from "./routes/aps";
 import buildingGroupsRouter from "./routes/buildingGroups";
 import buildingsRouter from "./routes/buildings";
+import { request } from "http";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -35,6 +37,27 @@ app.use(
 app.use(express.static(frontendPath));
 
 app.use(express.json());
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const auth = req.headers.authorization;
+
+    if (auth?.startsWith("Session ")) {
+        const sid = auth.slice("Session ".length);
+
+        const signed = "s:" + signature.sign(sid, process.env.SESSION_SECRET ?? "");
+
+        const encoded = encodeURIComponent(signed);
+
+        if (!req.headers.cookie) {
+            req.headers.cookie = `sid=${encoded}`;
+        } else if (!req.headers.cookie.includes("sid=")) {
+            req.headers.cookie += `; sid=${encoded}`;
+        }
+    }
+
+    next();
+});
+
 app.use(
     session({
         store: new PrismaSessionStore(prisma, {
@@ -48,7 +71,7 @@ app.use(
         resave: false,
         cookie: {
             maxAge: COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
-            secure: false,
+            secure: isProd,
             httpOnly: true,
             sameSite: "lax",
         },
@@ -63,7 +86,6 @@ app.use(base, buildingsRouter);
 
 app.use((error: unknown, request: Request, response: Response, next: NextFunction) => {
     console.error(error);
-
     const maybeError = error as any;
 
     const status = maybeError?.status ?? maybeError?.statusCode ?? 500;
