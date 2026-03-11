@@ -48,9 +48,9 @@ app.use(
         resave: false,
         cookie: {
             maxAge: COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
-            secure: isProd,
-            httpOnly: isProd,
-            sameSite: isProd ? "strict" : "none",
+            secure: true,
+            httpOnly: false,
+            sameSite: "lax",
         },
     }),
 );
