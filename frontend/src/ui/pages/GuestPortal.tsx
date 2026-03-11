@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import AutodeskViewer from "@/components/AutodeskViewer";
-import { apiUrl } from "@/lib/utils";
+import { apiFetch, apiUrl } from "@/lib/utils";
 import { apsBase, apsRoutes } from "@autocoderz/shared";
 import {
   Bed,
@@ -34,7 +34,7 @@ export default function GuestPortal() {
 
   useEffect(() => {
 
-    fetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`)
+    apiFetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`)
       .then((res) => res.json())
       .then((data) => {
         setToken(data.access_token);

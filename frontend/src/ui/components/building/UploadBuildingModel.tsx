@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { apiUrl } from "@/lib/utils";
+import { apiFetch, apiUrl } from "@/lib/utils";
 import { authBase, authRoutes, buildingsBase, buildingsRoutes } from "@autocoderz/shared";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
@@ -27,11 +27,10 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
             const formData = new FormData();
             formData.append("file", file);
 
-            const response = await fetch(
+            const response = await apiFetch(
                 `${apiUrl}${buildingsBase}${buildingsRoutes.upload}?buildingId=${buildingId}`,
                 {
                     method: "POST",
-                    credentials: "include",
                     body: formData,
                 },
             );
@@ -65,11 +64,8 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
 
         const interval = setInterval(async () => {
             try {
-                const res = await fetch(
+                const res = await apiFetch(
                     `${apiUrl}${authBase}${authRoutes.uploadProgress}?jobId=${jobId}`,
-                    {
-                        credentials: "include",
-                    },
                 );
 
                 if (res.status === 404) {

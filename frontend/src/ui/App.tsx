@@ -5,8 +5,9 @@ import Navbar from "./components/Navbar";
 import { useAuth } from "./context/AuthContext";
 import LoadingPage from "./components/LoadingPage";
 import { Bot } from "lucide-react";
+import { isElectron } from "./lib/utils";
 
-const Router = import.meta.env.VITE_BUILD_TARGET === "electron" ? HashRouter : BrowserRouter;
+const Router = isElectron ? HashRouter : BrowserRouter;
 
 function Layout() {
     return (

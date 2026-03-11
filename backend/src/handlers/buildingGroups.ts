@@ -38,8 +38,8 @@ export async function getBuildingGroups(request: Request, response: Response, ne
     if (!userId) {
         response.status(401).json({
             error: {
-                title: "Not authenticated",
-                description: "You must be logged in to perform this action",
+                title: "User not found",
+                description: "No user ID found in session",
             },
         });
         return;
