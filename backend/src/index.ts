@@ -48,8 +48,8 @@ app.use(
         resave: false,
         cookie: {
             maxAge: COOKIE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
-            secure: true,
-            httpOnly: false,
+            secure: false,
+            httpOnly: true,
             sameSite: "lax",
         },
     }),
