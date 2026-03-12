@@ -16,7 +16,6 @@ import authRouter from "./routes/auth";
 import apsRouter from "./routes/aps";
 import buildingGroupsRouter from "./routes/buildingGroups";
 import buildingsRouter from "./routes/buildings";
-import { request } from "http";
 
 const isProd = process.env.NODE_ENV === "production";
 
