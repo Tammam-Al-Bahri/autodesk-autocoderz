@@ -27,6 +27,8 @@ const frontendPath = path.join(process.cwd(), "../frontend/dist-react");
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(
     cors({
         origin: true,
