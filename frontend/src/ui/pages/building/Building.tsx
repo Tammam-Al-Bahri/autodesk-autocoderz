@@ -1,14 +1,15 @@
 import AutodeskViewer from "@/components/AutodeskViewer";
+import InviteStaffForm from "@/components/building/InviteBuidlingStaffForm";
 import { UploadBuildingModel } from "@/components/building/UploadBuildingModel";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { apiFetch, apiUrl } from "@/lib/utils";
-import { apsBase, apsRoutes, buildingsBase } from "@autocoderz/shared";
+import { apsBase, apsRoutes, buildingsBase, type BuildingId } from "@autocoderz/shared";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function Building() {
-    const { buildingId } = useParams();
+    const { buildingId } = useParams<{ buildingId: BuildingId }>();
 
     if (!buildingId) return <>no buildingId found</>;
 
@@ -65,6 +66,7 @@ export default function Building() {
     return (
         <div className="flex-col">
             building id: {buildingId}
+            <InviteStaffForm buildingId={buildingId} />
             <UploadBuildingModel buildingId={buildingId} />
             {autodeskToken && buildingUrn && (
                 <Card className="w-300">

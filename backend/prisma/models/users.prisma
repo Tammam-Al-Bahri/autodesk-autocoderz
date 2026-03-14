@@ -9,4 +9,6 @@ model User {
   lastName   String
 
   buildingGroups BuildingGroup[]
+
+  staff BuildingStaff[]
 }

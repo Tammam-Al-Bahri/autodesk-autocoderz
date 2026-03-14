@@ -1,4 +1,4 @@
-import { BuildingGroupId, BuildingId, CreateBuilding, URN } from "@autocoderz/shared";
+import { BuildingGroupId, BuildingId, CreateBuilding, URN, UserId } from "@autocoderz/shared";
 import { prisma } from "../lib/prisma";
 import { handlePrismaError } from "../lib/handlePrismaError";
 
@@ -56,6 +56,33 @@ export async function updateBuildingUrn(buildingId: BuildingId, urn: URN) {
                 urn: urn,
             },
         });
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}
+
+export async function canManageBuildingStaff(userId: UserId, buildingId: BuildingId) {
+    // if userId = building's building group's owner's userId
+    // aka only company owner can invite staff to any buildings in company
+    // at least for now
+    try {
+        const buildingGroupOwner = await prisma.building.findUnique({
+            where: {
+                id: buildingId,
+                buildingGroup: {
+                    ownerId: userId,
+                },
+            },
+            select: {
+                buildingGroup: {
+                    select: {
+                        ownerId: true,
+                    },
+                },
+            },
+        });
+
+        return !!buildingGroupOwner;
     } catch (error) {
         throw handlePrismaError(error);
     }

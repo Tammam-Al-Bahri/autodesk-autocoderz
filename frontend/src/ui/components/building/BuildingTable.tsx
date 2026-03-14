@@ -1,5 +1,5 @@
 import { columns } from "./columns";
-import { buildingsBase, type Building } from "@autocoderz/shared";
+import { buildingsBase, type Building, type BuildingGroupId } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
 import { apiFetch, apiUrl } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -7,7 +7,7 @@ import { Card } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
 import { toast } from "sonner";
 
-export default function BuildingTable({ buildingGroupId }: { buildingGroupId: string }) {
+export default function BuildingTable({ buildingGroupId }: { buildingGroupId: BuildingGroupId }) {
     const [data, setData] = useState<Building[]>([]);
     const [loading, setLoading] = useState(true);
 

@@ -1,0 +1,26 @@
+model BuildingStaff {
+  id String @id @default(cuid())
+
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  buildingId String
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  role BuildingStaffRole
+  status BuildingStaffInviteStatus
+
+  @@unique([buildingId, userId])
+}
+
+enum BuildingStaffRole {
+  RECEPTIONIST
+  MAINTENANCE
+}
+
+enum BuildingStaffInviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  PAUSED
+}

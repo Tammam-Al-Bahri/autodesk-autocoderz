@@ -1,8 +1,18 @@
 import { Router } from "express";
 import { validate } from "../lib/validate";
-import { createBuildingSchema, buildingsRoutes, buildingsBase } from "@autocoderz/shared";
+import {
+    createBuildingSchema,
+    buildingsRoutes,
+    buildingsBase,
+    createBuildingStaffInviteSchema,
+} from "@autocoderz/shared";
 import { requireAuth } from "../middleware/auth";
-import { createBuilding, getBuildings, uploadBuildingModel } from "../handlers/buildings";
+import {
+    createBuilding,
+    createBuildingStaffInvite,
+    getBuildings,
+    uploadBuildingModel,
+} from "../handlers/buildings";
 import { upload } from "../lib/uploadFile";
 
 const router = Router();
@@ -14,6 +24,12 @@ router.post(
     requireAuth,
     upload.single("file"),
     uploadBuildingModel,
+);
+router.post(
+    `${buildingsBase}${buildingsRoutes.invite}`,
+    requireAuth,
+    validate(createBuildingStaffInviteSchema),
+    createBuildingStaffInvite,
 );
 
 export default router;

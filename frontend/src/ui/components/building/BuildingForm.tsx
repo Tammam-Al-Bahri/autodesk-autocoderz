@@ -9,6 +9,7 @@ import {
     type BuildingForm as FormFields,
     buildingGroupId as buildingGroupIdSchema,
     type CreateBuilding,
+    type BuildingGroupId,
 } from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -17,7 +18,7 @@ import { apiFetch, apiUrl, formatEnum } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
-export function BuildingForm({ buildingGroupId }: { buildingGroupId: string }) {
+export function BuildingForm({ buildingGroupId }: { buildingGroupId: BuildingGroupId }) {
     const form = useForm<FormFields>({
         resolver: zodResolver(formSchema),
         // defaultValues: {

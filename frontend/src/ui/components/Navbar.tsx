@@ -14,6 +14,7 @@ import {
 } from "./ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { pagesLinks } from "@/pages";
+import Notifications from "./Notifications";
 
 export type NavbarView = "Guest" | "Staff" | "Manage";
 
@@ -22,6 +23,9 @@ export default function Navbar() {
 
     const [currentView, setCurrentView] = useState<NavbarView>(() => {
         const savedView = localStorage.getItem("selectedView");
+        if (!user) {
+            return "Guest";
+        }
         if (savedView === "Guest" || savedView === "Staff" || savedView === "Manage") {
             return savedView;
         }
@@ -30,7 +34,7 @@ export default function Navbar() {
 
     const navLinks = pagesLinks.filter((link) => link.navbarView?.includes(currentView));
 
-    const views: { title: string; value: "Guest" | "Staff" | "Manage" }[] = [
+    const views: { title: string; value: NavbarView }[] = [
         { title: "Guest", value: "Guest" },
         { title: "Staff", value: "Staff" },
         { title: "Manage", value: "Manage" },
@@ -42,28 +46,30 @@ export default function Navbar() {
                 <div className="border-r-2 pr-2">
                     <Logo />
                 </div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <div className="font-semibold italic flex">
-                            {currentView}
-                            <ChevronDown className="scale-50" />
-                        </div>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        {views.map((view) => (
-                            <DropdownMenuItem
-                                key={view.value}
-                                className="justify-center"
-                                onClick={() => {
-                                    setCurrentView(view.value);
-                                    localStorage.setItem("selectedView", view.value);
-                                }}
-                            >
-                                {view.title}
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                {user ? (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <div className="font-semibold italic flex">
+                                {currentView}
+                                <ChevronDown className="scale-50" />
+                            </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            {views.map((view) => (
+                                <DropdownMenuItem
+                                    key={view.value}
+                                    className="justify-center"
+                                    onClick={() => {
+                                        setCurrentView(view.value);
+                                        localStorage.setItem("selectedView", view.value);
+                                    }}
+                                >
+                                    {view.title}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                ) : null}
             </div>
 
             <div className="absolute left-1/2 top-0 flex h-full -translate-x-1/2 items-center gap-2">
@@ -76,7 +82,10 @@ export default function Navbar() {
 
             <div className="flex items-center gap-4 ml-auto z-10">
                 {user ? (
-                    <LogoutButton />
+                    <>
+                        <Notifications />
+                        <LogoutButton />
+                    </>
                 ) : (
                     <Button asChild variant="outline">
                         <Link to="/login">Login</Link>
