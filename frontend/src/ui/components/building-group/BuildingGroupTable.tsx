@@ -1,13 +1,14 @@
 import { columns } from "./columns";
 import { buildingGroupsBase, type BuildingGroup } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
-import { apiFetch, apiUrl } from "@/lib/utils";
+import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { Card } from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
 import { toast } from "sonner";
+import { Building, Loader2, Network } from "lucide-react";
 
-export default function BuildingGroupTable() {
+export default function BuildingGroupTable({ className, ...props }: React.ComponentProps<"div">) {
     const [data, setData] = useState<BuildingGroup[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -36,10 +37,56 @@ export default function BuildingGroupTable() {
 
     if (loading) {
         return (
-            <Card className="p-6 w-full">
-                <SkeletonForm />
-            </Card>
+            <div className={cn("w-full", className)} {...props}>
+                <Card className="p-6 w-full border-border bg-card shadow-sm flex flex-col items-center justify-center min-h-[400px] transition-colors duration-300">
+                    <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
+                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                        Loading Portfolios...
+                    </p>
+                    <div className="w-full mt-8 opacity-40">
+                        <SkeletonForm />
+                    </div>
+                </Card>
+            </div>
         );
     }
-    return <DataTable columns={columns} data={data} />;
+
+    return (
+        <div className={cn("w-full", className)} {...props}>
+            <Card className="border-border shadow-lg bg-card overflow-hidden rounded-xl transition-colors duration-300">
+                <CardHeader className="border-b border-border/50 pb-6 bg-muted/20">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle className="text-2xl font-bold flex items-center text-foreground">
+                                <Network className="w-6 h-6 mr-3 text-primary" />
+                                Company Portfolios
+                            </CardTitle>
+                            <CardDescription className="text-muted-foreground mt-1">
+                                A top-level directory of all organisations and franchise groups you manage.
+                            </CardDescription>
+                        </div>
+                        <div className="hidden sm:flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
+                            {data.length} {data.length === 1 ? 'Organisation' : 'Organisations'}
+                        </div>
+                    </div>
+                </CardHeader>
+                
+                <CardContent className="p-0 sm:p-6">
+                    {data.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+                            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+                                <Building className="w-6 h-6 text-muted-foreground" />
+                            </div>
+                            <h3 className="text-lg font-bold text-foreground">No portfolios found</h3>
+                            <p className="text-sm text-muted-foreground max-w-sm mt-1">
+                                Use the form to create your first company. It will appear here once initialised.
+                            </p>
+                        </div>
+                    ) : (
+                        <DataTable columns={columns} data={data} />
+                    )}
+                </CardContent>
+            </Card>
+        </div>
+    );
 }
