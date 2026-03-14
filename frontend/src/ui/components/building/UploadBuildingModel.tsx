@@ -6,6 +6,15 @@ import { Input } from "../ui/input";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
 import { Progress } from "../ui/progress";
+import { 
+    CloudUpload, 
+    FileBox, 
+    HardDriveUpload, 
+    CheckCircle2, 
+    Loader2, 
+    AlertCircle 
+} from "lucide-react";
+import { Badge } from "../ui/badge";
 
 export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
     const [file, setFile] = useState<File | null>(null);
@@ -88,7 +97,6 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
                 const data = await res.json();
 
                 if (data.job) {
-                    // Specific job response
                     const job = data.job;
                     setProgress(job.percent);
                     setStatus(job.status);
@@ -119,7 +127,6 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
                             setFile(null);
                         }
                     } else {
-                        // Job disappeared (cleaned up) → assume done or failed
                         clearInterval(interval);
                         setLoading(false);
                         setProgress(100);
@@ -133,44 +140,93 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
                 setStatus("error");
                 toast.error("Could not track upload progress");
             }
-        }, 500); // Poll every 0.5 s
+        }, 500);
 
         return () => clearInterval(interval);
     }, [jobId, loading]);
 
+    const getFileSize = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
+
     if (loading) {
         return (
-            <Card className="p-6 w-full">
-                <div>{status}</div>
-                <div>{message}</div>
-                <div>{progress}%</div>
-                {file && (
-                    <div>
-                        {file.name} • {(file.size / (1024 * 1024)).toFixed(1)} MB
+            <Card className="p-6 w-full border-border bg-card shadow-sm relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-muted/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                
+                <div className="relative z-10 flex flex-col gap-4">
+                    <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                {status === "error" ? <AlertCircle className="w-5 h-5" /> : <Loader2 className="w-5 h-5 animate-spin" />}
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-foreground flex items-center gap-2">
+                                    Cloud Translation Active
+                                    <Badge variant="outline" className="text-[10px] uppercase bg-background text-foreground">
+                                        {status || "Initialising"}
+                                    </Badge>
+                                </h4>
+                                <p className="text-xs text-muted-foreground font-medium mt-0.5">
+                                    {message || "Synchronising BIM data with Autodesk Forge..."}
+                                </p>
+                            </div>
+                        </div>
+                        <span className="text-2xl font-black text-primary tracking-tighter">
+                            {progress}%
+                        </span>
                     </div>
-                )}
-                <Progress value={progress} />
+
+                    <Progress value={progress} className="h-2" />
+
+                    {file && (
+                        <div className="flex items-center justify-between text-xs text-muted-foreground bg-muted/50 p-2 rounded border border-border mt-1">
+                            <span className="flex items-center font-mono truncate max-w-[200px]">
+                                <FileBox className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                                {file.name}
+                            </span>
+                            <span className="font-medium whitespace-nowrap">
+                                {getFileSize(file.size)} MB
+                            </span>
+                        </div>
+                    )}
+                </div>
             </Card>
         );
     }
 
     return (
-        <div>
-            <Input
-                type="file"
-                accept=".rvt,.ifc,.dwg"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            />
+        <div className="w-full flex flex-col gap-3">
+            <div className="relative group">
+                <Input
+                    type="file"
+                    accept=".rvt,.ifc,.dwg"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                />
+                <div className="flex items-center justify-between p-3 border-2 border-dashed border-border rounded-lg bg-background group-hover:border-primary group-hover:bg-muted/50 transition-all">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="p-2 bg-muted rounded text-muted-foreground group-hover:text-primary transition-colors">
+                            <HardDriveUpload className="w-5 h-5" />
+                        </div>
+                        <div className="flex flex-col truncate">
+                            <span className="text-sm font-semibold text-foreground truncate">
+                                {file ? file.name : "Select architectural file..."}
+                            </span>
+                            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+                                {file ? `${getFileSize(file.size)} MB` : "RVT, IFC, DWG (Max 50MB)"}
+                            </span>
+                        </div>
+                    </div>
+                    {file && <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mx-2" />}
+                </div>
+            </div>
+
             <Button
-                onClick={
-                    file
-                        ? handleUpload
-                        : () => {
-                              toast.error("No file selected");
-                          }
-                }
+                onClick={file ? handleUpload : () => toast.error("No file selected")}
+                disabled={!file}
+                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all shadow-md group"
             >
-                Upload Building Model
+                <CloudUpload className="w-4 h-4 mr-2 group-hover:-translate-y-0.5 transition-transform" />
+                Initialise Cloud Upload
             </Button>
         </div>
     );
