@@ -21,8 +21,10 @@ export async function login(request: Request, response: Response, next: NextFunc
 
         request.session.userId = user.id as UserId;
 
+        request.session.save((error) => next(error));
+
         const safeUser = safeUserSchema.parse(user);
-        response.status(200).json({ token: request.session.id, safeUser });
+        response.status(200).json({ sid: request.session.id, safeUser });
         return;
     } catch (error) {
         next(error);
@@ -44,6 +46,7 @@ export async function logout(request: Request, response: Response, next: NextFun
 export async function me(request: Request, response: Response, next: NextFunction) {
     try {
         const userId = request.session.userId;
+        console.log(userId);
         if (!userId) {
             response.status(401).json({ error: { title: "Not logged in", description: "" } });
             return;

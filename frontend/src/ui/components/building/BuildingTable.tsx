@@ -1,7 +1,7 @@
 import { columns } from "./columns";
 import { buildingsBase, type Building } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
-import { apiUrl, cn } from "@/lib/utils";
+import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
@@ -22,11 +22,10 @@ export default function BuildingTable({
         async function fetchData() {
             try {
                 const method = "GET";
-                const response = await fetch(
+                const response = await apiFetch(
                     `${apiUrl}${buildingsBase}?buildingGroupId=${buildingGroupId}`,
                     {
                         method,
-                        credentials: "include",
                     },
                 );
                 const resData = await response.json();

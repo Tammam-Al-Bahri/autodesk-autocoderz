@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { SafeUser } from "@autocoderz/shared";
 import { authBase, authRoutes, loginUserSchema } from "@autocoderz/shared";
-import { apiUrl } from "@/lib/utils";
+import { apiFetch, apiUrl, isElectron } from "@/lib/utils";
 
 interface AuthContextType {
     user: SafeUser | null;
@@ -23,9 +23,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const fetchUser = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${apiUrl}${authBase}${authRoutes.me}`, {
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.me}`, {
                 method: "GET",
-                credentials: "include",
             });
             if (!res.ok) {
                 setUser(null);
@@ -46,9 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = async (email: string, password: string) => {
         try {
             loginUserSchema.parse({ email, password });
-            const res = await fetch(`${apiUrl}${authBase}${authRoutes.login}`, {
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.login}`, {
                 method: "POST",
-                credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
@@ -56,6 +54,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const data = await res.json();
 
             if (res.ok) {
+                if (isElectron) {
+                    localStorage.setItem("sid", data.sid);
+                }
                 setUser(data.safeUser);
                 return { success: true };
             } else {
@@ -68,10 +69,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = async () => {
         try {
-            await fetch(`${apiUrl}${authBase}${authRoutes.logout}`, {
+            await apiFetch(`${apiUrl}${authBase}${authRoutes.logout}`, {
                 method: "POST",
                 credentials: "include",
             });
+            if (isElectron) {
+                localStorage.removeItem("sid");
+            }
         } finally {
             setUser(null);
         }

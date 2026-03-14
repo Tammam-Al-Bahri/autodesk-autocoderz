@@ -5,7 +5,7 @@
     "icon": "./desktopIcon.png",
 
     "win": {
-        "target": ["portable", "msi"]
+        "target": ["portable"]
     },
     "mac": {
         "target": "dmg"

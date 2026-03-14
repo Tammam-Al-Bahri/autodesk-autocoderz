@@ -11,7 +11,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
-import { apiUrl, cn } from "@/lib/utils";
+import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Building, AlignLeft, Loader2, ArrowRight } from "lucide-react";
 
@@ -24,9 +24,8 @@ export function BuildingGroupForm({ className, ...props }: React.ComponentProps<
         try {
             const method = "POST";
             setIsUpdating(true);
-            const response = await fetch(`${apiUrl}${buildingGroupsBase}`, {
+            const response = await apiFetch(`${apiUrl}${buildingGroupsBase}`, {
                 method,
-                credentials: "include",
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" },
             });

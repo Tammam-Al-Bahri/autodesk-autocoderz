@@ -13,7 +13,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
-import { apiUrl, formatEnum, cn } from "@/lib/utils";
+import { apiFetch, apiUrl, formatEnum, cn } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Building2, MapPin, Loader2, PlusCircle } from "lucide-react";
@@ -45,9 +45,8 @@ export function BuildingForm({ buildingGroupId, className, ...props }: { buildin
             console.log(fullData);
 
             setIsUpdating(true);
-            const response = await fetch(`${apiUrl}${buildingsBase}`, {
+            const response = await apiFetch(`${apiUrl}${buildingsBase}`, {
                 method,
-                credentials: "include",
                 body: JSON.stringify(fullData),
                 headers: { "Content-Type": "application/json" },
             });

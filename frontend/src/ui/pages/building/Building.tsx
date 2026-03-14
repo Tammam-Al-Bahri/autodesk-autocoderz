@@ -1,7 +1,7 @@
 import AutodeskViewer from "@/components/AutodeskViewer";
 import { UploadBuildingModel } from "@/components/building/UploadBuildingModel";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { apiUrl } from "@/lib/utils";
+import { apiFetch, apiUrl } from "@/lib/utils";
 import { apsBase, apsRoutes, buildingsBase } from "@autocoderz/shared";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -20,7 +20,7 @@ export default function Building() {
             try {
                 const method = "GET";
 
-                const buildingRes = await fetch(
+                const buildingRes = await apiFetch(
                     `${apiUrl}${buildingsBase}?buildingId=${buildingId}`,
                     {
                         method,
@@ -40,7 +40,7 @@ export default function Building() {
                     toast.error(title, { description });
                 }
 
-                const tokenRes = await fetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`, {
+                const tokenRes = await apiFetch(`${apiUrl}${apsBase}${apsRoutes.viewerToken}`, {
                     method,
                     credentials: "include",
                 });

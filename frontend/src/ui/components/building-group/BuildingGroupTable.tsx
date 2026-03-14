@@ -1,7 +1,7 @@
 import { columns } from "./columns";
 import { buildingGroupsBase, type BuildingGroup } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
-import { apiUrl, cn } from "@/lib/utils";
+import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
@@ -16,9 +16,8 @@ export default function BuildingGroupTable({ className, ...props }: React.Compon
         async function fetchData() {
             try {
                 const method = "GET";
-                const response = await fetch(`${apiUrl}${buildingGroupsBase}`, {
+                const response = await apiFetch(`${apiUrl}${buildingGroupsBase}`, {
                     method,
-                    credentials: "include",
                 });
                 const resData = await response.json();
                 if (response.ok) {
