@@ -17,6 +17,7 @@ import { Button } from "../ui/button";
 import { apiFetch, apiUrl } from "@/lib/utils";
 import type z from "zod";
 import { toast } from "sonner";
+import { Card } from "../ui/card";
 
 export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: BuildingId }) {
     const [selectedUser, setSelectedUser] = useState<SafeUser | null>(null);
@@ -59,49 +60,51 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
     };
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div>
-                    <FormLabel>User</FormLabel>
+        <Card>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <div>
+                        <FormLabel>Invite Staff to Building</FormLabel>
 
-                    <SearchUsers onSelect={handleUserSelect} />
+                        <SearchUsers onSelect={handleUserSelect} />
 
-                    {selectedUser && (
-                        <p className="text-sm text-muted-foreground mt-2">
-                            Selected: {selectedUser.email}
-                        </p>
-                    )}
+                        {selectedUser && (
+                            <p className="text-sm text-muted-foreground mt-2">
+                                Selected: {selectedUser.email}
+                            </p>
+                        )}
 
-                    <FormMessage>{form.formState.errors.userId?.message}</FormMessage>
-                </div>
+                        <FormMessage>{form.formState.errors.userId?.message}</FormMessage>
+                    </div>
 
-                <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Role</FormLabel>
+                    <FormField
+                        control={form.control}
+                        name="role"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Role</FormLabel>
 
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select role" />
-                                    </SelectTrigger>
-                                </FormControl>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select role" />
+                                        </SelectTrigger>
+                                    </FormControl>
 
-                                <SelectContent>
-                                    <SelectItem value="RECEPTIONIST">Receptionist</SelectItem>
-                                    <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                    <SelectContent>
+                                        <SelectItem value="RECEPTIONIST">Receptionist</SelectItem>
+                                        <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
+                                    </SelectContent>
+                                </Select>
 
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                <Button type="submit">Send Invite</Button>
-            </form>
-        </Form>
+                    <Button type="submit">Send Invite</Button>
+                </form>
+            </Form>
+        </Card>
     );
 }

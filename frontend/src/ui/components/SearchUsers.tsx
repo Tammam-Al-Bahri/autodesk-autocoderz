@@ -41,7 +41,7 @@ export default function SearchUsers({ onSelect }: { onSelect: (user: SafeUser) =
     }, [query]);
 
     return (
-        <Command shouldFilter={false}>
+        <Command shouldFilter={false} className="border-2">
             <CommandInput placeholder="Search users..." value={query} onValueChange={setQuery} />
 
             <CommandList>
