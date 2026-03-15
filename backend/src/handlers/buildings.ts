@@ -1,11 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
 import {
     buildingGroupId as buildingGroupIdSchema,
-    BuildingId,
     buildingId as buildingIdSchema,
     CreateBuilding,
     CreateBuildingStaffInvite,
-    URN,
 } from "@autocoderz/shared";
 import {
     canManageBuildingStaff,
@@ -13,7 +11,10 @@ import {
     getBuildingFromId,
     getBuildingsFromBuildingGroupId,
 } from "../db/building";
-import { createBuildingStaffInvite as createBuildingStaffInviteDB, getBuildingStaffFromBuildingId } from "../db/buildingStaff";
+import {
+    createBuildingStaffInvite as createBuildingStaffInviteDB,
+    getBuildingStaffFromBuildingId,
+} from "../db/buildingStaff";
 import { randomUUID } from "node:crypto";
 import saveSession from "../lib/saveSession";
 import { processApsUpload } from "../lib/processApsUpload";
@@ -104,10 +105,10 @@ export async function uploadBuildingModel(
             });
         }
 
-        // Respond immediately
+        // respond immediately
         response.status(200).json({ jobId });
 
-        // Fire-and-forget (no await)
+        // then upload
         void processApsUpload({
             jobId,
             createdAt,
@@ -153,8 +154,6 @@ export async function createBuildingStaffInvite(
         next(error);
     }
 }
-
-getBuildingStaff;
 
 export async function getBuildingStaff(request: Request, response: Response, next: NextFunction) {
     try {
