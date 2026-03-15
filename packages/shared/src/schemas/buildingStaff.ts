@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { userId } from "./user.js";
+import { safeUserSchema, userId } from "./user.js";
 import { buildingId } from "./building.js";
 
 const buildingStaffId = z.cuid().brand<"buildingStaffId">();
@@ -14,4 +14,10 @@ export const createBuildingStaffInviteSchema = z.object({
 
 export type CreateBuildingStaffInvite = z.infer<typeof createBuildingStaffInviteSchema>;
 
+export const buildingStaffTableSchema = createBuildingStaffInviteSchema.extend({
+    buildingStaffId,
+    status,
+    user: safeUserSchema,
+});
 
+export type BuildingStaffTable = z.infer<typeof buildingStaffTableSchema>;

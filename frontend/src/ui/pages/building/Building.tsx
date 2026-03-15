@@ -1,5 +1,6 @@
 import AutodeskViewer from "@/components/AutodeskViewer";
 import InviteStaffForm from "@/components/building/InviteBuidlingStaffForm";
+import BuildingStaffTable from "@/components/building/staff/BuildingStaffTable";
 import { UploadBuildingModel } from "@/components/building/UploadBuildingModel";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { apiFetch, apiUrl } from "@/lib/utils";
@@ -67,6 +68,7 @@ export default function Building() {
         <div className="flex-col">
             building id: {buildingId}
             <InviteStaffForm buildingId={buildingId} />
+            <BuildingStaffTable buildingId={buildingId} />
             <UploadBuildingModel buildingId={buildingId} />
             {autodeskToken && buildingUrn && (
                 <Card className="w-300">
