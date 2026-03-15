@@ -28,6 +28,7 @@ export async function getBuildingStaffFromBuildingId(buildingId: BuildingId) {
             include: {
                 user: {
                     select: {
+                        id: true,
                         firstName: true,
                         middleName: true,
                         lastName: true,
