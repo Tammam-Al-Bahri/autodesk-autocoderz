@@ -12,12 +12,14 @@ import {
     createBuildingStaffInvite,
     getBuildings,
     uploadBuildingModel,
+    getBuildingStaff
 } from "../handlers/buildings";
 import { upload } from "../lib/uploadFile";
 
 const router = Router();
 
 router.get(`${buildingsBase}`, requireAuth, getBuildings);
+router.get(`${buildingsBase}${buildingsRoutes.staff}`, requireAuth, getBuildingStaff);
 router.post(`${buildingsBase}`, requireAuth, validate(createBuildingSchema), createBuilding);
 router.post(
     `${buildingsBase}${buildingsRoutes.upload}`,

@@ -18,3 +18,26 @@ export async function createBuildingStaffInvite(data: CreateBuildingStaffInvite)
         throw handlePrismaError(error);
     }
 }
+
+export async function getBuildingStaffFromBuildingId(buildingId: BuildingId) {
+    try {
+        const buildlingStaff = await prisma.buildingStaff.findMany({
+            where: {
+                buildingId,
+            },
+            include: {
+                user: {
+                    select: {
+                        firstName: true,
+                        middleName: true,
+                        lastName: true,
+                        email: true,
+                    },
+                },
+            },
+        });
+        return buildlingStaff;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}

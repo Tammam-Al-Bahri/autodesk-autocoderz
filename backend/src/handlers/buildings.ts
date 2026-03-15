@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import {
     buildingGroupId as buildingGroupIdSchema,
+    BuildingId,
     buildingId as buildingIdSchema,
     CreateBuilding,
     CreateBuildingStaffInvite,
@@ -12,7 +13,7 @@ import {
     getBuildingFromId,
     getBuildingsFromBuildingGroupId,
 } from "../db/building";
-import { createBuildingStaffInvite as createBuildingStaffInviteDB } from "../db/buildingStaff";
+import { createBuildingStaffInvite as createBuildingStaffInviteDB, getBuildingStaffFromBuildingId } from "../db/buildingStaff";
 import { randomUUID } from "node:crypto";
 import saveSession from "../lib/saveSession";
 import { processApsUpload } from "../lib/processApsUpload";
@@ -147,6 +148,21 @@ export async function createBuildingStaffInvite(
     try {
         const building = await createBuildingStaffInviteDB(data);
         response.status(201).json({ success: true, data: building });
+        return;
+    } catch (error) {
+        next(error);
+    }
+}
+
+getBuildingStaff;
+
+export async function getBuildingStaff(request: Request, response: Response, next: NextFunction) {
+    try {
+        const { buildingId } = request.query;
+        const parsedId = buildingIdSchema.parse(buildingId);
+
+        const buildingStaff = await getBuildingStaffFromBuildingId(parsedId);
+        response.status(201).json({ success: true, data: buildingStaff });
         return;
     } catch (error) {
         next(error);
