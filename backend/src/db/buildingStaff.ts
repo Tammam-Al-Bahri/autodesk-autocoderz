@@ -52,6 +52,7 @@ export async function getBuildingsWhereStaffFromUserId(userId: UserId) {
             include: {
                 building: {
                     select: {
+                        buildingGroupId: true,
                         name: true,
                         address: true,
                         status: true,

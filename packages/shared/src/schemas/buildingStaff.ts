@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { safeUserSchema, userId } from "./user.js";
-import { buildingId } from "./building.js";
+import { buildingId, buildingSchema } from "./building.js";
 
 const buildingStaffId = z.cuid().brand<"buildingStaffId">();
 const role = z.enum(["RECEPTIONIST", "MAINTENANCE"]);
@@ -18,6 +18,7 @@ export const buildingStaffTableSchema = createBuildingStaffInviteSchema.extend({
     buildingStaffId,
     status,
     user: safeUserSchema,
+    building: buildingSchema
 });
 
 export type BuildingStaffTable = z.infer<typeof buildingStaffTableSchema>;

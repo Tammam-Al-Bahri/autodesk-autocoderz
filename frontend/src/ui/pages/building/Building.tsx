@@ -66,9 +66,12 @@ export default function Building() {
 
     return (
         <div className="flex-col">
-            building id: {buildingId}
+            <div>building id: {buildingId}</div>
+            Invite Staff:
             <InviteStaffForm buildingId={buildingId} />
+            Building Staff:
             <BuildingStaffTable buildingId={buildingId} />
+            Upload Building Model:
             <UploadBuildingModel buildingId={buildingId} />
             {autodeskToken && buildingUrn && (
                 <Card className="w-300">

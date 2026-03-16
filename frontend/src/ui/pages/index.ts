@@ -16,6 +16,7 @@ const MyBuildingGroups = lazy(() => import("./building-group/MyBuildingGroups"))
 const BuildingGroup = lazy(() => import("./building-group/BuildingGroup"));
 const GuestPortal = lazy(() => import("./GuestPortal"));
 const Building = lazy(() => import("./building/Building"));
+const MyJobs = lazy(() => import("./staff/MyJobs"));
 
 type Page = {
     path: string;
@@ -51,6 +52,12 @@ const pages: Page[] = [
         title: "Guest Portal",
         component: GuestPortal,
         navbarView: ["Guest"],
+    },
+    {
+        path: "/my-jobs",
+        title: "My Jobs",
+        component: MyJobs,
+        navbarView: ["Staff"],
     },
     {
         path: "/staff",
