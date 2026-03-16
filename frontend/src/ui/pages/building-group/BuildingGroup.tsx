@@ -1,9 +1,10 @@
 import { BuildingForm } from "@/components/building/BuildingForm";
 import BuildingTable from "@/components/building/BuildingTable";
+import { type BuildingGroupId } from "@autocoderz/shared";
 import { useParams } from "react-router-dom";
 
 export default function BuildingGroup() {
-    const { buildingGroupId } = useParams();
+    const { buildingGroupId } = useParams < { buildingGroupId: BuildingGroupId }>();
 
     if (!buildingGroupId) return <>buildingGroupId not found</>;
 

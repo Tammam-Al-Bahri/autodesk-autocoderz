@@ -6,8 +6,8 @@ const About = lazy(() => import("./About"));
 const Home = lazy(() => import("./Home"));
 const LoginPage = lazy(() => import("./login"));
 const Test = lazy(() => import("./Test"));
-const StaffTasks = lazy(() => import("./StaffTasks"));
-const Receptionist = lazy(() => import("./Receptionist"));
+// const StaffTasks = lazy(() => import("./StaffTasks"));
+// const Receptionist = lazy(() => import("./Receptionist"));
 const SignupPage = lazy(() => import("./signup"));
 const Dashboard = lazy(() => import("./Dashboard"));
 const Applications = lazy(() => import("./Application"));
@@ -16,6 +16,8 @@ const MyBuildingGroups = lazy(() => import("./building-group/MyBuildingGroups"))
 const BuildingGroup = lazy(() => import("./building-group/BuildingGroup"));
 const GuestPortal = lazy(() => import("./GuestPortal"));
 const Building = lazy(() => import("./building/Building"));
+const MyJobs = lazy(() => import("./staff/MyJobs"));
+const StaffJobDashboard = lazy(() => import("./staff/StaffJobDashboard"));
 
 type Page = {
     path: string;
@@ -53,17 +55,28 @@ const pages: Page[] = [
         navbarView: ["Guest"],
     },
     {
-        path: "/staff",
-        title: "Staff Dashboard",
-        component: StaffTasks,
+        path: "/jobs",
+        title: "My Jobs",
+        component: MyJobs,
         navbarView: ["Staff"],
     },
     {
-        path: "/receptionist",
-        title: "Receptionist Dashboard",
-        component: Receptionist,
-        navbarView: ["Staff"],
+        path: "/jobs/:buildingId",
+        title: "Building",
+        component: StaffJobDashboard,
     },
+    // {
+    //     path: "/staff",
+    //     title: "Staff Dashboard",
+    //     component: StaffTasks,
+    //     navbarView: ["Staff"],
+    // },
+    // {
+    //     path: "/receptionist",
+    //     title: "Receptionist Dashboard",
+    //     component: Receptionist,
+    //     navbarView: ["Staff"],
+    // },
     {
         path: "/building-groups",
         title: "My Portfolio",
@@ -92,7 +105,7 @@ const pages: Page[] = [
         path: "/test",
         title: "Test",
         component: Test,
-        navbarView: ["Guest", "Staff", "Manage"],
+        // navbarView: ["Guest", "Staff", "Manage"],
     },
     {
         path: "/building-groups/:buildingGroupId",

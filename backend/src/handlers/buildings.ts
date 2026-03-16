@@ -3,14 +3,18 @@ import {
     buildingGroupId as buildingGroupIdSchema,
     buildingId as buildingIdSchema,
     CreateBuilding,
-    URN,
+    CreateBuildingStaffInvite,
 } from "@autocoderz/shared";
 import {
+    canManageBuildingStaff,
     createBuilding as createBuildingDB,
     getBuildingFromId,
     getBuildingsFromBuildingGroupId,
-    updateBuildingUrn,
 } from "../db/building";
+import {
+    createBuildingStaffInvite as createBuildingStaffInviteDB,
+    getBuildingStaffFromBuildingId,
+} from "../db/buildingStaff";
 import { randomUUID } from "node:crypto";
 import saveSession from "../lib/saveSession";
 import { processApsUpload } from "../lib/processApsUpload";
@@ -101,10 +105,10 @@ export async function uploadBuildingModel(
             });
         }
 
-        // Respond immediately
+        // respond immediately
         response.status(200).json({ jobId });
 
-        // Fire-and-forget (no await)
+        // then upload
         void processApsUpload({
             jobId,
             createdAt,
@@ -114,6 +118,59 @@ export async function uploadBuildingModel(
         }).catch((error) => {
             console.error("Upload error:", error);
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function createBuildingStaffInvite(
+    request: Request<{}, {}, CreateBuildingStaffInvite>,
+    response: Response,
+    next: NextFunction,
+) {
+    const data = request.body;
+    if (data.userId === request.session.userId) {
+        response.status(400).json({ error: { title: "Can not invite yourself", description: "" } });
+    }
+    const userId = request.session.userId;
+
+    if (userId) {
+        const canInvite = await canManageBuildingStaff(userId, data.buildingId);
+        if (!canInvite) {
+            response.status(403).json({
+                error: {
+                    title: "Unauthorized",
+                    description: "You do not have permission to invite staff to this building",
+                },
+            });
+            return;
+        }
+    } else {
+        response.status(401).json({
+            error: {
+                title: "Unauthenticated",
+                description: "",
+            },
+        });
+        return;
+    }
+    try {
+        const building = await createBuildingStaffInviteDB(data);
+        response.status(201).json({ success: true, data: building });
+        return;
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getBuildingStaff(request: Request, response: Response, next: NextFunction) {
+    try {
+        const { buildingId } = request.query;
+        const parsedId = buildingIdSchema.parse(buildingId);
+
+        const buildingStaff = await getBuildingStaffFromBuildingId(parsedId);
+        response.status(201).json({ success: true, data: buildingStaff });
+        return;
     } catch (error) {
         next(error);
     }

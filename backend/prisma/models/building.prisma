@@ -12,6 +12,8 @@ model Building {
   type   BuildingType
 
   rooms Room[]
+
+  staff BuildingStaff[]
 }
 
 enum BuildingStatus {

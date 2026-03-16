@@ -1,5 +1,5 @@
 import { columns } from "./columns";
-import { buildingsBase, type Building } from "@autocoderz/shared";
+import { buildingsBase, type Building, type BuildingGroupId } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
 import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { SkeletonForm } from "../skeleton-form";
 import { toast } from "sonner";
 import { ListOrdered, Loader2 } from "lucide-react";
 
+export default function BuildingTable({ buildingGroupId }: { buildingGroupId: BuildingGroupId }) {
 export default function BuildingTable({ 
     buildingGroupId, 
     className, 

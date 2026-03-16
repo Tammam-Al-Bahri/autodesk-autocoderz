@@ -9,6 +9,7 @@ import {
     type BuildingForm as FormFields,
     buildingGroupId as buildingGroupIdSchema,
     type CreateBuilding,
+    type BuildingGroupId,
 } from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -18,6 +19,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Building2, MapPin, Loader2, PlusCircle } from "lucide-react";
 
+export function BuildingForm({ buildingGroupId }: { buildingGroupId: BuildingGroupId }) {
 export function BuildingForm({ buildingGroupId, className, ...props }: { buildingGroupId: string } & React.ComponentProps<"div">) {
     const form = useForm<FormFields>({
         resolver: zodResolver(formSchema),

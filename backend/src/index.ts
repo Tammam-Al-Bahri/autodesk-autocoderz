@@ -16,6 +16,7 @@ import authRouter from "./routes/auth";
 import apsRouter from "./routes/aps";
 import buildingGroupsRouter from "./routes/buildingGroups";
 import buildingsRouter from "./routes/buildings";
+import buildingStaffRouter from "./routes/buildingStaff";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -84,6 +85,7 @@ app.use(base, authRouter);
 app.use(base, apsRouter);
 app.use(base, buildingGroupsRouter);
 app.use(base, buildingsRouter);
+app.use(base, buildingStaffRouter);
 
 app.use((error: unknown, request: Request, response: Response, next: NextFunction) => {
     console.error(error);

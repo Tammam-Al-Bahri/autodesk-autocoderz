@@ -43,3 +43,34 @@ export async function getUserById(id: UserId) {
 export async function userExists(id: UserId) {
     return !!prisma.user.findFirst({ where: { id } });
 }
+
+export async function searchUsers(query: string) {
+    const users = await prisma.user.findMany({
+        where: {
+            OR: [
+                {
+                    email: {
+                        contains: query,
+                    },
+                },
+                {
+                    firstName: {
+                        contains: query,
+                    },
+                },
+                {
+                    middleName: {
+                        contains: query,
+                    },
+                },
+                {
+                    lastName: {
+                        contains: query,
+                    },
+                },
+            ],
+        },
+        take: 10,
+    });
+    return users;
+}
