@@ -42,3 +42,26 @@ export async function getBuildingStaffFromBuildingId(buildingId: BuildingId) {
         throw handlePrismaError(error);
     }
 }
+
+export async function getBuildingsWhereStaffFromUserId(userId: UserId) {
+    try {
+        const buildlings = await prisma.buildingStaff.findMany({
+            where: {
+                userId,
+            },
+            include: {
+                building: {
+                    select: {
+                        name: true,
+                        address: true,
+                        status: true,
+                        type: true,
+                    },
+                },
+            },
+        });
+        return buildlings;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}

@@ -145,6 +145,14 @@ export async function createBuildingStaffInvite(
             });
             return;
         }
+    } else {
+        response.status(401).json({
+            error: {
+                title: "Unauthenticated",
+                description: "",
+            },
+        });
+        return;
     }
     try {
         const building = await createBuildingStaffInviteDB(data);
