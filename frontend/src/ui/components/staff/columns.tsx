@@ -10,9 +10,9 @@ export const columns: ColumnDef<BuildingStaffTable>[] = [
         cell: ({ row }) => {
             const name = row.original.building.name;
             const buildingId = row.original.buildingId;
-            const buildingGroupId = row.original.building.buildingGroupId;
+            // const buildingGroupId = row.original.building.buildingGroupId;
             return (
-                <Link to={`/building-groups/${buildingGroupId}/buildings/${buildingId}`}>
+                <Link to={`/jobs/${buildingId}`}>
                     <div className="font-semibold hover:underline">{name}</div>
                 </Link>
             );

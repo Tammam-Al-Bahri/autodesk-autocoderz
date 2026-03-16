@@ -43,11 +43,12 @@ export async function getBuildingStaffFromBuildingId(buildingId: BuildingId) {
     }
 }
 
-export async function getBuildingsWhereStaffFromUserId(userId: UserId) {
+export async function getBuildingsWhereStaffFromUserId(userId: UserId, buildingId?: BuildingId) {
     try {
         const buildlings = await prisma.buildingStaff.findMany({
             where: {
                 userId,
+                buildingId,
             },
             include: {
                 building: {
