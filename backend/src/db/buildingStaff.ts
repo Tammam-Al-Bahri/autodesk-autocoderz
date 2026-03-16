@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma";
 import { handlePrismaError } from "../lib/handlePrismaError";
-import { BuildingId, CreateBuildingStaffInvite, UserId } from "@autocoderz/shared";
+import { BuildingId, BuildingStaffId, CreateBuildingStaffInvite, UserId } from "@autocoderz/shared";
+import { BuildingStaffInviteStatus } from "../generated/prisma/enums";
 
 export async function createBuildingStaffInvite(data: CreateBuildingStaffInvite) {
     try {
@@ -45,7 +46,7 @@ export async function getBuildingStaffFromBuildingId(buildingId: BuildingId) {
 
 export async function getBuildingsWhereStaffFromUserId(userId: UserId, buildingId?: BuildingId) {
     try {
-        const buildlings = await prisma.buildingStaff.findMany({
+        const buildlingStaff = await prisma.buildingStaff.findMany({
             where: {
                 userId,
                 buildingId,
@@ -62,7 +63,26 @@ export async function getBuildingsWhereStaffFromUserId(userId: UserId, buildingI
                 },
             },
         });
-        return buildlings;
+        return buildlingStaff;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}
+
+export async function updateBuildingStaffStatus(
+    id: BuildingStaffId,
+    status: BuildingStaffInviteStatus,
+) {
+    try {
+        const buildlingStaff = await prisma.buildingStaff.update({
+            where: {
+                id,
+            },
+            data: {
+                status,
+            },
+        });
+        return buildlingStaff;
     } catch (error) {
         throw handlePrismaError(error);
     }

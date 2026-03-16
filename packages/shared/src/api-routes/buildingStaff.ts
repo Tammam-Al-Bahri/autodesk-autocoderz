@@ -1,3 +1,3 @@
 export const buildingStaffBase = "/staff";
 
-export const buildingStaffRoutes = {} as const;
+export const buildingStaffRoutes = { manageInvite: "/manage-invite" } as const;

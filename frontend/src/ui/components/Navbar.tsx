@@ -14,7 +14,6 @@ import {
 } from "./ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { pagesLinks } from "@/pages";
-import Notifications from "./Notifications";
 
 export type NavbarView = "Guest" | "Staff" | "Manage";
 
@@ -102,7 +101,6 @@ export default function Navbar() {
             <div className="flex items-center gap-4 ml-auto z-10">
                 {user ? (
                     <>
-                        <Notifications />
                         <LogoutButton />
                     </>
                 ) : (
