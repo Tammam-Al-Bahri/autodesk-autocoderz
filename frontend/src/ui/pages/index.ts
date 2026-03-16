@@ -92,7 +92,7 @@ const pages: Page[] = [
         path: "/test",
         title: "Test",
         component: Test,
-        navbarView: ["Guest", "Staff", "Manage"],
+        // navbarView: ["Guest", "Staff", "Manage"],
     },
     {
         path: "/building-groups/:buildingGroupId",
