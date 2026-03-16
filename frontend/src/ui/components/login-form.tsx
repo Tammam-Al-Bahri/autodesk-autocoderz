@@ -11,212 +11,174 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
-import {
-  Mail,
-  Lock,
-  Building2,
-  ArrowRight,
-  Loader2,
-  ShieldCheck
-} from "lucide-react";
+import { Mail, Lock, Building2, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+    const { login } = useAuth();
+    const navigate = useNavigate();
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
+    const form = useForm<FormFields>({
+        resolver: zodResolver(formSchema),
+    });
 
-  const form = useForm<FormFields>({
-    resolver: zodResolver(formSchema)
-  });
+    const { handleSubmit } = form;
 
-  const { handleSubmit } = form;
+    const [loading, setLoading] = useState(false);
 
-  const [loading, setLoading] = useState(false);
+    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+        setLoading(true);
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    setLoading(true);
+        try {
+            const res = await login(data.email, data.password);
 
-    try {
-      const res = await login(data.email, data.password);
+            if (res?.success) {
+                const savedView = localStorage.getItem("selectedView");
+                if (savedView === "Staff") {
+                    navigate("/jobs", { replace: true });
+                } else if (savedView === "Manage") {
+                    navigate("/building-groups", { replace: true });
+                }
+            } else if (res?.error) {
+                toast.error(res.error.title, {
+                    description: res.error.description,
+                });
+            }
+        } catch (err) {
+            console.log("Login error:", err);
+        }
 
-      if (res?.success) {
-        navigate("/", { replace: true });
-      } else if (res?.error) {
-        toast.error(res.error.title, {
-          description: res.error.description
-        });
-      }
+        setLoading(false);
+    };
 
-    } catch (err) {
-      console.log("Login error:", err);
-    }
+    return (
+        <div className={cn("flex flex-col gap-6 w-full max-w-md mx-auto", className)} {...props}>
+            <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden">
+                <div className="h-2 w-full bg-gradient-to-r from-blue-600 to-indigo-600" />
 
-    setLoading(false);
-  };
+                <CardHeader className="space-y-1 pt-8 text-center">
+                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                        <Building2 className="w-6 h-6 text-blue-600" />
+                    </div>
 
-  return (
-    <div className={cn("flex flex-col gap-6 w-full max-w-md mx-auto", className)} {...props}>
+                    <CardTitle className="text-3xl font-black tracking-tight text-slate-900">
+                        Welcome <span className="text-blue-600">Back</span>
+                    </CardTitle>
 
-      <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden">
+                    <CardDescription className="text-slate-500">
+                        Sign in to continue to the dashboard
+                    </CardDescription>
+                </CardHeader>
 
-        <div className="h-2 w-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+                <CardContent className="pb-8">
+                    {loading ? (
+                        <div className="py-10">
+                            <SkeletonForm />
+                        </div>
+                    ) : (
+                        <Form {...form}>
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-slate-700 font-bold">
+                                                Email Address
+                                            </FormLabel>
 
-        <CardHeader className="space-y-1 pt-8 text-center">
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 
-          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
-            <Building2 className="w-6 h-6 text-blue-600" />
-          </div>
+                                                    <Input
+                                                        type="email"
+                                                        placeholder="name@company.com"
+                                                        className="pl-10 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-blue-500"
+                                                        {...field}
+                                                    />
+                                                </div>
+                                            </FormControl>
 
-          <CardTitle className="text-3xl font-black tracking-tight text-slate-900">
-            Welcome <span className="text-blue-600">Back</span>
-          </CardTitle>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-          <CardDescription className="text-slate-500">
-            Sign in to continue to the dashboard
-          </CardDescription>
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <div className="flex items-center justify-between">
+                                                <FormLabel className="text-slate-700 font-bold">
+                                                    Password
+                                                </FormLabel>
 
-        </CardHeader>
+                                                <Link
+                                                    to="#"
+                                                    className="text-xs font-semibold text-blue-600 hover:underline"
+                                                >
+                                                    Forgot?
+                                                </Link>
+                                            </div>
 
-        <CardContent className="pb-8">
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
 
-          {loading ? (
+                                                    <Input
+                                                        type="password"
+                                                        placeholder="••••••••"
+                                                        className="pl-10 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-blue-500"
+                                                        {...field}
+                                                    />
+                                                </div>
+                                            </FormControl>
 
-            <div className="py-10">
-              <SkeletonForm />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <Button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-100 transition-all hover:scale-[1.02]"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                            Signing in...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Sign In
+                                            <ArrowRight className="w-5 h-5 ml-2" />
+                                        </>
+                                    )}
+                                </Button>
+
+                                <div className="pt-4 text-center">
+                                    <p className="text-sm text-slate-500">
+                                        Don't have an account?{" "}
+                                        <Link
+                                            to="/signup"
+                                            className="font-bold text-blue-600 hover:underline"
+                                        >
+                                            Create one
+                                        </Link>
+                                    </p>
+                                </div>
+                            </form>
+                        </Form>
+                    )}
+                </CardContent>
+            </Card>
+
+            <div className="flex items-center justify-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Secure login connection</span>
             </div>
-
-          ) : (
-
-            <Form {...form}>
-
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-
-                      <FormLabel className="text-slate-700 font-bold">
-                        Email Address
-                      </FormLabel>
-
-                      <FormControl>
-
-                        <div className="relative">
-
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-
-                          <Input
-                            type="email"
-                            placeholder="name@company.com"
-                            className="pl-10 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-blue-500"
-                            {...field}
-                          />
-
-                        </div>
-
-                      </FormControl>
-
-                      <FormMessage />
-
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-
-                      <div className="flex items-center justify-between">
-
-                        <FormLabel className="text-slate-700 font-bold">
-                          Password
-                        </FormLabel>
-
-                        <Link
-                          to="#"
-                          className="text-xs font-semibold text-blue-600 hover:underline"
-                        >
-                          Forgot?
-                        </Link>
-
-                      </div>
-
-                      <FormControl>
-
-                        <div className="relative">
-
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-
-                          <Input
-                            type="password"
-                            placeholder="••••••••"
-                            className="pl-10 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-blue-500"
-                            {...field}
-                          />
-
-                        </div>
-
-                      </FormControl>
-
-                      <FormMessage />
-
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-100 transition-all hover:scale-[1.02]"
-                >
-
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    <>
-                      Sign In
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </>
-                  )}
-
-                </Button>
-
-                <div className="pt-4 text-center">
-
-                  <p className="text-sm text-slate-500">
-                    Don't have an account?{" "}
-                    <Link
-                      to="/signup"
-                      className="font-bold text-blue-600 hover:underline"
-                    >
-                      Create one
-                    </Link>
-                  </p>
-
-                </div>
-
-              </form>
-
-            </Form>
-
-          )}
-
-        </CardContent>
-
-      </Card>
-
-      <div className="flex items-center justify-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
-        <ShieldCheck className="w-4 h-4" />
-        <span>Secure login connection</span>
-      </div>
-
-    </div>
-  );
+        </div>
+    );
 }

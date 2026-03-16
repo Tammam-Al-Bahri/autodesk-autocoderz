@@ -18,14 +18,14 @@ export const columns: ColumnDef<BuildingStaffTable>[] = [
         cell: ({ row }) => {
             const name = row.original.building.name;
             const buildingId = row.original.buildingId;
-            if (row.original.status === "DECLINED") {
-                return <div className="font-semibold">{name}</div>;
+            if (row.original.status === "ACCEPTED") {
+                return (
+                    <Link to={`/jobs/${buildingId}`}>
+                        <div className="font-semibold hover:underline">{name}</div>
+                    </Link>
+                );
             }
-            return (
-                <Link to={`/jobs/${buildingId}`}>
-                    <div className="font-semibold hover:underline">{name}</div>
-                </Link>
-            );
+            return <div className="font-semibold">{name}</div>;
         },
     },
     {

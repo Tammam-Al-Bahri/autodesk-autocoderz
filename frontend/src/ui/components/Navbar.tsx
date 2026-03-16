@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -19,6 +19,7 @@ export type NavbarView = "Guest" | "Staff" | "Manage";
 
 export default function Navbar() {
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const [currentView, setCurrentView] = useState<NavbarView>(() => {
         const savedView = localStorage.getItem("selectedView");
@@ -79,6 +80,12 @@ export default function Navbar() {
                                     className="justify-center"
                                     onClick={() => {
                                         setCurrentView(view.value);
+
+                                        if (view.value === "Staff") {
+                                            navigate("/jobs", { replace: true });
+                                        } else if (view.value === "Manage") {
+                                            navigate("/building-groups", { replace: true });
+                                        }
                                         localStorage.setItem("selectedView", view.value);
                                     }}
                                 >
