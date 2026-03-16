@@ -8,13 +8,12 @@ import { SkeletonForm } from "../skeleton-form";
 import { toast } from "sonner";
 import { ListOrdered, Loader2 } from "lucide-react";
 
-export default function BuildingTable({ buildingGroupId }: { buildingGroupId: BuildingGroupId }) {
-export default function BuildingTable({ 
-    buildingGroupId, 
-    className, 
-    ...props 
-}: { 
-    buildingGroupId: string 
+export default function BuildingTable({
+    buildingGroupId,
+    className,
+    ...props
+}: {
+    buildingGroupId: BuildingGroupId;
 } & React.ComponentProps<"div">) {
     const [data, setData] = useState<Building[]>([]);
     const [loading, setLoading] = useState(true);
@@ -72,24 +71,28 @@ export default function BuildingTable({
                                 Property Registry
                             </CardTitle>
                             <CardDescription className="text-muted-foreground mt-1">
-                                A complete directory of all building assets currently assigned to this portfolio.
+                                A complete directory of all building assets currently assigned to
+                                this portfolio.
                             </CardDescription>
                         </div>
                         <div className="hidden sm:flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
-                            {data.length} {data.length === 1 ? 'Asset' : 'Assets'}
+                            {data.length} {data.length === 1 ? "Asset" : "Assets"}
                         </div>
                     </div>
                 </CardHeader>
-                
+
                 <CardContent className="p-0 sm:p-6">
                     {data.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 text-center px-4">
                             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
                                 <ListOrdered className="w-6 h-6 text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-bold text-foreground">No properties found</h3>
+                            <h3 className="text-lg font-bold text-foreground">
+                                No properties found
+                            </h3>
                             <p className="text-sm text-muted-foreground max-w-sm mt-1">
-                                Use the form to register your first building. It will appear here once initialised.
+                                Use the form to register your first building. It will appear here
+                                once initialised.
                             </p>
                         </div>
                     ) : (
