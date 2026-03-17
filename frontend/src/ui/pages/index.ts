@@ -101,12 +101,12 @@ const pages: Page[] = [
         component: Tickets,
         navbarView: ["Manage"],
     },
-    {
-        path: "/test",
-        title: "Test",
-        component: Test,
-        // navbarView: ["Guest", "Staff", "Manage"],
-    },
+    // {
+    //     path: "/test",
+    //     title: "Test",
+    //     component: Test,
+    //     // navbarView: ["Guest", "Staff", "Manage"],
+    // },
     {
         path: "/building-groups/:buildingGroupId",
         title: "Company",
