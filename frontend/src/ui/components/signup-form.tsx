@@ -67,7 +67,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
     return (
         <div className={cn("flex flex-col gap-6 w-full max-w-lg mx-auto", className)} {...props}>
             <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden">
-                <div className="h-2 w-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+                <div className="h-2 w-full bg-linear-to-r from-blue-600 to-indigo-600" />
 
                 <CardHeader className="space-y-1 pt-8 text-center">
                     <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 border border-blue-100">

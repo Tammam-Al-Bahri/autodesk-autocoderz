@@ -69,7 +69,7 @@ export default function Navbar() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <div className="font-semibold italic flex">
-                                {currentView}
+                                {currentView} view
                                 <ChevronDown className="scale-50" />
                             </div>
                         </DropdownMenuTrigger>
