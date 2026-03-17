@@ -1,5 +1,11 @@
 import { columns } from "./columns";
-import { buildingStaffBase, type BuildingStaffTable } from "@autocoderz/shared";
+import {
+    buildingStaffBase,
+    buildingStaffRoutes,
+    type BuildingStaffId,
+    type BuildingStaffInviteStatus,
+    type BuildingStaffTable,
+} from "@autocoderz/shared";
 import { DataTable } from "@/components/ui/data-table";
 import { apiFetch, apiUrl } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -34,6 +40,17 @@ export default function BuildingStaffJobsTable() {
         fetchData();
     }, []);
 
+    const handleUpdate = async (
+        id: BuildingStaffId,
+        status: Extract<BuildingStaffInviteStatus, "ACCEPTED" | "DECLINED">,
+    ) => {
+        const res = await updateInviteStatus(id, status);
+
+        if (res) {
+            setData((prev) => prev.map((row) => (row.id === id ? { ...row, status } : row)));
+        }
+    };
+
     if (loading) {
         return (
             <Card className="p-6 w-full">
@@ -41,5 +58,33 @@ export default function BuildingStaffJobsTable() {
             </Card>
         );
     }
-    return <DataTable columns={columns} data={data} />;
+    return <DataTable columns={columns(handleUpdate)} data={data} />;
+}
+
+async function updateInviteStatus(
+    buildingStaffId: BuildingStaffId,
+    status: Extract<BuildingStaffInviteStatus, "ACCEPTED" | "DECLINED">,
+) {
+    const response = await apiFetch(
+        `${apiUrl}${buildingStaffBase}${buildingStaffRoutes.manageInvite}`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                buildingStaffId,
+                status,
+            }),
+        },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        const { title, description } = data.error;
+        toast.error(title, { description });
+    }
+
+    return data;
 }
