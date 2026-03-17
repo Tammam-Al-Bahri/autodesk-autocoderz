@@ -1,47 +1,24 @@
 import { columns } from "./columns";
-import { buildingGroupsBase, type BuildingGroup } from "@autocoderz/shared";
+import { type BuildingGroup } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
-import { apiFetch, apiUrl, cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
-import { toast } from "sonner";
 import { Building, Loader2, Network } from "lucide-react";
 
-export default function BuildingGroupTable({ className, ...props }: React.ComponentProps<"div">) {
-    const [data, setData] = useState<BuildingGroup[]>([]);
-    const [loading, setLoading] = useState(true);
+type Props = {
+    data: BuildingGroup[];
+    loading: boolean;
+} & React.ComponentProps<"div">;
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const method = "GET";
-                const response = await apiFetch(`${apiUrl}${buildingGroupsBase}`, {
-                    method,
-                });
-                const resData = await response.json();
-                if (response.ok) {
-                    setData(resData.data);
-                } else {
-                    const { title, description } = resData.error;
-                    toast.error(title, { description });
-                }
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchData();
-    }, []);
-
+export default function BuildingGroupTable({ data, loading, className, ...props }: Props) {
     if (loading) {
         return (
             <div className={cn("w-full", className)} {...props}>
                 <Card className="p-6 w-full border-border bg-card shadow-sm flex flex-col items-center justify-center min-h-[400px] transition-colors duration-300">
                     <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
                     <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
-                        Loading Portfolios...
+                        Loading...
                     </p>
                     <div className="w-full mt-8 opacity-40">
                         <SkeletonForm />
@@ -62,24 +39,28 @@ export default function BuildingGroupTable({ className, ...props }: React.Compon
                                 Company Portfolios
                             </CardTitle>
                             <CardDescription className="text-muted-foreground mt-1">
-                                A top-level directory of all organisations and franchise groups you manage.
+                                A top-level directory of all organisations and franchise groups you
+                                manage.
                             </CardDescription>
                         </div>
                         <div className="hidden sm:flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
-                            {data.length} {data.length === 1 ? 'Organisation' : 'Organisations'}
+                            {data.length} {data.length === 1 ? "Organisation" : "Organisations"}
                         </div>
                     </div>
                 </CardHeader>
-                
+
                 <CardContent className="p-0 sm:p-6">
                     {data.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 text-center px-4">
                             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
                                 <Building className="w-6 h-6 text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-bold text-foreground">No portfolios found</h3>
+                            <h3 className="text-lg font-bold text-foreground">
+                                No portfolios found
+                            </h3>
                             <p className="text-sm text-muted-foreground max-w-sm mt-1">
-                                Use the form to create your first company. It will appear here once initialised.
+                                Use the form to create your first company. It will appear here once
+                                initialised.
                             </p>
                         </div>
                     ) : (

@@ -1,45 +1,16 @@
 import { columns } from "./columns";
-import {
-    buildingsBase,
-    buildingsRoutes,
-    type BuildingId,
-    type BuildingStaffTable,
-} from "@autocoderz/shared";
+import { type BuildingStaffTable } from "@autocoderz/shared";
 import { DataTable } from "@/components/ui/data-table";
-import { apiFetch, apiUrl, cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
 
-export default function BuildingStaffTable({ buildingId }: { buildingId: BuildingId }) {
-    const [data, setData] = useState<BuildingStaffTable[]>([]);
-    const [loading, setLoading] = useState(true);
+type Props = {
+    data: BuildingStaffTable[];
+    loading: boolean;
+};
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const res = await apiFetch(
-                    `${apiUrl}${buildingsBase}${buildingsRoutes.staff}?buildingId=${buildingId}`,
-                    { method: "GET" }
-                );
-
-                const json = await res.json();
-
-                if (res.ok) {
-                    setData(json.data);
-                } else {
-                    toast.error(json.error?.title || "Error");
-                }
-            } catch (err) {
-                console.log(err);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchData();
-    }, [buildingId]);
-
+export default function BuildingStaffTable({ data, loading }: Props) {
     if (loading) {
         return (
             <Card className="p-6">
@@ -58,9 +29,7 @@ export default function BuildingStaffTable({ buildingId }: { buildingId: Buildin
 
             <CardContent>
                 {data.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                        No staff added yet.
-                    </p>
+                    <p className="text-sm text-muted-foreground">No staff added yet.</p>
                 ) : (
                     <DataTable columns={columns} data={data} />
                 )}

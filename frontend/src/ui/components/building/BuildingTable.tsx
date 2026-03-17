@@ -1,49 +1,18 @@
 import { columns } from "./columns";
-import { buildingsBase, type Building, type BuildingGroupId } from "@autocoderz/shared";
+import { type Building } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
-import { apiFetch, apiUrl, cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
-import { toast } from "sonner";
 import { ListOrdered, Loader2 } from "lucide-react";
 
-export default function BuildingTable({
-    buildingGroupId,
-    className,
-    ...props
-}: {
-    buildingGroupId: BuildingGroupId;
-} & React.ComponentProps<"div">) {
-    const [data, setData] = useState<Building[]>([]);
-    const [loading, setLoading] = useState(true);
+type Props = {
+    data: Building[];
+    loading: boolean;
+} & React.ComponentProps<"div">;
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const method = "GET";
-                const response = await apiFetch(
-                    `${apiUrl}${buildingsBase}?buildingGroupId=${buildingGroupId}`,
-                    {
-                        method,
-                    },
-                );
-                const resData = await response.json();
-                if (response.ok) {
-                    setData(resData.data);
-                } else {
-                    const { title, description } = resData.error;
-                    toast.error(title, { description });
-                }
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchData();
-    }, [buildingGroupId]);
-
+export default function BuildingTable({ data, loading, className, ...props }: Props) {
     if (loading) {
         return (
             <div className={cn("w-full", className)} {...props}>

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import {
     buildingGroupsBase,
     createBuildingGroupSchema as formSchema,
+    type BuildingGroup,
     type CreateBuildingGroup as FormFields,
 } from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +16,15 @@ import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Building, AlignLeft, Loader2, ArrowRight } from "lucide-react";
 
-export function BuildingGroupForm({ className, ...props }: React.ComponentProps<"div">) {
+type Props = {
+    setData: React.Dispatch<React.SetStateAction<BuildingGroup[]>>;
+};
+
+export function BuildingGroupForm({
+    setData,
+    className,
+    ...props
+}: Props & React.ComponentProps<"div">) {
     const form = useForm<FormFields>({ resolver: zodResolver(formSchema) });
     const { handleSubmit } = form;
     const [isUpdating, setIsUpdating] = useState(false);
@@ -32,9 +41,11 @@ export function BuildingGroupForm({ className, ...props }: React.ComponentProps<
             setIsUpdating(false);
             const resData = await response.json();
             if (response.ok) {
-                toast.success(`Building Group ${data.name} created`, {
-                    // description: JSON.stringify(resData, null, 2),
-                });
+                const newGroup = resData.data;
+
+                setData((prev) => [...prev, newGroup]);
+
+                toast.success(`Building Group ${data.name} created`);
                 form.reset();
             } else {
                 const { title, description } = resData.error;

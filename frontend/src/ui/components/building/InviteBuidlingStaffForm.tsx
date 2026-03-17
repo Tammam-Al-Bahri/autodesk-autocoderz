@@ -4,6 +4,7 @@ import {
     buildingsBase,
     buildingsRoutes,
     type SafeUserNoEmail,
+    type BuildingStaffTable,
 } from "@autocoderz/shared";
 
 import SearchUsers from "../SearchUsers";
@@ -19,7 +20,12 @@ import type z from "zod";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
 
-export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: BuildingId }) {
+type Props = {
+    buildingId: BuildingId;
+    setStaff: React.Dispatch<React.SetStateAction<BuildingStaffTable[]>>;
+};
+
+export default function InviteBuidlingStaffForm({ buildingId, setStaff }: Props) {
     const [selectedUser, setSelectedUser] = useState<SafeUserNoEmail | null>(null);
 
     type FormFields = z.input<typeof createBuildingStaffInviteSchema>;
@@ -45,6 +51,9 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
             const json = await res.json();
 
             if (res.ok) {
+                const newInvite = json.data;
+                setStaff((prev) => [...prev, { ...newInvite, user: selectedUser }]);
+
                 toast.success("Invite sent");
                 form.reset({ buildingId, role: "RECEPTIONIST" });
                 setSelectedUser(null);

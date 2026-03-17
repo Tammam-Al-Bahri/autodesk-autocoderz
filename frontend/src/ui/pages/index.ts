@@ -5,7 +5,6 @@ import type { ComponentType } from "react";
 const About = lazy(() => import("./About"));
 const Home = lazy(() => import("./Home"));
 const LoginPage = lazy(() => import("./login"));
-const Test = lazy(() => import("./Test"));
 // const StaffTasks = lazy(() => import("./StaffTasks"));
 // const Receptionist = lazy(() => import("./Receptionist"));
 const SignupPage = lazy(() => import("./signup"));
@@ -101,12 +100,6 @@ const pages: Page[] = [
         component: Tickets,
         navbarView: ["Manage"],
     },
-    // {
-    //     path: "/test",
-    //     title: "Test",
-    //     component: Test,
-    //     // navbarView: ["Guest", "Staff", "Manage"],
-    // },
     {
         path: "/building-groups/:buildingGroupId",
         title: "Company",
