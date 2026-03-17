@@ -6,10 +6,9 @@ import {
     type BuildingStaffTable,
 } from "@autocoderz/shared";
 import { DataTable } from "@/components/ui/data-table";
-import { apiFetch, apiUrl } from "@/lib/utils";
+import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { SkeletonForm } from "@/components/skeleton-form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export default function BuildingStaffTable({ buildingId }: { buildingId: BuildingId }) {
@@ -19,35 +18,53 @@ export default function BuildingStaffTable({ buildingId }: { buildingId: Buildin
     useEffect(() => {
         async function fetchData() {
             try {
-                const method = "GET";
-                const response = await apiFetch(
+                const res = await apiFetch(
                     `${apiUrl}${buildingsBase}${buildingsRoutes.staff}?buildingId=${buildingId}`,
-                    {
-                        method,
-                    },
+                    { method: "GET" }
                 );
-                const resData = await response.json();
-                if (response.ok) {
-                    setData(resData.data);
+
+                const json = await res.json();
+
+                if (res.ok) {
+                    setData(json.data);
                 } else {
-                    const { title, description } = resData.error;
-                    toast.error(title, { description });
+                    toast.error(json.error?.title || "Error");
                 }
-            } catch (error) {
-                console.log(error);
+            } catch (err) {
+                console.log(err);
             } finally {
                 setLoading(false);
             }
         }
+
         fetchData();
-    }, []);
+    }, [buildingId]);
 
     if (loading) {
         return (
-            <Card className="p-6 w-full">
-                <SkeletonForm />
+            <Card className="p-6">
+                <p className="text-sm">Loading...</p>
             </Card>
         );
     }
-    return <DataTable columns={columns} data={data} />;
+
+    return (
+        <Card className={cn("p-4")}>
+            <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold">
+                    Building Staff ({data.length})
+                </CardTitle>
+            </CardHeader>
+
+            <CardContent>
+                {data.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                        No staff added yet.
+                    </p>
+                ) : (
+                    <DataTable columns={columns} data={data} />
+                )}
+            </CardContent>
+        </Card>
+    );
 }

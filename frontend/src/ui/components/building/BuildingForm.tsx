@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
     buildingsBase,
@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import { apiFetch, apiUrl, formatEnum, cn } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Building2, MapPin, Loader2, PlusCircle } from "lucide-react";
 
 export function BuildingForm({
     buildingGroupId,
@@ -25,103 +24,87 @@ export function BuildingForm({
 }: { buildingGroupId: BuildingGroupId } & React.ComponentProps<"div">) {
     const form = useForm<FormFields>({
         resolver: zodResolver(formSchema),
-        // defaultValues: {
-        //     name: "",
-        //     address: "",
-        //     status: formSchema.shape.status.options[0],
-        //     type: formSchema.shape.type.options[0],
-        // },
     });
+
     const { handleSubmit } = form;
     const [isUpdating, setIsUpdating] = useState(false);
 
-    const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
+    const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
-            const method = "POST";
             const bgId = buildingGroupIdSchema.safeParse(buildingGroupId);
 
             if (!bgId.success) {
-                toast.error("Missing fields: buildingGroupId");
+                toast.error("Missing building group");
                 return;
             }
 
-            const fullData: CreateBuilding = { ...data, buildingGroupId: bgId.data };
-            console.log(fullData);
+            const fullData: CreateBuilding = {
+                ...data,
+                buildingGroupId: bgId.data,
+            };
 
             setIsUpdating(true);
-            const response = await apiFetch(`${apiUrl}${buildingsBase}`, {
-                method,
+
+            const res = await apiFetch(`${apiUrl}${buildingsBase}`, {
+                method: "POST",
                 body: JSON.stringify(fullData),
                 headers: { "Content-Type": "application/json" },
             });
+
+            const json = await res.json();
             setIsUpdating(false);
-            const resData = await response.json();
-            if (response.ok) {
-                toast.success(`Building ${data.name} created`, {
-                    description: JSON.stringify(resData, null, 2),
-                });
+
+            if (res.ok) {
+                toast.success("Building created");
                 form.reset();
             } else {
-                const { title, description } = resData.error;
-                toast.error(title, { description });
+                toast.error(json.error?.title || "Error");
             }
-        } catch (error) {
+        } catch (err) {
             setIsUpdating(false);
-            console.log(error);
+            console.log(err);
         }
     };
 
     if (isUpdating) {
         return (
-            <Card className="p-6 w-full border-border shadow-sm bg-card transition-colors duration-300">
-                <div className="flex flex-col items-center py-6">
-                    <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
-                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
-                        Registering Asset...
-                    </p>
-                </div>
+            <Card className="p-6">
+                <p className="text-sm">Creating building...</p>
             </Card>
         );
     }
 
     return (
         <div className={cn("w-full", className)} {...props}>
-            <Card className="border-border shadow-lg bg-card overflow-hidden rounded-xl transition-colors duration-300">
-                <div className="h-1.5 w-full bg-primary" />
-
-                <CardHeader className="pb-4">
-                    <CardTitle className="text-xl flex items-center text-foreground">
-                        <PlusCircle className="w-5 h-5 mr-2 text-primary" />
-                        Create Building
+            <Card className="p-4">
+                <CardHeader className="p-0 mb-4">
+                    <CardTitle className="text-lg">
+                        Create building
                     </CardTitle>
-                    <CardDescription className="text-muted-foreground">
-                        Add a new building to your company portfolio.
+                    <CardDescription className="text-sm">
+                        Add a new building
                     </CardDescription>
                 </CardHeader>
 
-                <CardContent>
+                <CardContent className="p-0">
                     <Form {...form}>
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
                             <FormField
                                 control={form.control}
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-xs font-bold uppercase tracking-wider text-foreground/80">
+                                        <FormLabel className="text-sm">
                                             Name
                                         </FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                <Input
-                                                    type="text"
-                                                    placeholder="Fiktional Estates Group"
-                                                    className="pl-9 h-11 bg-background border-input focus-visible:ring-1 focus-visible:ring-ring transition-all font-medium text-foreground placeholder:text-muted-foreground"
-                                                    {...field}
-                                                />
-                                            </div>
+                                            <Input
+                                                placeholder="Building name"
+                                                {...field}
+                                            />
                                         </FormControl>
-                                        <FormMessage className="text-[10px]" />
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -131,32 +114,27 @@ export function BuildingForm({
                                 name="address"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-xs font-bold uppercase tracking-wider text-foreground/80">
+                                        <FormLabel className="text-sm">
                                             Address
                                         </FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                <Input
-                                                    type="text"
-                                                    placeholder="S10 1WB, UK"
-                                                    className="pl-9 h-11 bg-background border-input focus-visible:ring-1 focus-visible:ring-ring transition-all font-medium text-foreground placeholder:text-muted-foreground"
-                                                    {...field}
-                                                />
-                                            </div>
+                                            <Input
+                                                placeholder="Address"
+                                                {...field}
+                                            />
                                         </FormControl>
-                                        <FormMessage className="text-[10px]" />
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <FormField
                                     control={form.control}
                                     name="status"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-foreground/80">
+                                            <FormLabel className="text-sm">
                                                 Status
                                             </FormLabel>
                                             <Select
@@ -164,21 +142,19 @@ export function BuildingForm({
                                                 value={field.value}
                                             >
                                                 <FormControl>
-                                                    <SelectTrigger className="h-11 bg-background border-input focus-visible:ring-1 focus-visible:ring-ring transition-all font-medium text-foreground">
+                                                    <SelectTrigger>
                                                         <SelectValue placeholder="Select status" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {formSchema.shape.status.options.map(
-                                                        (value) => (
-                                                            <SelectItem key={value} value={value}>
-                                                                {formatEnum(value)}
-                                                            </SelectItem>
-                                                        ),
-                                                    )}
+                                                    {formSchema.shape.status.options.map((value) => (
+                                                        <SelectItem key={value} value={value}>
+                                                            {formatEnum(value)}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
-                                            <FormMessage className="text-[10px]" />
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -188,7 +164,7 @@ export function BuildingForm({
                                     name="type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-foreground/80">
+                                            <FormLabel className="text-sm">
                                                 Type
                                             </FormLabel>
                                             <Select
@@ -196,7 +172,7 @@ export function BuildingForm({
                                                 value={field.value}
                                             >
                                                 <FormControl>
-                                                    <SelectTrigger className="h-11 bg-background border-input focus-visible:ring-1 focus-visible:ring-ring transition-all font-medium text-foreground">
+                                                    <SelectTrigger>
                                                         <SelectValue placeholder="Select type" />
                                                     </SelectTrigger>
                                                 </FormControl>
@@ -208,25 +184,14 @@ export function BuildingForm({
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            <FormMessage className="text-[10px]" />
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                             </div>
 
-                            <Button
-                                type="submit"
-                                disabled={isUpdating}
-                                className="w-full h-11 mt-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] group"
-                            >
-                                {isUpdating ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        Registering...
-                                    </>
-                                ) : (
-                                    "Create Building"
-                                )}
+                            <Button type="submit" disabled={isUpdating} className="w-full">
+                                {isUpdating ? "Creating..." : "Create building"}
                             </Button>
                         </form>
                     </Form>

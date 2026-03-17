@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Button } from "../ui/button";
-import { apiFetch, apiUrl } from "@/lib/utils";
+import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import type z from "zod";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
@@ -23,6 +23,7 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
     const [selectedUser, setSelectedUser] = useState<SafeUser | null>(null);
 
     type FormFields = z.input<typeof createBuildingStaffInviteSchema>;
+
     const form = useForm<FormFields>({
         resolver: zodResolver(createBuildingStaffInviteSchema),
         defaultValues: {
@@ -32,49 +33,55 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
     });
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
-        const parsed = createBuildingStaffInviteSchema.parse(data);
+        try {
+            const parsed = createBuildingStaffInviteSchema.parse(data);
 
-        console.log(parsed);
-
-        const response = await apiFetch(`${apiUrl}${buildingsBase}${buildingsRoutes.invite}`, {
-            method: "POST",
-            body: JSON.stringify(parsed),
-            headers: { "Content-Type": "application/json" },
-        });
-
-        const resData = await response.json();
-
-        if (response.ok) {
-            toast.success(`Invite sent`, {
-                description: JSON.stringify(resData, null, 2),
+            const res = await apiFetch(`${apiUrl}${buildingsBase}${buildingsRoutes.invite}`, {
+                method: "POST",
+                body: JSON.stringify(parsed),
+                headers: { "Content-Type": "application/json" },
             });
-        } else {
-            const { title, description } = resData.error;
-            toast.error(title, { description });
+
+            const json = await res.json();
+
+            if (res.ok) {
+                toast.success("Invite sent");
+                form.reset({ buildingId, role: "RECEPTIONIST" });
+                setSelectedUser(null);
+            } else {
+                toast.error(json.error?.title || "Error sending invite");
+            }
+        } catch (err) {
+            console.log(err);
         }
     };
 
     const handleUserSelect = (user: SafeUser) => {
         setSelectedUser(user);
-        form.setValue("userId", user.id, { shouldValidate: true });
+        form.setValue("userId", user.id);
     };
 
     return (
-        <Card>
+        <Card className={cn("p-4")}>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    
                     <div>
-                        <FormLabel>Invite Staff to Building</FormLabel>
+                        <FormLabel className="text-sm font-semibold">
+                            Invite staff
+                        </FormLabel>
 
                         <SearchUsers onSelect={handleUserSelect} />
 
                         {selectedUser && (
-                            <p className="text-sm text-muted-foreground mt-2">
+                            <div className="mt-2 text-sm">
                                 Selected: {selectedUser.email}
-                            </p>
+                            </div>
                         )}
 
-                        <FormMessage>{form.formState.errors.userId?.message}</FormMessage>
+                        <FormMessage>
+                            {form.formState.errors.userId?.message}
+                        </FormMessage>
                     </div>
 
                     <FormField
@@ -82,7 +89,7 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
                         name="role"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Role</FormLabel>
+                                <FormLabel className="text-sm">Role</FormLabel>
 
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
@@ -102,7 +109,9 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
                         )}
                     />
 
-                    <Button type="submit">Send Invite</Button>
+                    <Button type="submit" className="w-full">
+                        Send invite
+                    </Button>
                 </form>
             </Form>
         </Card>
