@@ -24,5 +24,8 @@ enum BuildingStatus {
 
 enum BuildingType {
   HOTEL
+  MUSIC_STUDIO
+  CREATIVE_SPACE
+  CONFERENCE_CENTER
   OTHER
 }

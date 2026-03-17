@@ -12,7 +12,7 @@ export const buildingFormSchema = z.object({
         .max(50, { message: "Building name must be at most 50 characters" }),
     address: z.string(),
     status: z.enum(["DRAFT", "ACTIVE", "INACTIVE"]),
-    type: z.enum(["HOTEL", "OTHER"]),
+    type: z.enum(["HOTEL", "MUSIC_STUDIO", "CREATIVE_SPACE", "CONFERENCE_CENTER", "OTHER"]),
 });
 
 export type BuildingForm = z.infer<typeof buildingFormSchema>;
