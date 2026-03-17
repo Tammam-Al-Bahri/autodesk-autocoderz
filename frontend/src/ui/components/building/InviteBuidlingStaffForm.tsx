@@ -1,9 +1,9 @@
 import {
     type BuildingId,
-    type SafeUser,
     createBuildingStaffInviteSchema,
     buildingsBase,
     buildingsRoutes,
+    type SafeUserNoEmail,
 } from "@autocoderz/shared";
 
 import SearchUsers from "../SearchUsers";
@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { Card } from "../ui/card";
 
 export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: BuildingId }) {
-    const [selectedUser, setSelectedUser] = useState<SafeUser | null>(null);
+    const [selectedUser, setSelectedUser] = useState<SafeUserNoEmail | null>(null);
 
     type FormFields = z.input<typeof createBuildingStaffInviteSchema>;
 
@@ -56,7 +56,7 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
         }
     };
 
-    const handleUserSelect = (user: SafeUser) => {
+    const handleUserSelect = (user: SafeUserNoEmail) => {
         setSelectedUser(user);
         form.setValue("userId", user.id);
     };
@@ -65,23 +65,19 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
         <Card className={cn("p-4")}>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    
                     <div>
-                        <FormLabel className="text-sm font-semibold">
-                            Invite staff
-                        </FormLabel>
+                        <FormLabel className="text-sm font-semibold">Invite staff</FormLabel>
 
                         <SearchUsers onSelect={handleUserSelect} />
 
                         {selectedUser && (
                             <div className="mt-2 text-sm">
-                                Selected: {selectedUser.email}
+                                Selected:{" "}
+                                {`${selectedUser.firstName} ${selectedUser.middleName} ${selectedUser.lastName}`}
                             </div>
                         )}
 
-                        <FormMessage>
-                            {form.formState.errors.userId?.message}
-                        </FormMessage>
+                        <FormMessage>{form.formState.errors.userId?.message}</FormMessage>
                     </div>
 
                     <FormField

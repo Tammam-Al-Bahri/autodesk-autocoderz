@@ -13,7 +13,7 @@ export async function getUsers(request: Request, response: Response, next: NextF
 
         const users = await searchUsers(query);
 
-        const safeUsersSchema = safeUserSchema.array();
+        const safeUsersSchema = safeUserSchema.omit({ email: true }).array();
         const safeUsers = safeUsersSchema.parse(users);
 
         response.send(safeUsers);

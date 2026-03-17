@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { email, z } from "zod";
 
 export const userId = z.cuid().brand<"userId">();
 export type UserId = z.infer<typeof userId>;
@@ -33,6 +33,8 @@ export const safeUserSchema = baseUserSchema
     });
 
 export type SafeUser = z.infer<typeof safeUserSchema>;
+
+export type SafeUserNoEmail = Omit<SafeUser, "email">;
 
 export const createUserSchema = baseUserSchema
     .extend({
