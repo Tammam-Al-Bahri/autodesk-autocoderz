@@ -14,6 +14,8 @@ model Building {
   rooms Room[]
 
   staff BuildingStaff[]
+
+  @@unique([buildingGroupId, name])
 }
 
 enum BuildingStatus {
