@@ -21,6 +21,9 @@ import { User, Mail, Lock, UserPlus, ArrowRight, Loader2, ShieldCheck } from "lu
 export function SignupForm({ className, ...props }: React.ComponentProps<"div">) {
     const form = useForm<FormFields>({
         resolver: zodResolver(formSchema),
+        defaultValues: {
+            middleName: "",
+        },
     });
 
     const { handleSubmit } = form;
