@@ -4,7 +4,7 @@ import BuildingStaffTable from "@/components/building/staff/BuildingStaffTable";
 import { UploadBuildingModel } from "@/components/building/UploadBuildingModel";
 import CopyId from "@/components/CopyId";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { apiFetch, apiUrl, cn } from "@/lib/utils";
+import { apiFetch, apiUrl } from "@/lib/utils";
 import {
     apsBase,
     apsRoutes,

@@ -3,7 +3,7 @@ import BuildingTable from "@/components/building/BuildingTable";
 import { buildingsBase, type Building, type BuildingGroupId } from "@autocoderz/shared";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { apiFetch, apiUrl, cn } from "@/lib/utils";
+import { apiFetch, apiUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import CopyId from "@/components/CopyId";
 
