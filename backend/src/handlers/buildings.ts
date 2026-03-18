@@ -1,15 +1,19 @@
 import type { NextFunction, Request, Response } from "express";
 import {
     buildingGroupId as buildingGroupIdSchema,
+    BuildingId,
     buildingId as buildingIdSchema,
     CreateBuilding,
     CreateBuildingStaffInvite,
+    UserId,
 } from "@autocoderz/shared";
 import {
     canManageBuildingStaff,
     createBuilding as createBuildingDB,
+    deleteBuildingFromId,
     getBuildingFromId,
     getBuildingsFromBuildingGroupId,
+    updateBuildingFromId,
 } from "../db/building";
 import {
     createBuildingStaffInvite as createBuildingStaffInviteDB,
@@ -170,6 +174,86 @@ export async function getBuildingStaff(request: Request, response: Response, nex
 
         const buildingStaff = await getBuildingStaffFromBuildingId(parsedId);
         response.status(201).json({ success: true, data: buildingStaff });
+        return;
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function deleteBuilding(request: Request, response: Response, next: NextFunction) {
+    const userId = request.session.userId;
+
+    if (!userId) {
+        response.status(401).json({
+            error: {
+                title: "User not found",
+                description: "No user ID found in session",
+            },
+        });
+        return;
+    }
+    const buildingId = request.query.buildingId as BuildingId;
+
+    if (!buildingId) {
+        response.status(400).json({
+            error: {
+                title: "BuildingId not found",
+                description: "No Building ID found in request query",
+            },
+        });
+        return;
+    }
+
+    try {
+        const success = await deleteBuildingFromId(userId, buildingId);
+
+        if (!success) {
+            response.status(500).json({
+                error: {
+                    title: "Could not delete",
+                    description: "",
+                },
+            });
+            return;
+        }
+        response.status(200).json({ success });
+        return;
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateBuilding(
+    request: Request<{}, {}, CreateBuilding>,
+    response: Response,
+    next: NextFunction,
+) {
+    const data = request.body;
+    const userId = request.session.userId as UserId;
+
+    if (!userId) {
+        response.status(401).json({
+            error: {
+                title: "Not authenticated",
+                description: "You must be logged in to perform this action",
+            },
+        });
+        return;
+    }
+    const buildingId = request.query.buildingId as BuildingId;
+
+    if (!buildingId) {
+        response.status(400).json({
+            error: {
+                title: "BuildingId not found",
+                description: "No Building ID found in request query",
+            },
+        });
+        return;
+    }
+    try {
+        const building = await updateBuildingFromId(userId, buildingId, data);
+        response.status(201).json({ success: true, data: building });
         return;
     } catch (error) {
         next(error);

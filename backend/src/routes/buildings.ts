@@ -12,7 +12,9 @@ import {
     createBuildingStaffInvite,
     getBuildings,
     uploadBuildingModel,
-    getBuildingStaff
+    getBuildingStaff,
+    updateBuilding,
+    deleteBuilding,
 } from "../handlers/buildings";
 import { upload } from "../lib/uploadFile";
 
@@ -33,5 +35,7 @@ router.post(
     validate(createBuildingStaffInviteSchema),
     createBuildingStaffInvite,
 );
+router.delete(`${buildingsBase}`, requireAuth, deleteBuilding);
+router.patch(`${buildingsBase}`, requireAuth, validate(createBuildingSchema), updateBuilding);
 
 export default router;

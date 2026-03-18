@@ -1,18 +1,32 @@
 import { columns } from "./columns";
-import { type Building } from "@autocoderz/shared";
+import { type Building, type BuildingId } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
 import { cn } from "@/lib/utils";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
 import { ListOrdered, Loader2 } from "lucide-react";
+import { useMemo, useState } from "react";
 
 type Props = {
     data: Building[];
     loading: boolean;
+    onDelete: (id: BuildingId) => void;
+    onUpdate: (group: Building) => void;
 } & React.ComponentProps<"div">;
 
-export default function BuildingTable({ data, loading, className, ...props }: Props) {
+export default function BuildingTable({
+    data,
+    loading,
+    className,
+    onDelete,
+    onUpdate,
+    ...props
+}: Props) {
+    const [editingId, setEditingId] = useState<BuildingId | null>(null);
+    const [draft, setDraft] = useState<Partial<Building>>({});
+    const memoData = useMemo(() => data, [data]);
+
     if (loading) {
         return (
             <div className={cn("w-full", className)} {...props}>
@@ -65,7 +79,18 @@ export default function BuildingTable({ data, loading, className, ...props }: Pr
                             </p>
                         </div>
                     ) : (
-                        <DataTable columns={columns} data={data} />
+                        <DataTable
+                            columns={columns}
+                            data={memoData}
+                            meta={{
+                                editingId,
+                                setEditingId,
+                                draft,
+                                setDraft,
+                                onDelete,
+                                onUpdate,
+                            }}
+                        />
                     )}
                 </CardContent>
             </Card>

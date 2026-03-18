@@ -17,7 +17,7 @@ type ColumnProps = {
 export const columns: ColumnDef<BuildingGroup>[] = [
     {
         accessorKey: "name",
-        header: "Company Portfolio",
+        header: "Company",
         cell: ({ row, table }) => {
             const group = row.original;
             const { editingId, draft, setDraft } = table.options.meta as ColumnProps;
