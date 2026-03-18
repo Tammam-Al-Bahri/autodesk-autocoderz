@@ -2,6 +2,7 @@ import AutodeskViewer from "@/components/AutodeskViewer";
 import InviteStaffForm from "@/components/building/InviteBuidlingStaffForm";
 import BuildingStaffTable from "@/components/building/staff/BuildingStaffTable";
 import { UploadBuildingModel } from "@/components/building/UploadBuildingModel";
+import CopyId from "@/components/CopyId";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import {
@@ -23,7 +24,6 @@ export default function Building() {
 
     const [autodeskToken, setAutodeskToken] = useState("");
     const [buildingUrn, setBuildingUrn] = useState("");
-    const [showId, setShowId] = useState(false);
 
     useEffect(() => {
         if (!buildingId) return;
@@ -46,13 +46,6 @@ export default function Building() {
 
         fetchStaff();
     }, [buildingId]);
-
-    useEffect(() => {
-        if (showId) {
-            const t = setTimeout(() => setShowId(false), 5000);
-            return () => clearTimeout(t);
-        }
-    }, [showId]);
 
     useEffect(() => {
         async function fetchData() {
@@ -91,12 +84,7 @@ export default function Building() {
     return (
         <div className="max-w-5xl mx-auto w-full p-6 space-y-6">
             <div>
-                <div onClick={() => setShowId(!showId)} className="cursor-pointer text-sm mb-2">
-                    <span>Building ID:</span>{" "}
-                    <span className={cn(showId ? "text-primary" : "text-muted-foreground")}>
-                        {showId ? buildingId : "click to show"}
-                    </span>
-                </div>
+                <CopyId label="Building ID" value={buildingId} />
 
                 <h1 className="text-2xl font-semibold">Building Management</h1>
             </div>

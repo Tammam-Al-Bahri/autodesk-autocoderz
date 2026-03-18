@@ -47,11 +47,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
             const result = await response.json();
 
             if (response.ok) {
-                toast.success(`Welcome ${data.firstName}`);
+                toast.success(`Welcome, ${data.firstName}`);
 
                 await refreshUser();
 
-                navigate("/", { replace: true });
+                navigate("/building-groups", { replace: true });
             } else if (result?.error) {
                 toast.error(result.error.title, {
                     description: result.error.description,

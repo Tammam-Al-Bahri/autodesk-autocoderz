@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import LogoutButton from "./LogoutButton";
 import Logo from "./Logo";
 import {
     DropdownMenu,
@@ -23,7 +22,9 @@ export default function Navbar() {
 
     const [currentView, setCurrentView] = useState<NavbarView>(() => {
         const savedView = localStorage.getItem("selectedView");
-        if (!user) return "Guest";
+        if (!user) {
+            return "Guest";
+        }
 
         if (savedView === "Guest" || savedView === "Staff" || savedView === "Manager") {
             return savedView;
@@ -38,6 +39,9 @@ export default function Navbar() {
         const savedView = localStorage.getItem("selectedView");
         if (savedView === "Guest" || savedView === "Staff" || savedView === "Manager") {
             setCurrentView(savedView);
+        } else {
+            setCurrentView("Manager");
+            localStorage.setItem("selectedView", "Manager");
         }
     }, [user]);
 
@@ -108,7 +112,11 @@ export default function Navbar() {
             <div className="flex items-center gap-4 ml-auto z-10">
                 {user ? (
                     <>
-                        <LogoutButton />
+                        <Button asChild variant="outline">
+                            <Link to="/profile">
+                                <User />
+                            </Link>
+                        </Button>
                     </>
                 ) : (
                     <Button asChild variant="outline">

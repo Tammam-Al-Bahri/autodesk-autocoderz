@@ -5,23 +5,13 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { toast } from "sonner";
+import CopyId from "@/components/CopyId";
 
 export default function BuildingGroup() {
     const { buildingGroupId } = useParams<{ buildingGroupId: BuildingGroupId }>();
-    const [showId, setShowId] = useState(false);
 
     const [data, setData] = useState<Building[]>([]);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (showId) {
-            const timer = setTimeout(() => {
-                setShowId(false);
-            }, 5000);
-
-            return () => clearTimeout(timer);
-        }
-    }, [showId]);
 
     if (!buildingGroupId) {
         return <div>Group ID not found</div>;
@@ -55,12 +45,7 @@ export default function BuildingGroup() {
 
     return (
         <div className="max-w-5xl mx-auto w-full p-6 space-y-6">
-            <div onClick={() => setShowId(!showId)} className="cursor-pointer text-sm mb-2">
-                <span>Building Group ID:</span>{" "}
-                <span className={cn(showId ? "text-primary" : "text-muted-foreground")}>
-                    {showId ? buildingGroupId : "click to show"}
-                </span>
-            </div>
+            <CopyId label="Building Group ID" value={buildingGroupId} />
 
             <BuildingForm buildingGroupId={buildingGroupId} setData={setData} />
             <BuildingTable data={data} loading={loading} />

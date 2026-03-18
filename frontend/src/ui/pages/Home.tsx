@@ -1,4 +1,4 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +9,11 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Box, Wrench, BarChart3, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     return (
         <div className="min-h-screen pb-24">
@@ -32,19 +34,17 @@ export default function Home() {
                         in one place.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-                        <Button size="lg" className="px-8 h-12" onClick={() => navigate("/signup")}>
-                            Get Started
-                        </Button>
-
-                        <Button asChild variant="outline" size="lg" className="px-8 h-12">
-                            <Link to="/login">Partner Login</Link>
-                        </Button>
-
-                        <Button variant="ghost" onClick={() => navigate("/test")}>
-                            Demo
-                        </Button>
-                    </div>
+                    {!user && (
+                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                            <Button
+                                size="lg"
+                                className="px-8 h-12"
+                                onClick={() => navigate("/signup")}
+                            >
+                                Get Started <ArrowRight />
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
 

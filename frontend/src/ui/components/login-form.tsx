@@ -37,6 +37,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                     navigate("/jobs", { replace: true });
                 } else if (savedView === "Manage") {
                     navigate("/building-groups", { replace: true });
+                } else {
+                    navigate("/building-groups", { replace: true });
                 }
             } else if (res?.error) {
                 toast.error(res.error.title, {

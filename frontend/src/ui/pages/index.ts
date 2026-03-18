@@ -17,6 +17,7 @@ const GuestPortal = lazy(() => import("./GuestPortal"));
 const Building = lazy(() => import("./building/Building"));
 const MyJobs = lazy(() => import("./staff/MyJobs"));
 const StaffJobDashboard = lazy(() => import("./staff/StaffJobDashboard"));
+const Profile = lazy(() => import("./user/Profile.tsx"));
 
 type Page = {
     path: string;
@@ -109,6 +110,11 @@ const pages: Page[] = [
         path: "/building-groups/:buildingGroupId/buildings/:buildingId",
         title: "Building",
         component: Building,
+    },
+    {
+        path: "/profile",
+        title: "Profile",
+        component: Profile,
     },
 ] as const;
 
