@@ -6,13 +6,13 @@ import { Input } from "../ui/input";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
 import { Progress } from "../ui/progress";
-import { 
-    CloudUpload, 
-    FileBox, 
-    HardDriveUpload, 
-    CheckCircle2, 
-    Loader2, 
-    AlertCircle 
+import {
+    CloudUpload,
+    FileBox,
+    HardDriveUpload,
+    CheckCircle2,
+    Loader2,
+    AlertCircle,
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 
@@ -146,18 +146,25 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
     if (loading) {
         return (
             <Card className="p-6 w-full border-border bg-card shadow-sm relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-muted/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                
+                <div className="absolute inset-0 bg-linear-to-r from-transparent via-muted/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+
                 <div className="relative z-10 flex flex-col gap-4">
                     <div className="flex justify-between items-start">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                {status === "error" ? <AlertCircle className="w-5 h-5" /> : <Loader2 className="w-5 h-5 animate-spin" />}
+                                {status === "error" ? (
+                                    <AlertCircle className="w-5 h-5" />
+                                ) : (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                )}
                             </div>
                             <div>
                                 <h4 className="font-bold text-foreground flex items-center gap-2">
                                     Cloud Translation Active
-                                    <Badge variant="outline" className="text-[10px] uppercase bg-background text-foreground">
+                                    <Badge
+                                        variant="outline"
+                                        className="text-[10px] uppercase bg-background text-foreground"
+                                    >
                                         {status || "Initialising"}
                                     </Badge>
                                 </h4>

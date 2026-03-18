@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import LogoutButton from "./LogoutButton";
 import Logo from "./Logo";
 import {
     DropdownMenu,
@@ -15,7 +14,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { pagesLinks } from "@/pages";
 
-export type NavbarView = "Guest" | "Staff" | "Manage";
+export type NavbarView = "Guest" | "Staff" | "Manager";
 
 export default function Navbar() {
     const { user } = useAuth();
@@ -23,9 +22,11 @@ export default function Navbar() {
 
     const [currentView, setCurrentView] = useState<NavbarView>(() => {
         const savedView = localStorage.getItem("selectedView");
-        if (!user) return "Guest";
+        if (!user) {
+            return "Guest";
+        }
 
-        if (savedView === "Guest" || savedView === "Staff" || savedView === "Manage") {
+        if (savedView === "Guest" || savedView === "Staff" || savedView === "Manager") {
             return savedView;
         }
         return "Staff";
@@ -36,8 +37,11 @@ export default function Navbar() {
             setCurrentView("Guest");
         }
         const savedView = localStorage.getItem("selectedView");
-        if (savedView === "Guest" || savedView === "Staff" || savedView === "Manage") {
+        if (savedView === "Guest" || savedView === "Staff" || savedView === "Manager") {
             setCurrentView(savedView);
+        } else {
+            setCurrentView("Manager");
+            localStorage.setItem("selectedView", "Manager");
         }
     }, [user]);
 
@@ -48,7 +52,7 @@ export default function Navbar() {
     const views: { title: string; value: NavbarView }[] = [
         // { title: "Guest", value: "Guest" },
         { title: "Staff", value: "Staff" },
-        { title: "Manage", value: "Manage" },
+        { title: "Manager", value: "Manager" },
     ];
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -69,7 +73,7 @@ export default function Navbar() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <div className="font-semibold italic flex">
-                                {currentView}
+                                {currentView} view
                                 <ChevronDown className="scale-50" />
                             </div>
                         </DropdownMenuTrigger>
@@ -83,7 +87,7 @@ export default function Navbar() {
 
                                         if (view.value === "Staff") {
                                             navigate("/jobs", { replace: true });
-                                        } else if (view.value === "Manage") {
+                                        } else if (view.value === "Manager") {
                                             navigate("/building-groups", { replace: true });
                                         }
                                         localStorage.setItem("selectedView", view.value);
@@ -108,7 +112,11 @@ export default function Navbar() {
             <div className="flex items-center gap-4 ml-auto z-10">
                 {user ? (
                     <>
-                        <LogoutButton />
+                        <Button asChild variant="outline">
+                            <Link to="/profile">
+                                <User />
+                            </Link>
+                        </Button>
                     </>
                 ) : (
                     <Button asChild variant="outline">

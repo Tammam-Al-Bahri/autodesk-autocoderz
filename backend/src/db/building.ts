@@ -87,3 +87,40 @@ export async function canManageBuildingStaff(userId: UserId, buildingId: Buildin
         throw handlePrismaError(error);
     }
 }
+
+export async function deleteBuildingFromId(ownerId: UserId, id: BuildingId) {
+    try {
+        const building = await prisma.building.delete({
+            where: {
+                id,
+                buildingGroup: {
+                    ownerId,
+                },
+            },
+        });
+        return !!building;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}
+
+export async function updateBuildingFromId(
+    ownerId: UserId,
+    buildingId: BuildingId,
+    data: CreateBuilding,
+) {
+    try {
+        const building = await prisma.building.update({
+            where: {
+                buildingGroup: {
+                    ownerId,
+                },
+                id: buildingId,
+            },
+            data,
+        });
+        return building;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}

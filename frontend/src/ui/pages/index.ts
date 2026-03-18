@@ -5,7 +5,6 @@ import type { ComponentType } from "react";
 const About = lazy(() => import("./About"));
 const Home = lazy(() => import("./Home"));
 const LoginPage = lazy(() => import("./login"));
-const Test = lazy(() => import("./Test"));
 // const StaffTasks = lazy(() => import("./StaffTasks"));
 // const Receptionist = lazy(() => import("./Receptionist"));
 const SignupPage = lazy(() => import("./signup"));
@@ -18,6 +17,7 @@ const GuestPortal = lazy(() => import("./GuestPortal"));
 const Building = lazy(() => import("./building/Building"));
 const MyJobs = lazy(() => import("./staff/MyJobs"));
 const StaffJobDashboard = lazy(() => import("./staff/StaffJobDashboard"));
+const Profile = lazy(() => import("./user/Profile.tsx"));
 
 type Page = {
     path: string;
@@ -81,31 +81,25 @@ const pages: Page[] = [
         path: "/building-groups",
         title: "My Portfolio",
         component: MyBuildingGroups,
-        navbarView: ["Manage"],
+        navbarView: ["Manager"],
     },
     {
         path: "/dashboard",
         title: "Manager Dashboard",
         component: Dashboard,
-        navbarView: ["Manage"],
+        // navbarView: ["Manager"],
     },
     {
         path: "/applications",
         title: "Applications",
         component: Applications,
-        navbarView: ["Manage"],
+        // navbarView: ["Manager"],
     },
     {
         path: "/tickets",
         title: "Tickets",
         component: Tickets,
-        navbarView: ["Manage"],
-    },
-    {
-        path: "/test",
-        title: "Test",
-        component: Test,
-        // navbarView: ["Guest", "Staff", "Manage"],
+        // navbarView: ["Manager"],
     },
     {
         path: "/building-groups/:buildingGroupId",
@@ -116,6 +110,11 @@ const pages: Page[] = [
         path: "/building-groups/:buildingGroupId/buildings/:buildingId",
         title: "Building",
         component: Building,
+    },
+    {
+        path: "/profile",
+        title: "Profile",
+        component: Profile,
     },
 ] as const;
 

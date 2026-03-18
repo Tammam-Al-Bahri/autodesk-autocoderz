@@ -37,6 +37,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                     navigate("/jobs", { replace: true });
                 } else if (savedView === "Manage") {
                     navigate("/building-groups", { replace: true });
+                } else {
+                    navigate("/building-groups", { replace: true });
                 }
             } else if (res?.error) {
                 toast.error(res.error.title, {
@@ -52,19 +54,19 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
     return (
         <div className={cn("flex flex-col gap-6 w-full max-w-md mx-auto", className)} {...props}>
-            <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden">
-                <div className="h-2 w-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+            <Card className="shadow-2xl backdrop-blur-md rounded-2xl overflow-hidden">
+                <div className="h-2 w-full bg-linear-to-r from-accent to-primary" />
 
                 <CardHeader className="space-y-1 pt-8 text-center">
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
-                        <Building2 className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <Building2 size={50} className="text-primary" />
                     </div>
 
-                    <CardTitle className="text-3xl font-black tracking-tight text-slate-900">
-                        Welcome <span className="text-blue-600">Back</span>
+                    <CardTitle className="text-3xl font-black tracking-tight">
+                        Welcome <span className="">Back</span>
                     </CardTitle>
 
-                    <CardDescription className="text-slate-500">
+                    <CardDescription className="text-muted-foreground">
                         Sign in to continue to the dashboard
                     </CardDescription>
                 </CardHeader>
@@ -82,18 +84,18 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-slate-700 font-bold">
+                                            <FormLabel className="font-bold">
                                                 Email Address
                                             </FormLabel>
 
                                             <FormControl>
                                                 <div className="relative">
-                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
                                                     <Input
                                                         type="email"
                                                         placeholder="name@company.com"
-                                                        className="pl-10 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-blue-500"
+                                                        className="pl-10 h-12 focus:ring-2 focus:ring-popover"
                                                         {...field}
                                                     />
                                                 </div>
@@ -110,13 +112,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                     render={({ field }) => (
                                         <FormItem>
                                             <div className="flex items-center justify-between">
-                                                <FormLabel className="text-slate-700 font-bold">
+                                                <FormLabel className="font-bold">
                                                     Password
                                                 </FormLabel>
 
                                                 <Link
                                                     to="#"
-                                                    className="text-xs font-semibold text-blue-600 hover:underline"
+                                                    className="text-xs font-semibold text-accent-foreground hover:underline"
                                                 >
                                                     Forgot?
                                                 </Link>
@@ -124,12 +126,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
                                             <FormControl>
                                                 <div className="relative">
-                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
                                                     <Input
                                                         type="password"
                                                         placeholder="••••••••"
-                                                        className="pl-10 h-12 bg-slate-50 border-slate-200 focus:ring-2 focus:ring-blue-500"
+                                                        className="pl-10 h-12"
                                                         {...field}
                                                     />
                                                 </div>
@@ -143,7 +145,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                 <Button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-100 transition-all hover:scale-[1.02]"
+                                    className="w-full h- font-bold text-lg shadow-lg transition-all hover:scale-101"
                                 >
                                     {loading ? (
                                         <>
@@ -163,7 +165,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                         Don't have an account?{" "}
                                         <Link
                                             to="/signup"
-                                            className="font-bold text-blue-600 hover:underline"
+                                            className="font-bold hover:underline text-accent-foreground"
                                         >
                                             Create one
                                         </Link>
@@ -175,9 +177,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                 </CardContent>
             </Card>
 
-            <div className="flex items-center justify-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs font-bold uppercase tracking-widest">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Secure login connection</span>
+                <span>Secure login</span>
             </div>
         </div>
     );

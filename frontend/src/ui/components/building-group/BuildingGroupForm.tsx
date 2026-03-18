@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import {
     buildingGroupsBase,
     createBuildingGroupSchema as formSchema,
+    type BuildingGroup,
     type CreateBuildingGroup as FormFields,
 } from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +16,15 @@ import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Building, AlignLeft, Loader2, ArrowRight } from "lucide-react";
 
-export function BuildingGroupForm({ className, ...props }: React.ComponentProps<"div">) {
+type Props = {
+    setData: React.Dispatch<React.SetStateAction<BuildingGroup[]>>;
+};
+
+export function BuildingGroupForm({
+    setData,
+    className,
+    ...props
+}: Props & React.ComponentProps<"div">) {
     const form = useForm<FormFields>({ resolver: zodResolver(formSchema) });
     const { handleSubmit } = form;
     const [isUpdating, setIsUpdating] = useState(false);
@@ -32,9 +41,11 @@ export function BuildingGroupForm({ className, ...props }: React.ComponentProps<
             setIsUpdating(false);
             const resData = await response.json();
             if (response.ok) {
-                toast.success(`Building Group ${data.name} created`, {
-                    description: JSON.stringify(resData, null, 2),
-                });
+                const newGroup = resData.data;
+
+                setData((prev) => [...prev, newGroup]);
+
+                toast.success(`Building Group ${data.name} created`);
                 form.reset();
             } else {
                 const { title, description } = resData.error;
@@ -64,23 +75,22 @@ export function BuildingGroupForm({ className, ...props }: React.ComponentProps<
         <div className={cn("w-full max-w-2xl mx-auto", className)} {...props}>
             <Card className="border-border shadow-lg bg-card overflow-hidden rounded-xl transition-colors duration-300">
                 <div className="h-2 w-full bg-primary" />
-                
+
                 <CardHeader className="pt-8 pb-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4 border border-primary/20">
                         <Building className="w-6 h-6 text-primary" />
                     </div>
-                    <CardTitle className="text-2xl font-black text-center text-foreground tracking-tight">
-                        Initialise <span className="text-primary">Company</span>
+                    <CardTitle className="text-3xl font-black text-center text-foreground tracking-tight">
+                        Register Company
                     </CardTitle>
                     <CardDescription className="text-center text-muted-foreground text-base px-4">
-                        Add a new organisation to your platform. You can configure individual properties and staff logic after creation.
+                        You can configure individual properties and invite staff after creation.
                     </CardDescription>
                 </CardHeader>
 
                 <CardContent className="pb-8">
                     <Form {...form}>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                            
                             <FormField
                                 control={form.control}
                                 name="name"
@@ -111,7 +121,7 @@ export function BuildingGroupForm({ className, ...props }: React.ComponentProps<
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-xs font-bold uppercase tracking-wider text-foreground/80">
-                                            Operational Mandate (Description)
+                                            Description
                                         </FormLabel>
                                         <FormControl>
                                             <div className="relative">
@@ -129,15 +139,14 @@ export function BuildingGroupForm({ className, ...props }: React.ComponentProps<
                                 )}
                             />
 
-                            <Button 
-                                type="submit" 
+                            <Button
+                                type="submit"
                                 disabled={isUpdating}
                                 className="w-full h-12 mt-4 bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-lg transition-all hover:scale-[1.01] active:scale-[0.99] group"
                             >
-                                Create Portfolio
+                                Add
                                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                             </Button>
-
                         </form>
                     </Form>
                 </CardContent>

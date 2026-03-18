@@ -1,4 +1,4 @@
-import { usersBase, type SafeUser } from "@autocoderz/shared";
+import { usersBase, type SafeUserNoEmail } from "@autocoderz/shared";
 import { useState, useEffect } from "react";
 import {
     Command,
@@ -10,9 +10,9 @@ import {
 import { apiFetch, apiUrl } from "@/lib/utils";
 import { toast } from "sonner";
 
-export default function SearchUsers({ onSelect }: { onSelect: (user: SafeUser) => void }) {
+export default function SearchUsers({ onSelect }: { onSelect: (user: SafeUserNoEmail) => void }) {
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState<SafeUser[]>([]);
+    const [results, setResults] = useState<SafeUserNoEmail[]>([]);
 
     const searchUsers = async (q: string) => {
         const response = await apiFetch(`${apiUrl}${usersBase}?q=${q}`, { method: "GET" });
@@ -52,7 +52,6 @@ export default function SearchUsers({ onSelect }: { onSelect: (user: SafeUser) =
                             <span>
                                 {user.firstName} {user.middleName} {user.lastName}
                             </span>
-                            <span className="text-xs text-muted-foreground">{user.email}</span>
                         </div>
                     </CommandItem>
                 ))}

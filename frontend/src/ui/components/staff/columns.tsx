@@ -1,17 +1,19 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import {
-    buildingStaffBase,
-    buildingStaffRoutes,
     type BuildingStaffId,
     type BuildingStaffInviteStatus,
     type BuildingStaffTable,
 } from "@autocoderz/shared";
-import { apiFetch, apiUrl, formatEnum } from "@/lib/utils";
+import { formatEnum } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { Button } from "../ui/button";
 
-export const columns: ColumnDef<BuildingStaffTable>[] = [
+export const columns = (
+    onUpdate: (
+        id: BuildingStaffId,
+        status: Extract<BuildingStaffInviteStatus, "ACCEPTED" | "DECLINED">,
+    ) => void,
+): ColumnDef<BuildingStaffTable>[] => [
     {
         accessorKey: "building",
         header: "Building",
@@ -73,39 +75,10 @@ export const columns: ColumnDef<BuildingStaffTable>[] = [
 
             return (
                 <div className="flex gap-2">
-                    <Button onClick={() => updateInviteStatus(id, "ACCEPTED")}>Accept</Button>
-
-                    <Button onClick={() => updateInviteStatus(id, "DECLINED")}>Decline</Button>
+                    <Button onClick={() => onUpdate(id, "ACCEPTED")}>Accept</Button>
+                    <Button onClick={() => onUpdate(id, "DECLINED")}>Decline</Button>
                 </div>
             );
         },
     },
 ];
-
-async function updateInviteStatus(
-    buildingStaffId: BuildingStaffId,
-    status: Extract<BuildingStaffInviteStatus, "ACCEPTED" | "DECLINED">,
-) {
-    const response = await apiFetch(
-        `${apiUrl}${buildingStaffBase}${buildingStaffRoutes.manageInvite}`,
-        {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                buildingStaffId,
-                status,
-            }),
-        },
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        const { title, description } = data.error;
-        toast.error(title, { description });
-    }
-
-    return data;
-}

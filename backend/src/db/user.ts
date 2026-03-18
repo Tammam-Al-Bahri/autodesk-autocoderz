@@ -49,11 +49,6 @@ export async function searchUsers(query: string) {
         where: {
             OR: [
                 {
-                    email: {
-                        contains: query,
-                    },
-                },
-                {
                     firstName: {
                         contains: query,
                     },

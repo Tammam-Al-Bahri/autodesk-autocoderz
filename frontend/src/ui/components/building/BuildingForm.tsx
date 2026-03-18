@@ -9,6 +9,7 @@ import {
     buildingGroupId as buildingGroupIdSchema,
     type CreateBuilding,
     type BuildingGroupId,
+    type Building,
 } from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -17,11 +18,17 @@ import { apiFetch, apiUrl, formatEnum, cn } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
+type Props = {
+    buildingGroupId: BuildingGroupId;
+    setData: React.Dispatch<React.SetStateAction<Building[]>>;
+};
+
 export function BuildingForm({
     buildingGroupId,
+    setData,
     className,
     ...props
-}: { buildingGroupId: BuildingGroupId } & React.ComponentProps<"div">) {
+}: Props & React.ComponentProps<"div">) {
     const form = useForm<FormFields>({
         resolver: zodResolver(formSchema),
     });
@@ -55,6 +62,8 @@ export function BuildingForm({
             setIsUpdating(false);
 
             if (res.ok) {
+                const newBuilding = json.data;
+                setData((prev) => [...prev, newBuilding]);
                 toast.success("Building created");
                 form.reset();
             } else {
@@ -78,31 +87,21 @@ export function BuildingForm({
         <div className={cn("w-full", className)} {...props}>
             <Card className="p-4">
                 <CardHeader className="p-0 mb-4">
-                    <CardTitle className="text-lg">
-                        Create building
-                    </CardTitle>
-                    <CardDescription className="text-sm">
-                        Add a new building
-                    </CardDescription>
+                    <CardTitle className="text-lg">Create building</CardTitle>
+                    <CardDescription className="text-sm">Add a new building</CardDescription>
                 </CardHeader>
 
                 <CardContent className="p-0">
                     <Form {...form}>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
                             <FormField
                                 control={form.control}
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-sm">
-                                            Name
-                                        </FormLabel>
+                                        <FormLabel className="text-sm">Name</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="Building name"
-                                                {...field}
-                                            />
+                                            <Input placeholder="Building name" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -114,14 +113,9 @@ export function BuildingForm({
                                 name="address"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-sm">
-                                            Address
-                                        </FormLabel>
+                                        <FormLabel className="text-sm">Address</FormLabel>
                                         <FormControl>
-                                            <Input
-                                                placeholder="Address"
-                                                {...field}
-                                            />
+                                            <Input placeholder="Address" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -134,9 +128,7 @@ export function BuildingForm({
                                     name="status"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm">
-                                                Status
-                                            </FormLabel>
+                                            <FormLabel className="text-sm">Status</FormLabel>
                                             <Select
                                                 onValueChange={field.onChange}
                                                 value={field.value}
@@ -147,11 +139,13 @@ export function BuildingForm({
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {formSchema.shape.status.options.map((value) => (
-                                                        <SelectItem key={value} value={value}>
-                                                            {formatEnum(value)}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {formSchema.shape.status.options.map(
+                                                        (value) => (
+                                                            <SelectItem key={value} value={value}>
+                                                                {formatEnum(value)}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -164,9 +158,7 @@ export function BuildingForm({
                                     name="type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm">
-                                                Type
-                                            </FormLabel>
+                                            <FormLabel className="text-sm">Type</FormLabel>
                                             <Select
                                                 onValueChange={field.onChange}
                                                 value={field.value}

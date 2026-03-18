@@ -1,9 +1,10 @@
 import {
     type BuildingId,
-    type SafeUser,
     createBuildingStaffInviteSchema,
     buildingsBase,
     buildingsRoutes,
+    type SafeUserNoEmail,
+    type BuildingStaffTable,
 } from "@autocoderz/shared";
 
 import SearchUsers from "../SearchUsers";
@@ -19,8 +20,13 @@ import type z from "zod";
 import { toast } from "sonner";
 import { Card } from "../ui/card";
 
-export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: BuildingId }) {
-    const [selectedUser, setSelectedUser] = useState<SafeUser | null>(null);
+type Props = {
+    buildingId: BuildingId;
+    setStaff: React.Dispatch<React.SetStateAction<BuildingStaffTable[]>>;
+};
+
+export default function InviteBuidlingStaffForm({ buildingId, setStaff }: Props) {
+    const [selectedUser, setSelectedUser] = useState<SafeUserNoEmail | null>(null);
 
     type FormFields = z.input<typeof createBuildingStaffInviteSchema>;
 
@@ -45,6 +51,9 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
             const json = await res.json();
 
             if (res.ok) {
+                const newInvite = json.data;
+                setStaff((prev) => [...prev, { ...newInvite, user: selectedUser }]);
+
                 toast.success("Invite sent");
                 form.reset({ buildingId, role: "RECEPTIONIST" });
                 setSelectedUser(null);
@@ -56,7 +65,7 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
         }
     };
 
-    const handleUserSelect = (user: SafeUser) => {
+    const handleUserSelect = (user: SafeUserNoEmail) => {
         setSelectedUser(user);
         form.setValue("userId", user.id);
     };
@@ -65,23 +74,19 @@ export default function InviteBuidlingStaffForm({ buildingId }: { buildingId: Bu
         <Card className={cn("p-4")}>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    
                     <div>
-                        <FormLabel className="text-sm font-semibold">
-                            Invite staff
-                        </FormLabel>
+                        <FormLabel className="text-sm font-semibold">Invite staff</FormLabel>
 
                         <SearchUsers onSelect={handleUserSelect} />
 
                         {selectedUser && (
                             <div className="mt-2 text-sm">
-                                Selected: {selectedUser.email}
+                                Selected:{" "}
+                                {`${selectedUser.firstName} ${selectedUser.middleName} ${selectedUser.lastName}`}
                             </div>
                         )}
 
-                        <FormMessage>
-                            {form.formState.errors.userId?.message}
-                        </FormMessage>
+                        <FormMessage>{form.formState.errors.userId?.message}</FormMessage>
                     </div>
 
                     <FormField
