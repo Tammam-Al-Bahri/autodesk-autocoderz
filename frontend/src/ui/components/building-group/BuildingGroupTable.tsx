@@ -36,11 +36,10 @@ export default function BuildingGroupTable({ data, loading, className, ...props 
                         <div>
                             <CardTitle className="text-2xl font-bold flex items-center text-foreground">
                                 <Network className="w-6 h-6 mr-3 text-primary" />
-                                Company Portfolios
+                                Company Portfolio
                             </CardTitle>
                             <CardDescription className="text-muted-foreground mt-1">
-                                A top-level directory of all organisations and franchise groups you
-                                manage.
+                                All organisations and franchise groups you manage.
                             </CardDescription>
                         </div>
                         <div className="hidden sm:flex items-center justify-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">

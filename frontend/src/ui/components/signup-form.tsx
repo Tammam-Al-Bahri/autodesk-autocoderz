@@ -66,19 +66,19 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
 
     return (
         <div className={cn("flex flex-col gap-6 w-full max-w-lg mx-auto", className)} {...props}>
-            <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden">
-                <div className="h-2 w-full bg-linear-to-r from-blue-600 to-indigo-600" />
+            <Card className="shadow-2xl backdrop-blur-md rounded-2xl overflow-hidden">
+                <div className="h-2 w-full bg-linear-to-r from-accent to-primary" />
 
                 <CardHeader className="space-y-1 pt-8 text-center">
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
-                        <UserPlus className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <UserPlus className="w-6 h-6 text-primary" />
                     </div>
 
-                    <CardTitle className="text-3xl font-black tracking-tight text-slate-900">
-                        Create <span className="text-blue-600">Account</span>
+                    <CardTitle className="text-3xl font-black tracking-tight">
+                        Create <span className="text-primary">Account</span>
                     </CardTitle>
 
-                    <CardDescription className="text-slate-500">
+                    <CardDescription className="text-muted-foreground">
                         Sign up to start using the system
                     </CardDescription>
                 </CardHeader>
@@ -86,9 +86,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                 <CardContent className="pb-8 pt-2">
                     {loading ? (
                         <div className="py-10 flex flex-col items-center">
-                            <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
+                            <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
 
-                            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+                            <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
                                 Creating account...
                             </p>
 
@@ -103,17 +103,17 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                         name="firstName"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                                                <FormLabel className="text-muted-foreground font-bold text-xs uppercase tracking-wider">
                                                     First Name
                                                 </FormLabel>
 
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
                                                         <Input
                                                             placeholder="John"
-                                                            className="pl-9 h-11 bg-slate-50 border-slate-200"
+                                                            className="pl-9 h-11 bg-input border-border"
                                                             {...field}
                                                         />
                                                     </div>
@@ -129,14 +129,14 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                         name="middleName"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                                                <FormLabel className="text-muted-foreground font-bold text-xs uppercase tracking-wider">
                                                     Middle
                                                 </FormLabel>
 
                                                 <FormControl>
                                                     <Input
                                                         placeholder="A."
-                                                        className="h-11 bg-slate-50 border-slate-200"
+                                                        className="h-11 bg-input border-border"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -151,14 +151,14 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                         name="lastName"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                                                <FormLabel className="text-muted-foreground font-bold text-xs uppercase tracking-wider">
                                                     Last Name
                                                 </FormLabel>
 
                                                 <FormControl>
                                                     <Input
                                                         placeholder="Doe"
-                                                        className="h-11 bg-slate-50 border-slate-200"
+                                                        className="h-11 bg-input border-border"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -174,17 +174,17 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                                            <FormLabel className="text-muted-foreground font-bold text-xs uppercase tracking-wider">
                                                 Email
                                             </FormLabel>
 
                                             <FormControl>
                                                 <div className="relative">
-                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
                                                     <Input
                                                         placeholder="name@company.com"
-                                                        className="pl-9 h-11 bg-slate-50 border-slate-200"
+                                                        className="pl-9 h-11 bg-input border-border"
                                                         {...field}
                                                     />
                                                 </div>
@@ -201,18 +201,18 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                         name="password"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                                                <FormLabel className="text-muted-foreground font-bold text-xs uppercase tracking-wider">
                                                     Password
                                                 </FormLabel>
 
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
 
                                                         <Input
                                                             type="password"
                                                             placeholder="••••••••"
-                                                            className="pl-9 h-11 bg-slate-50 border-slate-200"
+                                                            className="pl-9 h-11 bg-input border-border"
                                                             {...field}
                                                         />
                                                     </div>
@@ -228,7 +228,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                         name="confirmPassword"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-slate-700 font-bold text-xs uppercase tracking-wider">
+                                                <FormLabel className="text-muted-foreground font-bold text-xs uppercase tracking-wider">
                                                     Confirm
                                                 </FormLabel>
 
@@ -236,7 +236,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                                     <Input
                                                         type="password"
                                                         placeholder="••••••••"
-                                                        className="h-11 bg-slate-50 border-slate-200"
+                                                        className="h-11 bg-input border-border"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -250,7 +250,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                 <Button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-100 transition-all hover:scale-[1.01] active:scale-[0.99] mt-4"
+                                    className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] mt-4"
                                 >
                                     {loading ? (
                                         <>
@@ -266,11 +266,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                                 </Button>
 
                                 <div className="pt-4 text-center">
-                                    <p className="text-sm text-slate-500 font-medium">
+                                    <p className="text-sm text-muted-foreground font-medium">
                                         Already have an account?{" "}
                                         <Link
                                             to="/login"
-                                            className="font-bold text-blue-600 hover:underline"
+                                            className="font-bold text-accent-foreground hover:underline"
                                         >
                                             Log In
                                         </Link>
@@ -282,7 +282,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                 </CardContent>
             </Card>
 
-            <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs font-bold uppercase tracking-widest">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Secure account connection</span>
             </div>

@@ -23,7 +23,7 @@ export default function Home() {
                     </Badge>
 
                     <h1 className="text-5xl md:text-6xl font-bold  mb-6">
-                        AUTO<span className="text-secondary">CODERZ</span>
+                        <span className="text-accent-foreground">AUTO</span>CODERZ
                     </h1>
 
                     <p className="text-lg max-w-2xl mx-auto mb-10">

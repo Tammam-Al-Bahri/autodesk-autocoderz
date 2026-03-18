@@ -15,7 +15,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { pagesLinks } from "@/pages";
 
-export type NavbarView = "Guest" | "Staff" | "Manage";
+export type NavbarView = "Guest" | "Staff" | "Manager";
 
 export default function Navbar() {
     const { user } = useAuth();
@@ -25,7 +25,7 @@ export default function Navbar() {
         const savedView = localStorage.getItem("selectedView");
         if (!user) return "Guest";
 
-        if (savedView === "Guest" || savedView === "Staff" || savedView === "Manage") {
+        if (savedView === "Guest" || savedView === "Staff" || savedView === "Manager") {
             return savedView;
         }
         return "Staff";
@@ -36,7 +36,7 @@ export default function Navbar() {
             setCurrentView("Guest");
         }
         const savedView = localStorage.getItem("selectedView");
-        if (savedView === "Guest" || savedView === "Staff" || savedView === "Manage") {
+        if (savedView === "Guest" || savedView === "Staff" || savedView === "Manager") {
             setCurrentView(savedView);
         }
     }, [user]);
@@ -48,7 +48,7 @@ export default function Navbar() {
     const views: { title: string; value: NavbarView }[] = [
         // { title: "Guest", value: "Guest" },
         { title: "Staff", value: "Staff" },
-        { title: "Manage", value: "Manage" },
+        { title: "Manager", value: "Manager" },
     ];
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -83,7 +83,7 @@ export default function Navbar() {
 
                                         if (view.value === "Staff") {
                                             navigate("/jobs", { replace: true });
-                                        } else if (view.value === "Manage") {
+                                        } else if (view.value === "Manager") {
                                             navigate("/building-groups", { replace: true });
                                         }
                                         localStorage.setItem("selectedView", view.value);

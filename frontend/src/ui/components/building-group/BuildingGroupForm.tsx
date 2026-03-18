@@ -80,12 +80,11 @@ export function BuildingGroupForm({
                     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4 border border-primary/20">
                         <Building className="w-6 h-6 text-primary" />
                     </div>
-                    <CardTitle className="text-2xl font-black text-center text-foreground tracking-tight">
-                        Initialise <span className="text-primary">Company</span>
+                    <CardTitle className="text-3xl font-black text-center text-foreground tracking-tight">
+                        Register Company
                     </CardTitle>
                     <CardDescription className="text-center text-muted-foreground text-base px-4">
-                        Add a new organisation to your platform. You can configure individual
-                        properties and staff logic after creation.
+                        You can configure individual properties and invite staff after creation.
                     </CardDescription>
                 </CardHeader>
 
@@ -122,7 +121,7 @@ export function BuildingGroupForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-xs font-bold uppercase tracking-wider text-foreground/80">
-                                            Operational Mandate (Description)
+                                            Description
                                         </FormLabel>
                                         <FormControl>
                                             <div className="relative">
@@ -145,7 +144,7 @@ export function BuildingGroupForm({
                                 disabled={isUpdating}
                                 className="w-full h-12 mt-4 bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-lg transition-all hover:scale-[1.01] active:scale-[0.99] group"
                             >
-                                Create Portfolio
+                                Add
                                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </form>
