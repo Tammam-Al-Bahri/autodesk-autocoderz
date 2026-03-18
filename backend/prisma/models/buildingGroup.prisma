@@ -8,4 +8,6 @@ model BuildingGroup {
   description String
 
   buildings Building[]
+
+  @@unique([ownerId, name])
 }

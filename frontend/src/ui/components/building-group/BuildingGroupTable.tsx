@@ -1,17 +1,32 @@
 import { columns } from "./columns";
-import { type BuildingGroup } from "@autocoderz/shared";
+import { type BuildingGroup, type BuildingGroupId } from "@autocoderz/shared";
 import { DataTable } from "../ui/data-table";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { SkeletonForm } from "../skeleton-form";
 import { Building, Loader2, Network } from "lucide-react";
+import { useMemo, useState } from "react";
 
 type Props = {
     data: BuildingGroup[];
     loading: boolean;
+    onDelete: (id: BuildingGroupId) => void;
+    onUpdate: (group: BuildingGroup) => void;
 } & React.ComponentProps<"div">;
 
-export default function BuildingGroupTable({ data, loading, className, ...props }: Props) {
+export default function BuildingGroupTable({
+    data,
+    loading,
+    className,
+    onDelete,
+    onUpdate,
+    ...props
+}: Props) {
+    const [editingId, setEditingId] = useState<BuildingGroupId | null>(null);
+    const [draft, setDraft] = useState<Partial<BuildingGroup>>({});
+
+    const memoData = useMemo(() => data, [data]);
+
     if (loading) {
         return (
             <div className={cn("w-full", className)} {...props}>
@@ -63,7 +78,18 @@ export default function BuildingGroupTable({ data, loading, className, ...props 
                             </p>
                         </div>
                     ) : (
-                        <DataTable columns={columns} data={data} />
+                        <DataTable
+                            columns={columns}
+                            data={memoData}
+                            meta={{
+                                editingId,
+                                setEditingId,
+                                draft,
+                                setDraft,
+                                onDelete,
+                                onUpdate,
+                            }}
+                        />
                     )}
                 </CardContent>
             </Card>
