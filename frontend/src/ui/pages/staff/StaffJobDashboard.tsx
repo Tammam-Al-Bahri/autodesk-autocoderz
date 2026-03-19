@@ -66,6 +66,7 @@ export default function StaffJobDashboard() {
                     <div>buidling address: {data[0].building.address}</div>
                     <div>buidling type: {data[0].building.type}</div>
                     <div>buidling status: {data[0].building.status}</div>
+                    <div>urn: {data[0].building.urn}</div>
                 </div>
                 <Receptionist />
             </>

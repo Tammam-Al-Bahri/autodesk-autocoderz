@@ -215,7 +215,7 @@ export function UploadBuildingModel({ buildingId }: { buildingId: string }) {
                                 {file ? file.name : "Select architectural file..."}
                             </span>
                             <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                                {file ? `${getFileSize(file.size)} MB` : "RVT, IFC, DWG (Max 50MB)"}
+                                {file ? `${getFileSize(file.size)} MB` : "RVT, IFC, DWG"}
                             </span>
                         </div>
                     </div>
