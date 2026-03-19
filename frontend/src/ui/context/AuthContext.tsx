@@ -1,12 +1,15 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import type { SafeUser } from "@autocoderz/shared";
-import { authRoutes, loginUserSchema } from "@autocoderz/shared";
-import { baseApiUrl } from "@/lib/utils";
+import { authBase, authRoutes, loginUserSchema } from "@autocoderz/shared";
+import { apiFetch, apiUrl, isElectron } from "@/lib/utils";
 
 interface AuthContextType {
     user: SafeUser | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    login: (
+        email: string,
+        password: string,
+    ) => Promise<{ success: boolean; error?: { title: string; description: string } }>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }
@@ -20,9 +23,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const fetchUser = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.me}`, {
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.me}`, {
                 method: "GET",
-                credentials: "include",
             });
             if (!res.ok) {
                 setUser(null);
@@ -43,9 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = async (email: string, password: string) => {
         try {
             loginUserSchema.parse({ email, password });
-            const res = await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.login}`, {
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.login}`, {
                 method: "POST",
-                credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
@@ -53,22 +54,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const data = await res.json();
 
             if (res.ok) {
+                if (isElectron) {
+                    localStorage.setItem("sid", data.sid);
+                }
                 setUser(data.safeUser);
                 return { success: true };
             } else {
                 return { success: false, error: data.error };
             }
         } catch {
-            return { success: false, error: "An error occurred" };
+            return { success: false, error: { title: "An error occurred", description: "" } };
         }
     };
 
     const logout = async () => {
         try {
-            await fetch(`${baseApiUrl}${authRoutes.base}${authRoutes.logout}`, {
+            await apiFetch(`${apiUrl}${authBase}${authRoutes.logout}`, {
                 method: "POST",
                 credentials: "include",
             });
+            if (isElectron) {
+                localStorage.removeItem("sid");
+            }
         } finally {
             setUser(null);
         }

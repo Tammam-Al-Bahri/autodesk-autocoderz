@@ -1,134 +1,161 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Box, Wrench, BarChart3, ArrowRight, Zap, Building, CloudUpload, Users } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
+    const navigate = useNavigate();
+    const { user } = useAuth();
 
-  const navigate = useNavigate();
+    return (
+        <div className="min-h-screen pb-24 bg-background">
+            <div className="pt-20 pb-16 px-4">
+                <div className="max-w-4xl mx-auto text-center">
 
-  function goToTest() {
-    navigate("/test");
-  }
+                    <Badge className="mb-6 bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
+                        <Zap className="w-3 h-3 mr-2" />
+                        Built with Autodesk Platform Services
+                    </Badge>
 
-  return (
-    <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
+                    <h1 className="text-5xl md:text-6xl font-black mb-6 tracking-tight text-foreground">
+                        <span className="text-primary">AUTO</span>CODERZ
+                    </h1>
 
-      <div className="text-center mb-12">
+                    <p className="text-lg max-w-2xl mx-auto mb-10 text-muted-foreground">
+                        The central platform to manage your digital property portfolio.
+                        Link BIM building models with property tools, view assets in 3D,
+                        and deal with maintenance issues all in one place.
+                    </p>
 
-        <Badge variant="outline" className="mb-4">
-          Autodesk Integration
-        </Badge>
+                    {!user ? (
+                        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                            <Button
+                                size="lg"
+                                className="px-8 h-12 bg-primary text-primary-foreground font-bold hover:scale-105 transition-all"
+                                onClick={() => {
+                                    navigate("/signup"); // expanded instead of inline
+                                }}
+                            >
+                                Get Started
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                        </div>
+                    ) : null}
+                </div>
+            </div>
 
-        <h1 className="text-4xl font-bold mb-4">
-          Autocoderz
-        </h1>
+            <div className="max-w-6xl mx-auto px-4 mt-8 grid md:grid-cols-3 gap-6 mb-24">
 
-        <p className="text-gray-500 max-w-xl mx-auto mb-6">
-          A property management system for hotel staff. 
-          Includes room tracking, maintenance tickets and 3D building models.
-        </p>
+                <FeatureCard
+                    icon={<Box className="w-6 h-6 text-primary" />}
+                    title="3D Model Viewer"
+                    description="Open BIM models and explore buildings in an interactive 3D viewer in the browser."
+                />
 
-        <div className="flex flex-col sm:flex-row justify-center gap-3">
+                <FeatureCard
+                    icon={<Wrench className="w-6 h-6 text-primary" />}
+                    title="Maintenance Reporting"
+                    description="Report maintenance issues and attach them to rooms or objects inside the model."
+                />
 
-          <Button onClick={() => navigate("/signup")}>
-            Register
-          </Button>
+                <FeatureCard
+                    icon={<BarChart3 className="w-6 h-6 text-primary" />}
+                    title="Management Overview"
+                    description="Track issues, monitor staff activity, and view building maintenance stats."
+                />
+            </div>
 
-          <Button asChild variant="outline">
-            <Link to="/login">Login</Link>
-          </Button>
+            <div className="max-w-4xl mx-auto px-4">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl font-black text-foreground">
+                        How to get started
+                    </h2>
+                    <p className="text-muted-foreground mt-2">
+                        Follow these steps to set up your portfolio and get things running.
+                    </p>
+                </div>
 
-          <Button variant="ghost" onClick={goToTest}>
-            Test Page
-          </Button>
+                <div className="grid md:grid-cols-3 gap-6">
+                    <StepCard
+                        number="1"
+                        icon={<Building className="w-5 h-5 text-primary" />}
+                        title="Initialise Portfolio"
+                        description="Create your organisation and add your first building."
+                    />
 
+                    <StepCard
+                        number="2"
+                        icon={<CloudUpload className="w-5 h-5 text-primary" />}
+                        title="Digitise Asset"
+                        description="Upload RVT, IFC, or DWG files to generate your digital twin."
+                    />
+
+                    <StepCard
+                        number="3"
+                        icon={<Users className="w-5 h-5 text-primary" />}
+                        title="Assign Personnel"
+                        description="Invite staff and assign roles like receptionist or maintenance."
+                    />
+                </div>
+            </div>
         </div>
-      </div>
+    );
+}
 
-      <div className="grid md:grid-cols-3 gap-6 mb-16">
-
-        <Card>
-          <CardHeader>
-            <CardTitle>3D Floor Plans</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">
-              Uses Autodesk Forge to show the building in 3D. 
-              Staff can click rooms to check their status.
-            </p>
-          </CardContent>
+function FeatureCard(props: {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+}) {
+    return (
+        <Card className="border-border shadow-lg bg-card transition-colors hover:border-primary/30">
+            <CardHeader>
+                <div className="w-12 h-12 bg-primary/10 flex items-center justify-center rounded-xl mb-3">
+                    {props.icon}
+                </div>
+                <CardTitle className="text-xl font-bold text-foreground">
+                    {props.title}
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p className="text-sm text-muted-foreground">
+                    {props.description}
+                </p>
+            </CardContent>
         </Card>
+    );
+}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Maintenance Tracking</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">
-              Staff can report issues like leaks or broken items.
-              Managers can then mark them as resolved.
-            </p>
-          </CardContent>
+function StepCard(props: {
+    number: string;
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+}) {
+    return (
+        <Card className="relative overflow-hidden border-border bg-card shadow-md">
+            <div className="absolute -right-4 -top-4 text-9xl font-black text-muted/10 select-none">
+                {props.number}
+            </div>
+
+            <CardHeader className="relative z-10 pb-2">
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                        {props.icon}
+                    </div>
+                    <h3 className="font-bold text-foreground">
+                        {props.title}
+                    </h3>
+                </div>
+            </CardHeader>
+
+            <CardContent className="relative z-10">
+                <p className="text-sm text-muted-foreground">
+                    {props.description}
+                </p>
+            </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Manager View</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600">
-              Overview page showing bookings and open problems
-              across different hotel locations.
-            </p>
-          </CardContent>
-        </Card>
-
-      </div>
-
-      <div className="max-w-2xl mx-auto">
-
-        <h3 className="text-2xl font-bold mb-6 text-center">
-          FAQ
-        </h3>
-
-        <Accordion type="single" collapsible>
-
-          <AccordionItem value="1">
-            <AccordionTrigger>
-              How does the 3D model work?
-            </AccordionTrigger>
-            <AccordionContent>
-              The system connects to Autodesk Forge and loads 
-              a building model file so users can view it in the browser.
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="2">
-            <AccordionTrigger>
-              Who handles maintenance tickets?
-            </AccordionTrigger>
-            <AccordionContent>
-              Managers see open tickets and assign them to staff.
-              Once fixed, they can mark them as resolved.
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="3">
-            <AccordionTrigger>
-              Can this be used for multiple hotels?
-            </AccordionTrigger>
-            <AccordionContent>
-              Yes, managers can switch between properties 
-              and view their individual data.
-            </AccordionContent>
-          </AccordionItem>
-
-        </Accordion>
-
-      </div>
-
-    </div>
-  );
+    );
 }

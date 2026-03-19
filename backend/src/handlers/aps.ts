@@ -6,11 +6,11 @@ if (!BASIC_AUTH) {
     throw new Error("APS_BASIC_AUTH is not defined");
 }
 
-export async function getAutodeskToken(request: Request, response: Response, next: NextFunction) {
+export async function getApsViewerToken(request: Request, response: Response, next: NextFunction) {
     try {
         const params = new URLSearchParams();
         params.append("grant_type", "client_credentials");
-        params.append("scope", "data:read data:write data:create bucket:create bucket:read");
+        params.append("scope", "viewables:read");
 
         const autodeskResponse = await fetch(
             "https://developer.api.autodesk.com/authentication/v2/token",
@@ -30,6 +30,7 @@ export async function getAutodeskToken(request: Request, response: Response, nex
 
         const data = await autodeskResponse.json();
         response.json(data);
+        return;
     } catch (error) {
         next(error);
     }
