@@ -117,7 +117,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                                 </FormLabel>
 
                                                 <Link
-                                                    to="#"
+                                                    to="/password-reset"
                                                     className="text-xs font-semibold text-accent-foreground hover:underline"
                                                 >
                                                     Forgot?
