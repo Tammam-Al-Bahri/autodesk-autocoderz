@@ -4,6 +4,10 @@ import { useAuth } from "@/context/AuthContext";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import CopyId from "@/components/CopyId";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
+import { useManagerView } from "@/context/ManagerViewContext";
 
 export default function Profile() {
     const { user, loading } = useAuth();
@@ -13,6 +17,8 @@ export default function Profile() {
     const fullName = [user?.firstName, user?.middleName, user?.lastName].filter(Boolean).join(" ");
 
     const initials = (user?.firstName?.[0] || "") + (user?.lastName?.[0] || "");
+
+    const { enabled: managerViewChecked, setEnabled: setManagerViewChecked } = useManagerView();
 
     return (
         <div className="flex justify-center items-start mt-10 px-4">
@@ -45,6 +51,18 @@ export default function Profile() {
                             {user?.lastName}
                         </div>
                     </div>
+
+                    <FieldGroup className="max-w-sm">
+                        <Field orientation="horizontal">
+                            <Checkbox
+                                id="manager-view"
+                                name="manager-view"
+                                checked={managerViewChecked}
+                                onCheckedChange={(value) => setManagerViewChecked(value === true)}
+                            />
+                            <Label htmlFor="manager-view">Enable Manager View</Label>
+                        </Field>
+                    </FieldGroup>
 
                     <div className="flex justify-center pt-4">
                         <LogoutButton />
