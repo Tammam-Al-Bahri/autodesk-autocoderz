@@ -1,6 +1,7 @@
 import { BuildingGroupId, CreateBuildingGroup, UserId } from "@autocoderz/shared";
 import { prisma } from "../lib/prisma";
 import { handlePrismaError } from "../lib/handlePrismaError";
+import { Prisma } from "../generated/prisma/client";
 
 export async function createBuildingGroup(ownerId: UserId, data: CreateBuildingGroup) {
     try {
@@ -14,6 +15,17 @@ export async function createBuildingGroup(ownerId: UserId, data: CreateBuildingG
         });
         return buildingGroup;
     } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            // Unique constraint violation
+            if (error.code === "P2002") {
+                throw {
+                    error: {
+                        title: "Company already exists",
+                        description: "Please use a different company name.",
+                    },
+                };
+            }
+        }
         throw handlePrismaError(error);
     }
 }
@@ -60,6 +72,17 @@ export async function updateBuildingGroupFromId(
         });
         return buildingGroup;
     } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            // Unique constraint violation
+            if (error.code === "P2002") {
+                throw {
+                    error: {
+                        title: "Company already exists",
+                        description: "Please use a different company name.",
+                    },
+                };
+            }
+        }
         throw handlePrismaError(error);
     }
 }
