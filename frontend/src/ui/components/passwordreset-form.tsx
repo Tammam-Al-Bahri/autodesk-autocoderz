@@ -11,25 +11,23 @@ import { toast } from "sonner";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
 import { Mail, Lock, ArrowRight, Loader2, ShieldCheck, KeyRound, RefreshCw } from "lucide-react";
 import * as z from "zod";
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSlot,
-} from "@/components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 const emailSchema = z.object({
     email: z.string().email("Enter a valid email"),
 });
 
-const resetSchema = z.object({
-    code: z.string().min(6, "Code must be 6 digits"),
-    password: z.string().min(8, "At least 8 characters"),
-    confirmPassword: z.string(),
-}).refine((d) => d.password === d.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-});
+const resetSchema = z
+    .object({
+        code: z.string().min(6, "Code must be 6 digits"),
+        password: z.string().min(8, "At least 8 characters"),
+        confirmPassword: z.string(),
+    })
+    .refine((d) => d.password === d.confirmPassword, {
+        message: "Passwords don't match",
+        path: ["confirmPassword"],
+    });
 
 export function PasswordResetForm({ className, ...props }: React.ComponentProps<"div">) {
     const navigate = useNavigate();
@@ -66,7 +64,7 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
     const sendCode = async (data: any) => {
         setLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 1200));
+            await new Promise((r) => setTimeout(r, 1200));
             setEmail(data.email);
             setStep(2);
             setCount(30);
@@ -81,7 +79,7 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
     const resend = async () => {
         setLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 1200));
+            await new Promise((r) => setTimeout(r, 1200));
             setCount(30);
             setCanResend(false);
             toast.success("Code resent");
@@ -91,10 +89,10 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
         setLoading(false);
     };
 
-    const doReset = async (data: any) => {
+    const doReset = async () => {
         setLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 1200));
+            await new Promise((r) => setTimeout(r, 1200));
             toast.success("Password updated");
             navigate("/login");
         } catch {
@@ -136,7 +134,6 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                     ) : step === 1 ? (
                         <Form {...emailForm}>
                             <form onSubmit={emailForm.handleSubmit(sendCode)} className="space-y-5">
-
                                 <FormField
                                     control={emailForm.control}
                                     name="email"
@@ -146,7 +143,11 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                             <FormControl>
                                                 <div className="relative">
                                                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
-                                                    <Input type="email" className="pl-10 h-11" {...field} />
+                                                    <Input
+                                                        type="email"
+                                                        className="pl-10 h-11"
+                                                        {...field}
+                                                    />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -159,15 +160,15 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                 </Button>
 
                                 <p className="text-sm text-center text-muted-foreground">
-                                    <Link to="/login" className="underline">Back to login</Link>
+                                    <Link to="/login" className="underline">
+                                        Back to login
+                                    </Link>
                                 </p>
-
                             </form>
                         </Form>
                     ) : (
                         <Form {...resetForm}>
                             <form onSubmit={resetForm.handleSubmit(doReset)} className="space-y-5">
-
                                 <FormField
                                     control={resetForm.control}
                                     name="code"
@@ -176,9 +177,13 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                             <FormLabel>Code</FormLabel>
 
                                             <FormControl>
-                                                <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS} {...field}>
+                                                <InputOTP
+                                                    maxLength={6}
+                                                    pattern={REGEXP_ONLY_DIGITS}
+                                                    {...field}
+                                                >
                                                     <InputOTPGroup className="gap-2">
-                                                        {[0,1,2,3,4,5].map(i => (
+                                                        {[0, 1, 2, 3, 4, 5].map((i) => (
                                                             <InputOTPSlot
                                                                 key={i}
                                                                 index={i}
@@ -207,7 +212,11 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                             <FormControl>
                                                 <div className="relative">
                                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
-                                                    <Input type="password" className="pl-10 h-11" {...field} />
+                                                    <Input
+                                                        type="password"
+                                                        className="pl-10 h-11"
+                                                        {...field}
+                                                    />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -224,7 +233,11 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                             <FormControl>
                                                 <div className="relative">
                                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
-                                                    <Input type="password" className="pl-10 h-11" {...field} />
+                                                    <Input
+                                                        type="password"
+                                                        className="pl-10 h-11"
+                                                        {...field}
+                                                    />
                                                 </div>
                                             </FormControl>
                                             <FormMessage />
@@ -233,7 +246,6 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                 />
 
                                 <div className="flex flex-col gap-3 pt-1">
-
                                     <Button type="submit" className="w-full h-11">
                                         Update Password
                                     </Button>
@@ -244,9 +256,15 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                         onClick={resend}
                                         disabled={!canResend}
                                     >
-                                        {canResend
-                                            ? <> <RefreshCw className="w-4 h-4 mr-2" /> Resend Code </>
-                                            : `Resend in ${count}s`}
+                                        {canResend ? (
+                                            <>
+                                                {" "}
+                                                <RefreshCw className="w-4 h-4 mr-2" /> Resend
+                                                Code{" "}
+                                            </>
+                                        ) : (
+                                            `Resend in ${count}s`
+                                        )}
                                     </Button>
 
                                     <Button
@@ -256,9 +274,7 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                     >
                                         Back
                                     </Button>
-
                                 </div>
-
                             </form>
                         </Form>
                     )}

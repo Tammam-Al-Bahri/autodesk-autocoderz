@@ -13,12 +13,15 @@ import {
 } from "./ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { pagesLinks } from "@/pages";
+import { useManagerView } from "@/context/ManagerViewContext";
 
 export type NavbarView = "Guest" | "Staff" | "Manager";
 
 export default function Navbar() {
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    const { enabled: managerViewEnabled } = useManagerView();
 
     const [currentView, setCurrentView] = useState<NavbarView>(() => {
         const savedView = localStorage.getItem("selectedView");
@@ -31,6 +34,13 @@ export default function Navbar() {
         }
         return "Staff";
     });
+
+    useEffect(() => {
+        if (!managerViewEnabled && currentView === "Manager") {
+            setCurrentView("Staff");
+            localStorage.setItem("selectedView", "Staff");
+        }
+    }, [managerViewEnabled, currentView]);
 
     useEffect(() => {
         if (!user) {
@@ -69,7 +79,7 @@ export default function Navbar() {
                 <div className="border-r-2 pr-2">
                     <Logo />
                 </div>
-                {user ? (
+                {user && managerViewEnabled ? (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <div className="font-semibold italic flex">
