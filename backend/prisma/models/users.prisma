@@ -11,4 +11,6 @@ model User {
   buildingGroups BuildingGroup[]
 
   staff BuildingStaff[]
+
+  tickets Ticket[]
 }
