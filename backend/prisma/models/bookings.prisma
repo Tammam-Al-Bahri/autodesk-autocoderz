@@ -1,0 +1,16 @@
+model Booking {
+  id String @id 
+
+  guestName String
+
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  buildingId String
+
+  room   Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId String
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+
+  createdAt DateTime @default(now())
+}
