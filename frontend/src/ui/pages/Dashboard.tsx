@@ -25,37 +25,38 @@ interface Ticket {
     priority: "Low" | "Med" | "High";
 }
 
-const formatName = (name: string, type: string) => {
-    if (type === "OTHER" && name.includes(" - ")) {
-        const split = name.split(" - ");
-        split.pop();
-        return split.join(" - ");
+const getDisplayName = (name: string, type: string) => {
+    if (type?.toUpperCase() === "OTHER" && name.includes(" - ")) {
+        const parts = name.split(" - ");
+        parts.pop();
+        return parts.join(" - ");
     }
     return name;
 };
 
-const formatType = (name: string, type: string) => {
-    if (type === "OTHER" && name.includes(" - ")) {
+const getDisplayType = (name: string, type: string) => {
+    if (type?.toUpperCase() === "OTHER" && name.includes(" - ")) {
         return name.split(" - ").pop();
     }
     return type ? type.replace(/_/g, " ") : "Unknown";
 };
 
-const getStatusStyle = (status: string) => {
-    if (status === "ACTIVE") return { dot: "bg-emerald-500", bg: "bg-emerald-50" };
-    if (status === "INACTIVE") return { dot: "bg-rose-500", bg: "bg-rose-50" };
-    if (status === "DRAFT") return { dot: "bg-orange-500", bg: "bg-orange-50" };
-    return { dot: "bg-slate-400", bg: "bg-slate-50" };
+const getStatusColors = (status: string) => {
+    const s = status?.toUpperCase() || "";
+    if (s === "ACTIVE") return { dot: "bg-primary", bg: "bg-primary/10" };
+    if (s === "INACTIVE") return { dot: "bg-destructive", bg: "bg-destructive/10" };
+    if (s === "DRAFT") return { dot: "bg-muted-foreground", bg: "bg-muted" };
+    return { dot: "bg-muted-foreground", bg: "bg-muted" };
 };
 
 export default function Dashboard() {
     const [companies, setCompanies] = useState<any[]>([]);
     const [buildings, setBuildings] = useState<Building[]>([]);
     const [tickets, setTickets] = useState<Ticket[]>([]);
-    
+
     const [compId, setCompId] = useState("");
     const [buildId, setBuildId] = useState("");
-    
+
     const [loadingCompanies, setLoadingCompanies] = useState(true);
     const [loadingBuildings, setLoadingBuildings] = useState(false);
     const [loadingTickets, setLoadingTickets] = useState(false);
@@ -133,30 +134,27 @@ export default function Dashboard() {
     }, [buildId]);
 
     const selectedBuilding = buildings.find(b => b.id === buildId);
-    const statusColors = getStatusStyle(selectedBuilding?.status || "");
-
-    const activeTickets = tickets.filter(t => t.status === "Open").length;
+    const statusColors = getStatusColors(selectedBuilding?.status || "");
+    const activeTicketsCount = tickets.filter(t => t.status === "Open").length;
 
     return (
-        <div className="min-h-screen bg-slate-50/50 pb-16">
-            <div className="bg-white border-b border-slate-200 mb-8 pt-8 pb-6 px-4 sticky top-0 z-20">
+        <div className="min-h-screen bg-muted/50 pb-16">
+            <div className="bg-card border-b border-border mb-8 pt-8 pb-6 px-4 sticky top-0 z-20">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
                     
                     <div className="space-y-1">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
-                            <LayoutDashboard className="text-blue-600 w-8 h-8" />
+                        <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+                            <LayoutDashboard className="text-primary w-8 h-8" />
                             Manager Dashboard
                         </h1>
-                        <p className="text-slate-500 font-medium">
+                        <p className="text-muted-foreground font-medium tracking-tight">
                             Real-time property asset management.
                         </p>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4">
-                        
-                        {/* Company */}
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
                                 Company
                             </label>
                             <div className="relative">
@@ -164,26 +162,22 @@ export default function Dashboard() {
                                     value={compId}
                                     onChange={(e) => setCompId(e.target.value)}
                                     disabled={loadingCompanies}
-                                    className="bg-slate-100 h-11 px-4 pr-10 rounded-xl font-bold min-w-[200px]"
+                                    className="bg-muted h-11 px-4 pr-10 rounded-xl text-foreground font-bold cursor-pointer focus:ring-2 focus:ring-ring outline-none border-none min-w-[200px] appearance-none"
                                 >
                                     <option value="">
-                                        {loadingCompanies ? "Loading..." : "Select Portfolio"}
+                                        {loadingCompanies ? "Loading..." : "Select Portfolio..."}
                                     </option>
-                                    {companies.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
+                                    {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
-
                                 {loadingCompanies && (
-                                    <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-slate-400" />
+                                    <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-muted-foreground" />
                                 )}
                             </div>
                         </div>
 
-                        {/* Building */}
-                        <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
-                                Building
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
+                                Building Asset
                             </label>
                             <div className="relative">
                                 <select
@@ -191,12 +185,12 @@ export default function Dashboard() {
                                     disabled={!compId || loadingBuildings}
                                     onChange={(e) => setBuildId(e.target.value)}
                                     className={cn(
-                                        "h-11 px-4 pr-10 rounded-xl font-bold min-w-[200px]",
-                                        !compId ? "bg-slate-50 text-slate-300" : "bg-slate-100 text-slate-900"
+                                        "h-11 px-4 pr-10 rounded-xl font-bold cursor-pointer focus:ring-2 focus:ring-ring outline-none border-none min-w-[200px] appearance-none transition-all",
+                                        !compId ? "bg-muted/50 text-muted-foreground" : "bg-muted text-foreground"
                                     )}
                                 >
                                     <option value="">
-                                        {loadingBuildings ? "Loading..." : "Select Building"}
+                                        {loadingBuildings ? "Loading Assets..." : "Select Building..."}
                                     </option>
                                     {buildings.map(b => (
                                         <option key={b.id} value={b.id}>
@@ -204,9 +198,8 @@ export default function Dashboard() {
                                         </option>
                                     ))}
                                 </select>
-
                                 {loadingBuildings && (
-                                    <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-slate-400" />
+                                    <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-muted-foreground" />
                                 )}
                             </div>
                         </div>
@@ -216,66 +209,86 @@ export default function Dashboard() {
 
             <div className="max-w-6xl mx-auto px-4">
                 {!selectedBuilding ? (
-                    <div className="py-32 flex flex-col items-center text-center space-y-4">
-                        <Building2 className="w-10 h-10 text-slate-300" />
-                        <h3 className="text-xl font-black text-slate-900 uppercase">
-                            Initialise View
-                        </h3>
-                        <p className="text-sm text-slate-500">
-                            Select a building to load data.
-                        </p>
+                    <div className="py-32 flex flex-col items-center justify-center text-center space-y-4">
+                        <div className="w-20 h-20 bg-card shadow-sm border border-border rounded-3xl flex items-center justify-center">
+                            <Building2 className="w-10 h-10 text-muted-foreground" />
+                        </div>
+                        <div className="max-w-xs">
+                            <h3 className="text-xl font-black text-foreground uppercase tracking-tight">
+                                Initialise View
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-2 font-medium">
+                                Please select a property from your portfolio to synchronise live building data.
+                            </p>
+                        </div>
                     </div>
                 ) : (
                     <>
                         {/* Stats */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                            <StatCard 
-                                title="Status"
-                                value={selectedBuilding.status.replace("_", " ")}
-                                icon={<div className={cn("w-2 h-2 rounded-full", statusColors.dot)} />}
+                            <StatCard
+                                title="Active Status"
+                                value={selectedBuilding.status.replace('_', ' ')}
+                                icon={<div className={cn("w-2 h-2 rounded-full animate-pulse", statusColors.dot)} />}
                                 color={statusColors.bg}
                             />
 
-                            <StatCard 
-                                title="Type"
-                                value={formatType(selectedBuilding.name, selectedBuilding.type)}
-                                icon={<Building2 className="w-5 h-5 text-blue-600" />}
+                            <StatCard
+                                title="Asset Type"
+                                value={getDisplayType(selectedBuilding.name, selectedBuilding.type)}
+                                icon={<Building2 className="text-primary w-5 h-5" />}
                             />
 
-                            <StatCard 
+                            <StatCard
                                 title="Address"
                                 value={selectedBuilding.address}
                                 isSmall
-                                icon={<Clock className="w-5 h-5 text-slate-400" />}
+                                icon={<Clock className="text-muted-foreground w-5 h-5" />}
                             />
 
-                            <StatCard 
+                            <StatCard
                                 title="Tickets"
-                                value={loadingTickets ? "..." : `${activeTickets} Active`}
-                                icon={<AlertCircle className="w-5 h-5 text-rose-600" />}
-                                color="bg-rose-50"
+                                value={loadingTickets ? "..." : `${activeTicketsCount} Active`}
+                                icon={<AlertCircle className="text-destructive w-5 h-5" />}
+                                color="bg-destructive/10"
                             />
                         </div>
 
                         {/* Main */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            
-                            <Card className="lg:col-span-2 bg-slate-900 border-none rounded-3xl">
-                                <CardContent className="p-12 text-center">
-                                    <Building2 className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                                    <h4 className="text-white text-2xl font-black">
-                                        {formatName(selectedBuilding.name, selectedBuilding.type)}
-                                    </h4>
-                                    <Button className="mt-6 bg-blue-600 text-white">
-                                        Enter 3D Viewer <ArrowRight className="ml-2 w-4 h-4" />
-                                    </Button>
+                            <Card className="lg:col-span-2 bg-card shadow-2xl border-none relative min-h-[450px] group overflow-hidden rounded-3xl">
+                                <div className="absolute top-6 left-6 flex gap-2 z-10">
+                                    <Badge className="bg-primary text-primary-foreground border-none px-4 py-1 text-[10px] font-black uppercase tracking-widest">
+                                        Live Digital Twin
+                                    </Badge>
+                                </div>
+                                <CardContent className="h-full flex items-center justify-center flex-col p-12 text-center">
+                                    <div className="space-y-6">
+                                        <div className="w-24 h-24 rounded-[2rem] bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto shadow-[0_0_50px_-12px_rgba(59,130,246,0.5)]">
+                                            <Building2 className="w-12 h-12 text-primary" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <p className="text-primary font-mono text-[10px] uppercase tracking-[0.4em]">
+                                                Metadata Synchronised
+                                            </p>
+                                            <h4 className="text-foreground font-black text-3xl tracking-tighter uppercase">
+                                                {getDisplayName(selectedBuilding.name, selectedBuilding.type)}
+                                            </h4>
+                                            <p className="text-muted-foreground text-sm max-w-sm mx-auto font-medium">
+                                                Virtualisation engine ready. Access the 3D BIM model for structural analysis and maintenance hotspots.
+                                            </p>
+                                        </div>
+                                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-xs tracking-widest px-8 h-12 rounded-xl">
+                                            Enter 3D Viewer <ArrowRight className="ml-2 w-4 h-4" />
+                                        </Button>
+                                    </div>
                                 </CardContent>
                             </Card>
 
-                            <Card className="rounded-3xl">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center font-black">
-                                        <ClipboardCheck className="mr-2 w-5 h-5" />
+                            <Card className="shadow-xl border-none bg-card rounded-3xl overflow-hidden">
+                                <CardHeader className="flex flex-row items-center justify-between border-b border-border pb-6 pt-8 px-8">
+                                    <CardTitle className="text-lg flex items-center font-black uppercase tracking-tight text-foreground">
+                                        <ClipboardCheck className="w-5 h-5 mr-3 text-primary" />
                                         Maintenance
                                     </CardTitle>
                                 </CardHeader>
@@ -283,27 +296,28 @@ export default function Dashboard() {
                                 <CardContent>
                                     <div className="space-y-6">
                                         {loadingTickets ? (
-                                            <Loader2 className="animate-spin mx-auto" />
+                                            <div className="flex items-center justify-center py-10">
+                                                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                                            </div>
                                         ) : tickets.length === 0 ? (
-                                            <p className="text-xs text-slate-400 text-center">
-                                                No tickets
+                                            <p className="text-xs text-muted-foreground text-center font-medium italic">
+                                                No active maintenance tickets.
                                             </p>
                                         ) : (
-                                            tickets.slice(0, 4).map(t => (
-                                                <TicketItem 
-                                                    key={t.id}
-                                                    title={t.issue}
-                                                    time={`Logged ${t.time}`}
-                                                    priority={t.priority}
+                                            tickets.slice(0, 4).map((ticket) => (
+                                                <TicketItem
+                                                    key={ticket.id}
+                                                    title={ticket.issue}
+                                                    time={`Logged ${ticket.time}`}
+                                                    priority={ticket.priority}
                                                 />
                                             ))
                                         )}
                                     </div>
-
-                                    <Button 
+                                    <Button
                                         variant="outline"
-                                        onClick={() => window.location.href = "/tickets"}
-                                        className="w-full mt-8"
+                                        onClick={() => (window.location.href = '/tickets')}
+                                        className="w-full mt-10 border-border hover:bg-muted text-muted-foreground font-black uppercase text-[10px] tracking-widest h-11 rounded-xl"
                                     >
                                         View All Tickets <ChevronRight className="ml-1 w-4 h-4" />
                                     </Button>
@@ -317,23 +331,17 @@ export default function Dashboard() {
     );
 }
 
-function StatCard({ title, value, icon, color = "bg-slate-50", isSmall = false }: any) {
+function StatCard({ title, value, icon, color = "bg-muted", isSmall = false }: any) {
     return (
-        <Card className="rounded-2xl">
-            <CardContent className="p-6">
-                <div className="flex justify-between mb-4">
-                    <div className={cn("p-2 rounded-xl", color)}>
-                        {icon}
-                    </div>
-                    <p className="text-[10px] text-slate-400 uppercase">
+        <Card className="shadow-sm border-none hover:shadow-md transition-all bg-card rounded-2xl overflow-hidden flex flex-col justify-between">
+            <CardContent className="p-6 h-full flex flex-col justify-between">
+                <div className="flex items-center justify-between mb-4">
+                    <div className={cn("p-2.5 rounded-xl", color)}>{icon}</div>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                         {title}
                     </p>
                 </div>
-
-                <p className={cn(
-                    "font-black text-slate-900",
-                    isSmall ? "text-sm" : "text-2xl"
-                )}>
+                <p className={cn("font-black text-foreground tracking-tight", isSmall ? "text-sm break-words" : "text-2xl break-words")}>
                     {value}
                 </p>
             </CardContent>
@@ -342,25 +350,24 @@ function StatCard({ title, value, icon, color = "bg-slate-50", isSmall = false }
 }
 
 function TicketItem({ title, time, priority }: any) {
-    const dot =
+    const dotColor =
         priority === "High"
-            ? "bg-rose-500"
+            ? "bg-destructive"
             : priority === "Med"
-            ? "bg-amber-400"
-            : "bg-blue-400";
+            ? "bg-primary"
+            : "bg-muted-foreground";
 
     return (
-        <div className="flex justify-between items-start">
-            <div>
-                <p className="text-sm font-bold text-slate-800">
+        <div className="flex justify-between items-start group cursor-pointer">
+            <div className="space-y-1 pr-4">
+                <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors uppercase tracking-tight line-clamp-1">
                     {title}
                 </p>
-                <p className="text-xs text-slate-400">
-                    {time}
-                </p>
+                <div className="flex items-center text-[10px] text-muted-foreground font-black uppercase tracking-wider">
+                    <Clock className="w-3 h-3 mr-1.5 opacity-50" /> {time}
+                </div>
             </div>
-
-            <div className={`w-2 h-2 rounded-full mt-1 ${dot}`} />
+            <div className={`shrink-0 w-2 h-2 rounded-full ${dotColor} mt-1.5 shadow-sm`} />
         </div>
     );
 }
