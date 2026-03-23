@@ -1,5 +1,5 @@
 import AutodeskViewer from "@/components/AutodeskViewer";
-import InviteStaffForm from "@/components/building/InviteBuidlingStaffForm";
+import InviteBuidlingStaffForm from "@/components/building/InviteBuidlingStaffForm";
 import BuildingStaffTable from "@/components/building/staff/BuildingStaffTable";
 import { UploadBuildingModel } from "@/components/building/UploadBuildingModel";
 import CopyId from "@/components/CopyId";
@@ -51,6 +51,8 @@ export default function Building() {
     }, [buildingId]);
 
     useEffect(() => {
+        if (!buildingId) return;
+
         async function fetchData() {
             try {
                 const buildingRes = await apiFetch(
@@ -135,7 +137,7 @@ export default function Building() {
 
             <section className="space-y-2">
                 <h2 className="text-sm font-medium">Invite staff</h2>
-                <InviteStaffForm buildingId={buildingId} setStaff={setStaff} />
+                <InviteBuidlingStaffForm buildingId={buildingId} setStaff={setStaff} />
             </section>
 
             <section className="space-y-2">
