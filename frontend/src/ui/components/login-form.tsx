@@ -12,6 +12,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
 import { Mail, Lock, Building2, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { useManagerView } from "@/context/ManagerViewContext";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
     const { login } = useAuth();
@@ -20,6 +21,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     const form = useForm<FormFields>({
         resolver: zodResolver(formSchema),
     });
+
+    const { enabled: managerViewEnabled } = useManagerView();
 
     const { handleSubmit } = form;
 
@@ -33,12 +36,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
 
             if (res?.success) {
                 const savedView = localStorage.getItem("selectedView");
-                if (savedView === "Staff") {
-                    navigate("/jobs", { replace: true });
-                } else if (savedView === "Manage") {
-                    navigate("/building-groups", { replace: true });
+                if (managerViewEnabled) {
+                    if (savedView === "Staff") {
+                        navigate("/jobs", { replace: true });
+                    } else if (savedView === "Manage") {
+                        navigate("/building-groups", { replace: true });
+                    } else {
+                        navigate("/building-groups", { replace: true });
+                    }
                 } else {
-                    navigate("/building-groups", { replace: true });
+                    navigate("/jobs", { replace: true });
                 }
             } else if (res?.error) {
                 toast.error(res.error.title, {

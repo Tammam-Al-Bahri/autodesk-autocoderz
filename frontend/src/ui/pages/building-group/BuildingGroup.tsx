@@ -44,7 +44,9 @@ export default function BuildingGroup() {
                 const groupResponse = await apiFetch(`${apiUrl}${buildingGroupsBase}`);
                 const groupResData = await groupResponse.json();
                 if (groupResponse.ok) {
-                    const currentGroup = groupResData.data.find((g: any) => g.id === buildingGroupId);
+                    const currentGroup = groupResData.data.find(
+                        (g: any) => g.id === buildingGroupId,
+                    );
                     if (currentGroup) {
                         setGroupName(currentGroup.name);
                     }
@@ -102,30 +104,33 @@ export default function BuildingGroup() {
 
     return (
         <div className="max-w-5xl mx-auto w-full p-6 space-y-6">
-            
             <div className="flex flex-col gap-2 mb-6 border-b border-border pb-6">
                 <div className="flex items-center text-sm text-muted-foreground mb-2">
-                    <Link to="/portfolios" className="hover:text-primary transition-colors">Portfolios</Link>
+                    <Link to="/building-groups" className="hover:text-primary transition-colors">
+                        Portfolios
+                    </Link>
                     <ChevronRight className="w-4 h-4 mx-1" />
                     <span className="text-foreground font-medium">{groupName}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                     <div className="p-3 bg-primary/10 rounded-xl">
                         <Building2 className="w-8 h-8 text-primary" />
                     </div>
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-black text-foreground">{groupName}</h1>
-                        <p className="text-sm text-muted-foreground mt-1">Manage all building assets assigned to this portfolio.</p>
+                        <h1 className="text-3xl md:text-4xl font-black text-foreground">
+                            {groupName}
+                        </h1>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Manage all building assets assigned to this portfolio.
+                        </p>
                     </div>
                 </div>
             </div>
 
             <CopyId label="Building Group ID" value={buildingGroupId} />
 
-            {data.length > 0 && (
-                <PortfolioMap buildings={data} />
-            )}
+            {data.length > 0 && <PortfolioMap buildings={data} />}
 
             <BuildingForm buildingGroupId={buildingGroupId} setData={setData} />
             <BuildingTable

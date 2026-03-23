@@ -133,7 +133,7 @@ export async function updateBuildingFromId(
         });
         return building;
     } catch (error) {
-                if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
             // Unique constraint violation
             if (error.code === "P2002") {
                 throw {

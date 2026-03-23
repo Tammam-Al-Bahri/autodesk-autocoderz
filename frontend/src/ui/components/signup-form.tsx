@@ -17,6 +17,7 @@ import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
 import { useAuth } from "@/context/AuthContext";
 import { User, Mail, Lock, UserPlus, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { useManagerView } from "@/context/ManagerViewContext";
 
 export function SignupForm({ className, ...props }: React.ComponentProps<"div">) {
     const form = useForm<FormFields>({
@@ -31,6 +32,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
 
     const navigate = useNavigate();
     const { refreshUser } = useAuth();
+
+    const { enabled: managerViewEnabled } = useManagerView();
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         setLoading(true);
@@ -51,7 +54,18 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
 
                 await refreshUser();
 
-                navigate("/building-groups", { replace: true });
+                const savedView = localStorage.getItem("selectedView");
+                if (managerViewEnabled) {
+                    if (savedView === "Staff") {
+                        navigate("/jobs", { replace: true });
+                    } else if (savedView === "Manage") {
+                        navigate("/building-groups", { replace: true });
+                    } else {
+                        navigate("/building-groups", { replace: true });
+                    }
+                } else {
+                    navigate("/jobs", { replace: true });
+                }
             } else if (result?.error) {
                 toast.error(result.error.title, {
                     description: result.error.description,
