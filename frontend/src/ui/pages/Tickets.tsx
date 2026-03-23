@@ -17,21 +17,25 @@ interface Ticket {
 
 export default function Tickets() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [filter, setFilter] = useState<string>("All");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [filter, setFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
 
   const loadTickets = async () => {
     setLoading(true);
+
     try {
-      const response = (await apiFetch(ticketsBase)) as unknown as { data: Ticket[] };
-      if (response && response.data) {
-        setTickets(response.data);
+      const res: any = await apiFetch(ticketsBase);
+
+      if (res?.data) {
+        setTickets(res.data);
+      } else {
+        console.log("no tickets found");
       }
-    } catch (error) {
-      console.error("Failed to fetch tickets:", error);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error("failed to load tickets", err);
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -42,16 +46,21 @@ export default function Tickets() {
     try {
       await apiFetch(ticketsBase, {
         method: "PATCH",
-        body: JSON.stringify({ id, status: "Resolved" }),
+        body: JSON.stringify({
+          id,
+          status: "Resolved",
+        }),
       });
 
       setTickets((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, status: "Resolved" } : t))
+        prev.map((t) =>
+          t.id === id ? { ...t, status: "Resolved" } : t
+        )
       );
-    } catch (error) {
-      console.error("Failed to update ticket:", error);
+    } catch (err) {
+      console.log("update failed");
     }
-  }
+  };
 
   const shownTickets =
     filter === "All" ? tickets : tickets.filter((t) => t.status === filter);
@@ -80,7 +89,7 @@ export default function Tickets() {
         </Button>
       </div>
 
-      {/* Filter Bar */}
+      {/* Filters */}
       <div className="flex gap-2 mb-8">
         {["All", "Open", "Resolved"].map((f) => (
           <Button

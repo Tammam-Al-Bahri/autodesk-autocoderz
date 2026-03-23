@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
     AlertCircle,
     ChevronRight,
@@ -39,7 +38,7 @@ const getDisplayType = (name: string, type: string) => {
     if (type?.toUpperCase() === "OTHER" && name.includes(" - ")) {
         return name.split(" - ").pop();
     }
-    return type?.replace(/_/g, ' ') || "Unknown";
+    return type ? type.replace(/_/g, " ") : "Unknown";
 };
 
 const getStatusColors = (status: string) => {
@@ -51,7 +50,7 @@ const getStatusColors = (status: string) => {
 };
 
 export default function Dashboard() {
-    const [companies, setCompanies] = useState<{ id: string, name: string }[]>([]);
+    const [companies, setCompanies] = useState<any[]>([]);
     const [buildings, setBuildings] = useState<Building[]>([]);
     const [tickets, setTickets] = useState<Ticket[]>([]);
 
@@ -62,11 +61,13 @@ export default function Dashboard() {
     const [loadingBuildings, setLoadingBuildings] = useState(false);
     const [loadingTickets, setLoadingTickets] = useState(false);
 
+    // load companies
     useEffect(() => {
-        async function fetchCompanies() {
+        const loadCompanies = async () => {
             try {
                 const res = await apiFetch(`${apiUrl}${buildingGroupsBase}`);
                 const json = await res.json();
+
                 if (res.ok) {
                     setCompanies(json.data || []);
                 } else {
@@ -74,13 +75,14 @@ export default function Dashboard() {
                 }
             } catch (err) {
                 console.error(err);
-            } finally {
-                setLoadingCompanies(false);
             }
-        }
-        fetchCompanies();
+            setLoadingCompanies(false);
+        };
+
+        loadCompanies();
     }, []);
 
+    // load buildings
     useEffect(() => {
         if (!compId) {
             setBuildings([]);
@@ -88,44 +90,47 @@ export default function Dashboard() {
             return;
         }
 
-        async function fetchBuildings() {
+        const loadBuildings = async () => {
             setLoadingBuildings(true);
             try {
                 const res = await apiFetch(`${apiUrl}${buildingsBase}?buildingGroupId=${compId}`);
                 const json = await res.json();
+
                 if (res.ok) {
                     setBuildings(json.data || []);
                 }
             } catch (err) {
-                toast.error("Error fetching buildings");
-            } finally {
-                setLoadingBuildings(false);
+                toast.error("Error loading buildings");
             }
-        }
-        fetchBuildings();
+            setLoadingBuildings(false);
+        };
+
+        loadBuildings();
     }, [compId]);
 
+    // load tickets
     useEffect(() => {
         if (!buildId) {
             setTickets([]);
             return;
         }
 
-        async function fetchTickets() {
+        const loadTickets = async () => {
             setLoadingTickets(true);
             try {
                 const res = await apiFetch(`${apiUrl}${ticketsBase}?buildingId=${buildId}`);
                 const json = await res.json();
+
                 if (res.ok) {
                     setTickets(json.data || []);
                 }
             } catch (err) {
-                console.error("Ticket sync error:", err);
-            } finally {
-                setLoadingTickets(false);
+                console.log("ticket error", err);
             }
-        }
-        fetchTickets();
+            setLoadingTickets(false);
+        };
+
+        loadTickets();
     }, [buildId]);
 
     const selectedBuilding = buildings.find(b => b.id === buildId);
@@ -136,6 +141,7 @@ export default function Dashboard() {
         <div className="min-h-screen bg-muted/50 pb-16">
             <div className="bg-card border-b border-border mb-8 pt-8 pb-6 px-4 sticky top-0 z-20">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    
                     <div className="space-y-1">
                         <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
                             <LayoutDashboard className="text-primary w-8 h-8" />
@@ -188,7 +194,7 @@ export default function Dashboard() {
                                     </option>
                                     {buildings.map(b => (
                                         <option key={b.id} value={b.id}>
-                                            {getDisplayName(b.name, b.type)}
+                                            {formatName(b.name, b.type)}
                                         </option>
                                     ))}
                                 </select>
@@ -217,7 +223,8 @@ export default function Dashboard() {
                         </div>
                     </div>
                 ) : (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <>
+                        {/* Stats */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                             <StatCard
                                 title="Active Status"
@@ -247,6 +254,7 @@ export default function Dashboard() {
                             />
                         </div>
 
+                        {/* Main */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <Card className="lg:col-span-2 bg-card shadow-2xl border-none relative min-h-[450px] group overflow-hidden rounded-3xl">
                                 <div className="absolute top-6 left-6 flex gap-2 z-10">
@@ -284,8 +292,9 @@ export default function Dashboard() {
                                         Maintenance
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="p-8">
-                                    <div className="space-y-8">
+
+                                <CardContent>
+                                    <div className="space-y-6">
                                         {loadingTickets ? (
                                             <div className="flex items-center justify-center py-10">
                                                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -310,12 +319,12 @@ export default function Dashboard() {
                                         onClick={() => (window.location.href = '/tickets')}
                                         className="w-full mt-10 border-border hover:bg-muted text-muted-foreground font-black uppercase text-[10px] tracking-widest h-11 rounded-xl"
                                     >
-                                        View All Tickets <ChevronRight className="w-4 h-4 ml-1" />
+                                        View All Tickets <ChevronRight className="ml-1 w-4 h-4" />
                                     </Button>
                                 </CardContent>
                             </Card>
                         </div>
-                    </div>
+                    </>
                 )}
             </div>
         </div>

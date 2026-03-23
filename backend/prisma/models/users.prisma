@@ -12,6 +12,8 @@ model User {
 
   staff BuildingStaff[]
 
+  bookings Booking[]
+
   passwordResets PasswordReset[]
   tickets Ticket[]
 }

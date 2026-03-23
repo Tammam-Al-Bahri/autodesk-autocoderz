@@ -11,6 +11,7 @@ import { prisma } from "./lib/prisma";
 
 import { base } from "@autocoderz/shared";
 
+// Route imports
 import usersRouter from "./routes/users";
 import authRouter from "./routes/auth";
 import apsRouter from "./routes/aps";
@@ -18,6 +19,7 @@ import buildingGroupsRouter from "./routes/buildingGroups";
 import buildingsRouter from "./routes/buildings";
 import buildingStaffRouter from "./routes/buildingStaff";
 import ticketsRouter from "./routes/tickets";
+import bookingsRouter from "./routes/booking";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -41,6 +43,7 @@ app.use(express.static(frontendPath));
 
 app.use(express.json());
 
+// Session authentication middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
     const auth = req.headers.authorization;
 
@@ -81,6 +84,7 @@ app.use(
     }),
 );
 
+// Mounting all routers to the base API path
 app.use(base, usersRouter);
 app.use(base, authRouter);
 app.use(base, apsRouter);
@@ -88,19 +92,21 @@ app.use(base, buildingGroupsRouter);
 app.use(base, buildingsRouter);
 app.use(base, buildingStaffRouter);
 app.use(base, ticketsRouter);
+app.use(base, bookingsRouter); // Mounted the new router here
 
+// Error handling middleware
 app.use((error: unknown, request: Request, response: Response, next: NextFunction) => {
     console.error(error);
     const maybeError = error as any;
 
     const status = maybeError?.status ?? maybeError?.statusCode ?? 500;
-
     const title = maybeError?.error?.title ?? "Internal Server Error";
-
     const description = maybeError?.error?.description ?? "Something went wrong.";
+    
     response.status(status).json({ error: { title, description } });
 });
 
+// Serve frontend files
 app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path.startsWith(base)) {
         next();

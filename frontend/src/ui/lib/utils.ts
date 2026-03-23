@@ -14,6 +14,7 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
     const sid = isElectron ? localStorage.getItem("sid") : undefined;
 
     const headers = {
+        "Content-Type": "application/json", 
         ...(options.headers ?? {}),
         ...(sid ? { Authorization: `Session ${sid}` } : {}),
     };
