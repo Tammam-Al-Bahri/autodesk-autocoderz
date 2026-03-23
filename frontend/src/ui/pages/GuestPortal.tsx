@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import AutodeskViewer from "@/components/AutodeskViewer";
 import { apiFetch, apiUrl } from "@/lib/utils";
-import { apsBase, apsRoutes } from "@autocoderz/shared";
+import { apsBase, apsRoutes, ticketsBase } from "@autocoderz/shared";
 import { toast } from "sonner";
 import {
     Bed,
@@ -67,11 +67,45 @@ export default function GuestPortal() {
         }
     }
 
-    function handleAction(name: string) {
+    // This function handles the quick requests. If it's a maintenance issue,
+    // it talks directly to our backend database. Otherwise, it just simulates
+    // sending a message to the front desk.
+    async function handleAction(name: string) {
         const time = Date.now();
         const last = requestTimes[name] || 0;
 
         if (time - last < COOLDOWN) return;
+
+        // If the guest clicks Maintenance, we log it in the real Ticket table
+        if (name === "Maintenance Report") {
+            try {
+                const response = await apiFetch(`${apiUrl}${ticketsBase}/guest`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        bookingId: booking,
+                        issue: "Maintenance requested via Guest Quick Request button."
+                    }),
+                });
+
+                if (!response.ok) throw new Error("API failure");
+
+                toast.success("Maintenance Logged", {
+                    description: "Maintenance staff have been notified of an issue in your suite.",
+                    icon: <Wind className="w-4 h-4 text-blue-500" />
+                });
+            } catch (error) {
+                console.error("Guest ticket failed:", error);
+                toast.error("Network Error", {
+                    description: "We couldn't reach maintenance. Please contact reception directly."
+                });
+                return;
+            }
+        } else {
+            toast.success("Request Dispatched", {
+                description: `Your request for ${name} has been sent to the receptionist.`,
+                icon: <CheckCircle2 className="w-4 h-4 text-green-500" />
+            });
+        }
 
         setRequestTimes((prev: any) => ({
             ...prev,
@@ -85,11 +119,6 @@ export default function GuestPortal() {
         };
 
         setRequests((prev) => [newItem, ...prev]);
-
-        toast.success("Request Dispatched", {
-            description: `Your request for ${name} has been sent to the receptionist.`,
-            icon: <CheckCircle2 className="w-4 h-4 text-green-500" />
-        });
     }
 
     function getCooldown(name: string) {
@@ -229,7 +258,7 @@ export default function GuestPortal() {
                         <CardContent className="space-y-3">
                             <RequestButton icon={<Sparkles className="w-4 h-4" />} label="Extra Towels" onClick={() => handleAction("Extra Towels")} cooldown={getCooldown("Extra Towels")} />
                             <RequestButton icon={<Utensils className="w-4 h-4" />} label="Fresh Linens" onClick={() => handleAction("Fresh Linens")} cooldown={getCooldown("Fresh Linens")} />
-                            <RequestButton icon={<Wind className="w-4 h-4" />} label="Maintenance" onClick={() => handleAction("Maintenance Report")} cooldown={getCooldown("Maintenance Report")} />
+                            <RequestButton icon={<Wind className="w-4 h-4" />} label="Maintenance Report" onClick={() => handleAction("Maintenance Report")} cooldown={getCooldown("Maintenance Report")} />
                         </CardContent>
                     </Card>
 
@@ -269,7 +298,6 @@ export default function GuestPortal() {
         </div>
     );
 }
-
 
 function Amenity({ icon, label }: { icon: React.ReactNode; label: string }) {
     return (

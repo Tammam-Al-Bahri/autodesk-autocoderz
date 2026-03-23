@@ -9,6 +9,8 @@ model Room {
   status RoomStatus
 
   tickets Ticket[]
+
+  bookings Booking[]
 }
 
 enum RoomType {

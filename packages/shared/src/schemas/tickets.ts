@@ -2,18 +2,16 @@ import { z } from "zod";
 import { buildingId } from "./building.js";
 import { userId } from "./user.js";
 
-// ID Branding
 export const ticketId = z.cuid().brand<"ticketId">();
 export type TicketId = z.infer<typeof ticketId>;
 
-// Enums
+
 export const ticketStatus = z.enum(["OPEN", "IN_PROGRESS", "RESOLVED"]);
 export type TicketStatus = z.infer<typeof ticketStatus>;
 
 export const ticketPriority = z.enum(["LOW", "MED", "HIGH"]);
 export type TicketPriority = z.infer<typeof ticketPriority>;
 
-// Form Schema
 export const ticketFormSchema = z.object({
     buildingId,
     roomId: z.string().cuid().optional(),
@@ -26,7 +24,6 @@ export const ticketFormSchema = z.object({
 
 export type TicketForm = z.infer<typeof ticketFormSchema>;
 
-// Create Schema (Wrapped in 'body' for your validate middleware)
 export const createTicketSchema = z.object({
     body: ticketFormSchema.extend({
         authorId: userId.optional(),
@@ -35,7 +32,6 @@ export const createTicketSchema = z.object({
 
 export type CreateTicket = z.infer<typeof createTicketSchema>;
 
-// Update Schema (Wrapped in 'body' for your validate middleware)
 export const updateTicketSchema = z.object({
     body: z.object({
         id: ticketId,
@@ -47,7 +43,6 @@ export const updateTicketSchema = z.object({
 
 export type UpdateTicket = z.infer<typeof updateTicketSchema>;
 
-// Full Model Schema
 export const ticketSchema = ticketFormSchema.extend({
     id: ticketId,
     status: ticketStatus,
