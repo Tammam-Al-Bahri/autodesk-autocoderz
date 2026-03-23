@@ -15,6 +15,8 @@ model Building {
 
   staff BuildingStaff[]
 
+  tickets Ticket[]
+
   @@unique([buildingGroupId, name])
 }
 

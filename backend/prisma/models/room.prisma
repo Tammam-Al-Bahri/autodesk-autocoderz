@@ -7,6 +7,8 @@ model Room {
   number String
   type   RoomType
   status RoomStatus
+
+  tickets Ticket[]
 }
 
 enum RoomType {

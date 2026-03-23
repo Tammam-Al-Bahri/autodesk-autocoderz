@@ -1,0 +1,31 @@
+model Ticket {
+  id String @id @default(cuid())
+
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  buildingId String
+
+  room   Room?   @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  roomId String?
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  issue    String
+  status   TicketStatus
+  priority TicketPriority
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum TicketPriority {
+  LOW
+  MED
+  HIGH
+}
