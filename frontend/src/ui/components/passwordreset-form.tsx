@@ -13,16 +13,17 @@ import { Mail, Lock, ArrowRight, Loader2, ShieldCheck, KeyRound, RefreshCw } fro
 import * as z from "zod";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { emailSchema, passwordSchema } from "@autocoderz/shared";
 
-const emailSchema = z.object({
-    email: z.string().email("Enter a valid email"),
+const emailSchemaObject = z.object({
+    email: emailSchema,
 });
 
 const resetSchema = z
     .object({
         code: z.string().min(6, "Code must be 6 digits"),
-        password: z.string().min(8, "At least 8 characters"),
-        confirmPassword: z.string(),
+        password: passwordSchema,
+        confirmPassword: passwordSchema,
     })
     .refine((d) => d.password === d.confirmPassword, {
         message: "Passwords don't match",
@@ -40,7 +41,7 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
     const [canResend, setCanResend] = useState(false);
 
     const emailForm = useForm({
-        resolver: zodResolver(emailSchema),
+        resolver: zodResolver(emailSchemaObject),
         defaultValues: { email: "" },
     });
 
