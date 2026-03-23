@@ -2,12 +2,20 @@ import LoadingPage from "@/components/LoadingPage";
 import LogoutButton from "@/components/LogoutButton";
 import { useAuth } from "@/context/AuthContext";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardFooter,
+} from "@/components/ui/card";
 import CopyId from "@/components/CopyId";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { useManagerView } from "@/context/ManagerViewContext";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
     const { user, loading } = useAuth();
@@ -35,23 +43,6 @@ export default function Profile() {
                 <CardContent className="space-y-4">
                     <CopyId label="User ID" value={user?.id} />
 
-                    <div className="text-sm space-y-1">
-                        <div>
-                            <span className="text-muted-foreground">First Name:</span>{" "}
-                            {user?.firstName}
-                        </div>
-                        {user?.middleName && (
-                            <div>
-                                <span className="text-muted-foreground">Middle Name:</span>{" "}
-                                {user.middleName}
-                            </div>
-                        )}
-                        <div>
-                            <span className="text-muted-foreground">Last Name:</span>{" "}
-                            {user?.lastName}
-                        </div>
-                    </div>
-
                     <FieldGroup className="max-w-sm">
                         <Field orientation="horizontal">
                             <Checkbox
@@ -60,13 +51,21 @@ export default function Profile() {
                                 checked={managerViewChecked}
                                 onCheckedChange={(value) => setManagerViewChecked(value === true)}
                             />
-                            <Label htmlFor="manager-view">Enable Manager View</Label>
+                            <Label htmlFor="manager-view" className="text-accent-foreground">
+                                Enable Manager View
+                            </Label>
                         </Field>
                     </FieldGroup>
 
-                    <div className="flex justify-center pt-4">
+                    <CardFooter className="flex flex-col justify-center gap-2">
                         <LogoutButton />
-                    </div>
+                        <Link
+                            to="/password-reset"
+                            className="flex items-center justify-center text-xs font-semibold text-accent-foreground hover:underline"
+                        >
+                            Reset Password
+                        </Link>
+                    </CardFooter>
                 </CardContent>
             </Card>
         </div>

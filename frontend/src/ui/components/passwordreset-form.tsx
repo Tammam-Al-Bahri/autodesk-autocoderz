@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -10,94 +10,158 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
 import { Mail, Lock, ArrowRight, Loader2, ShieldCheck, KeyRound, RefreshCw } from "lucide-react";
-import * as z from "zod";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-
-const emailSchema = z.object({
-    email: z.string().email("Enter a valid email"),
-});
-
-const resetSchema = z
-    .object({
-        code: z.string().min(6, "Code must be 6 digits"),
-        password: z.string().min(8, "At least 8 characters"),
-        confirmPassword: z.string(),
-    })
-    .refine((d) => d.password === d.confirmPassword, {
-        message: "Passwords don't match",
-        path: ["confirmPassword"],
-    });
+import {
+    authBase,
+    authRoutes,
+    forgotPasswordSchema,
+    resetPasswordFormSchema,
+    type ForgotPassword,
+    type ResetPasswordForm,
+} from "@autocoderz/shared";
+import { useAuth } from "@/context/AuthContext";
 
 export function PasswordResetForm({ className, ...props }: React.ComponentProps<"div">) {
     const navigate = useNavigate();
 
-    const [step, setStep] = useState<1 | 2>(1);
+    const { user } = useAuth();
+
+    const isLoggedIn = !!user?.email;
+
     const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState("");
+
+    const [step, setStep] = useState<1 | 2>(isLoggedIn ? 2 : 1);
+    const [email, setEmail] = useState(user?.email ?? "");
+
+    useEffect(() => {
+        if (isLoggedIn && user?.email) {
+            setEmail(user.email);
+            sendCode({ email: user.email });
+        }
+    }, [isLoggedIn, user?.email]);
 
     const [count, setCount] = useState(30);
     const [canResend, setCanResend] = useState(false);
 
     const emailForm = useForm({
-        resolver: zodResolver(emailSchema),
+        resolver: zodResolver(forgotPasswordSchema),
         defaultValues: { email: "" },
     });
 
     const resetForm = useForm({
-        resolver: zodResolver(resetSchema),
+        resolver: zodResolver(resetPasswordFormSchema),
         defaultValues: { code: "", password: "", confirmPassword: "" },
     });
 
     useEffect(() => {
         if (step !== 2) return;
 
-        if (count <= 0) {
-            setCanResend(true);
-            return;
-        }
+        const interval = setInterval(() => {
+            setCount((c) => {
+                if (c <= 1) {
+                    setCanResend(true);
+                    clearInterval(interval);
+                    return 0;
+                }
+                return c - 1;
+            });
+        }, 1000);
 
-        const t = setTimeout(() => setCount(count - 1), 1000);
-        return () => clearTimeout(t);
-    }, [count, step]);
+        return () => clearInterval(interval);
+    }, [step]);
 
-    const sendCode = async (data: any) => {
+    const sendCode = async (data: ForgotPassword) => {
         setLoading(true);
+
         try {
-            await new Promise((r) => setTimeout(r, 1200));
-            setEmail(data.email);
-            setStep(2);
-            setCount(30);
-            setCanResend(false);
-            toast.success("Code sent");
-        } catch {
-            toast.error("Couldn't send code");
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.forgotPassword}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: data.email }),
+            });
+
+            const json = await res.json();
+
+            if (json?.success) {
+                setEmail(data.email);
+                setStep(2);
+                setCount(30);
+                setCanResend(false);
+                toast.success("Code sent");
+            } else if (json?.error) {
+                toast.error(json.error.title, {
+                    description: json.error.description,
+                });
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Something went wrong");
         }
+
         setLoading(false);
     };
 
     const resend = async () => {
         setLoading(true);
+
         try {
-            await new Promise((r) => setTimeout(r, 1200));
-            setCount(30);
-            setCanResend(false);
-            toast.success("Code resent");
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.forgotPassword}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            const json = await res.json();
+
+            if (json?.success) {
+                setCount(30);
+                setCanResend(false);
+                toast.success("Code resent");
+            }
         } catch {
             toast.error("Try again");
         }
+
         setLoading(false);
     };
 
-    const doReset = async () => {
+    const doReset = async (data: ResetPasswordForm) => {
         setLoading(true);
+
         try {
-            await new Promise((r) => setTimeout(r, 1200));
-            toast.success("Password updated");
-            navigate("/login");
-        } catch {
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.resetPassword}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email,
+                    code: data.code,
+                    password: data.password,
+                    confirmPassword: data.confirmPassword,
+                }),
+            });
+
+            const json = await res.json();
+
+            if (json?.success) {
+                toast.success("Password updated");
+                navigate(isLoggedIn ? "/profile" : "/login");
+            } else if (json?.error) {
+                toast.error(json.error.title, {
+                    description: json.error.description,
+                });
+            }
+        } catch (err) {
+            console.error(err);
             toast.error("Reset failed");
         }
+
         setLoading(false);
     };
 
@@ -116,9 +180,7 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                     </CardTitle>
 
                     <CardDescription>
-                        {step === 1
-                            ? "Enter your email to receive a code"
-                            : `Code sent to ${email}`}
+                        {step ? "Enter your email to receive a code" : `Code sent to ${email}`}
                     </CardDescription>
                 </CardHeader>
 
@@ -127,11 +189,11 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                         <div className="py-10 flex flex-col items-center">
                             <Loader2 className="w-8 h-8 animate-spin mb-3" />
                             <p className="text-xs uppercase">
-                                {step === 1 ? "Sending..." : "Processing..."}
+                                {step === 1 && !isLoggedIn ? "Sending..." : "Processing..."}
                             </p>
                             <SkeletonForm />
                         </div>
-                    ) : step === 1 ? (
+                    ) : step === 1 && !isLoggedIn ? (
                         <Form {...emailForm}>
                             <form onSubmit={emailForm.handleSubmit(sendCode)} className="space-y-5">
                                 <FormField
@@ -270,7 +332,10 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        onClick={() => setStep(1)}
+                                        onClick={() => {
+                                            setStep(1);
+                                            resetForm.reset();
+                                        }}
                                     >
                                         Back
                                     </Button>

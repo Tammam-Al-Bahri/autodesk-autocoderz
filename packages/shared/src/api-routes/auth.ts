@@ -5,4 +5,6 @@ export const authRoutes = {
     logout: "/logout",
     me: "/me",
     uploadProgress: "/upload-progress",
+    forgotPassword: "/forgot-password",
+    resetPassword: "/reset-password",
 } as const;

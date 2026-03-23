@@ -11,9 +11,9 @@ const Router = isElectron ? HashRouter : BrowserRouter;
 
 function Layout() {
     return (
-        <main className="min-h-screen flex flex-col">
+        <main className="h-screen flex flex-col overflow-hidden">
             <Navbar />
-            <div className="flex-1">
+            <div className="flex-1 overflow-auto">
                 <Outlet />
             </div>
         </main>
