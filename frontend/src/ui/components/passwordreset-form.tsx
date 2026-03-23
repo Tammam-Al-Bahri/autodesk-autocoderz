@@ -20,13 +20,26 @@ import {
     type ForgotPassword,
     type ResetPasswordForm,
 } from "@autocoderz/shared";
+import { useAuth } from "@/context/AuthContext";
 
 export function PasswordResetForm({ className, ...props }: React.ComponentProps<"div">) {
     const navigate = useNavigate();
 
-    const [step, setStep] = useState<1 | 2>(1);
+    const { user } = useAuth();
+
+    const isLoggedIn = !!user?.email;
+
     const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState("");
+
+    const [step, setStep] = useState<1 | 2>(isLoggedIn ? 2 : 1);
+    const [email, setEmail] = useState(user?.email ?? "");
+
+    useEffect(() => {
+        if (isLoggedIn && user?.email) {
+            setEmail(user.email);
+            sendCode({ email: user.email });
+        }
+    }, [isLoggedIn, user?.email]);
 
     const [count, setCount] = useState(30);
     const [canResend, setCanResend] = useState(false);
@@ -138,7 +151,7 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
 
             if (json?.success) {
                 toast.success("Password updated");
-                navigate("/login");
+                navigate(isLoggedIn ? "/profile" : "/login");
             } else if (json?.error) {
                 toast.error(json.error.title, {
                     description: json.error.description,
@@ -167,9 +180,7 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                     </CardTitle>
 
                     <CardDescription>
-                        {step === 1
-                            ? "Enter your email to receive a code"
-                            : `Code sent to ${email}`}
+                        {step ? "Enter your email to receive a code" : `Code sent to ${email}`}
                     </CardDescription>
                 </CardHeader>
 
@@ -178,11 +189,11 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                         <div className="py-10 flex flex-col items-center">
                             <Loader2 className="w-8 h-8 animate-spin mb-3" />
                             <p className="text-xs uppercase">
-                                {step === 1 ? "Sending..." : "Processing..."}
+                                {step === 1 && !isLoggedIn ? "Sending..." : "Processing..."}
                             </p>
                             <SkeletonForm />
                         </div>
-                    ) : step === 1 ? (
+                    ) : step === 1 && !isLoggedIn ? (
                         <Form {...emailForm}>
                             <form onSubmit={emailForm.handleSubmit(sendCode)} className="space-y-5">
                                 <FormField
