@@ -1,3 +1,4 @@
+import { Prisma } from "../generated/prisma/client";
 import { handlePrismaError } from "../lib/handlePrismaError";
 import { hashPassword } from "../lib/hashPassword";
 import { prisma } from "../lib/prisma";
@@ -18,6 +19,17 @@ export async function createUser(data: CreateUser) {
         });
         return user;
     } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            // Unique constraint violation
+            if (error.code === "P2002") {
+                throw {
+                    error: {
+                        title: "Email already in use",
+                        description: "Please try logging in or using different email.",
+                    },
+                };
+            }
+        }
         throw handlePrismaError(error);
     }
 }

@@ -4,81 +4,96 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import {
     buildingsBase,
-    buildingFormSchema as formSchema,
-    type BuildingForm as FormFields,
-    buildingGroupId as buildingGroupIdSchema,
+    buildingFormSchema,
+    type BuildingForm,
+    buildingGroupId,
     type CreateBuilding,
-    type BuildingGroupId,
     type Building,
 } from "@autocoderz/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { apiFetch, apiUrl, formatEnum, cn } from "@/lib/utils";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "../ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 type Props = {
-    buildingGroupId: BuildingGroupId;
+    buildingGroupId: string;
     setData: React.Dispatch<React.SetStateAction<Building[]>>;
 };
 
 export function BuildingForm({
-    buildingGroupId,
+    buildingGroupId: groupId,
     setData,
     className,
     ...props
 }: Props & React.ComponentProps<"div">) {
-    const form = useForm<FormFields>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<BuildingForm>({
+        resolver: zodResolver(buildingFormSchema),
     });
 
-    const { handleSubmit } = form;
-    const [isUpdating, setIsUpdating] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [customType, setCustomType] = useState("");
 
-    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    const selectedType = form.watch("type");
+
+    const isOtherSelected = selectedType && selectedType.toString().toLowerCase() === "other";
+
+    const onSubmit = async (data: BuildingForm) => {
+        setLoading(true);
+
         try {
-            const bgId = buildingGroupIdSchema.safeParse(buildingGroupId);
+            const parsed = buildingGroupId.safeParse(groupId);
 
-            if (!bgId.success) {
-                toast.error("Missing building group");
+            if (!parsed.success) {
+                toast.error("No group id");
+                setLoading(false);
                 return;
             }
 
-            const fullData: CreateBuilding = {
-                ...data,
-                buildingGroupId: bgId.data,
-            };
+            let name = data.name;
 
-            setIsUpdating(true);
+            if (isOtherSelected && customType.trim() !== "") {
+                name = name + " - " + customType;
+            }
+
+            const body: CreateBuilding = {
+                ...data,
+                name,
+                buildingGroupId: parsed.data,
+            };
 
             const res = await apiFetch(`${apiUrl}${buildingsBase}`, {
                 method: "POST",
-                body: JSON.stringify(fullData),
-                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+                headers: {
+                    "Content-Type": "application/json",
+                },
             });
 
             const json = await res.json();
-            setIsUpdating(false);
 
             if (res.ok) {
-                const newBuilding = json.data;
-                setData((prev) => [...prev, newBuilding]);
-                toast.success("Building created");
+                setData((prev) => [...prev, json.data]);
+                toast.success("Created");
                 form.reset();
+                setCustomType("");
             } else {
-                toast.error(json.error?.title || "Error");
+                toast.error(json.error?.title || "Failed", {
+                    description: json.error?.description,
+                });
             }
-        } catch (err) {
-            setIsUpdating(false);
-            console.log(err);
+        } catch (e) {
+            console.log(e);
         }
+
+        setLoading(false);
     };
 
-    if (isUpdating) {
+    if (loading) {
         return (
             <Card className="p-6">
-                <p className="text-sm">Creating building...</p>
+                <p className="text-sm">Creating...</p>
             </Card>
         );
     }
@@ -93,13 +108,13 @@ export function BuildingForm({
 
                 <CardContent className="p-0">
                     <Form {...form}>
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
                                 control={form.control}
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-sm">Name</FormLabel>
+                                        <FormLabel>Name</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Building name" {...field} />
                                         </FormControl>
@@ -113,7 +128,7 @@ export function BuildingForm({
                                 name="address"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-sm">Address</FormLabel>
+                                        <FormLabel>Address</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Address" {...field} />
                                         </FormControl>
@@ -128,7 +143,7 @@ export function BuildingForm({
                                     name="status"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm">Status</FormLabel>
+                                            <FormLabel>Status</FormLabel>
                                             <Select
                                                 onValueChange={field.onChange}
                                                 value={field.value}
@@ -139,10 +154,10 @@ export function BuildingForm({
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {formSchema.shape.status.options.map(
-                                                        (value) => (
-                                                            <SelectItem key={value} value={value}>
-                                                                {formatEnum(value)}
+                                                    {buildingFormSchema.shape.status.options.map(
+                                                        (v) => (
+                                                            <SelectItem key={v} value={v}>
+                                                                {formatEnum(v)}
                                                             </SelectItem>
                                                         ),
                                                     )}
@@ -158,7 +173,7 @@ export function BuildingForm({
                                     name="type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm">Type</FormLabel>
+                                            <FormLabel>Type</FormLabel>
                                             <Select
                                                 onValueChange={field.onChange}
                                                 value={field.value}
@@ -169,11 +184,13 @@ export function BuildingForm({
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {formSchema.shape.type.options.map((value) => (
-                                                        <SelectItem key={value} value={value}>
-                                                            {formatEnum(value)}
-                                                        </SelectItem>
-                                                    ))}
+                                                    {buildingFormSchema.shape.type.options.map(
+                                                        (v) => (
+                                                            <SelectItem key={v} value={v}>
+                                                                {formatEnum(v)}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -182,8 +199,19 @@ export function BuildingForm({
                                 />
                             </div>
 
-                            <Button type="submit" disabled={isUpdating} className="w-full">
-                                {isUpdating ? "Creating..." : "Create building"}
+                            {isOtherSelected && (
+                                <div>
+                                    <FormLabel>Custom type</FormLabel>
+                                    <Input
+                                        placeholder="e.g. Warehouse"
+                                        value={customType}
+                                        onChange={(e) => setCustomType(e.target.value)}
+                                    />
+                                </div>
+                            )}
+
+                            <Button type="submit" disabled={loading} className="w-full">
+                                {loading ? "Creating..." : "Create building"}
                             </Button>
                         </form>
                     </Form>
