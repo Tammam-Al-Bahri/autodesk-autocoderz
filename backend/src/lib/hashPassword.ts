@@ -6,3 +6,9 @@ export async function hashPassword(password: string): Promise<string> {
     const hashedPassword = await bcrypt.hash(password + pepper, salt);
     return hashedPassword;
 }
+
+export async function compareHash(value: string, hash: string) {
+    const pepper = process.env.PEPPER ?? "";
+    const valid = await bcrypt.compare(value + pepper, hash);
+    return valid;
+}

@@ -1,7 +1,32 @@
 import { NextFunction, Request, Response } from "express-serve-static-core";
 import { loginUser } from "../lib/loginUser";
-import { loginUserSchema, safeUserSchema, UserId } from "@autocoderz/shared";
+import {
+    ForgotPassword,
+    loginUserSchema,
+    ResetPassword,
+    safeUserSchema,
+    UserId,
+} from "@autocoderz/shared";
 import { getUserById } from "../db/user";
+import { Resend } from "resend";
+import { createPasswordReset, resetUserPassword } from "../db/passwordReset";
+
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+
+if (!RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is not defined");
+}
+
+const EMAIL_FROM = process.env.EMAIL_FROM;
+
+if (!EMAIL_FROM) {
+    throw new Error("EMAIL_FROM is not defined");
+}
+
+console.log(`EMAIL_FROM: ${EMAIL_FROM}`);
+console.log(`RESEND_API_KEY: ${RESEND_API_KEY}`);
+
+const resend = new Resend(RESEND_API_KEY);
 
 export async function login(request: Request, response: Response, next: NextFunction) {
     try {
@@ -117,6 +142,50 @@ export async function getUploadProgress(request: Request, response: Response, ne
         }
 
         response.json({ job });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function forgotPassword(
+    request: Request<{}, {}, ForgotPassword>,
+    response: Response,
+    next: NextFunction,
+) {
+    try {
+        const { email } = request.body;
+
+        try {
+            const { code } = await createPasswordReset({ email });
+
+            const res = await resend.emails.send({
+                from: EMAIL_FROM as string,
+                to: email,
+                subject: "Password Reset Code",
+                html: `<p>Your code is <b>${code}</b></p>`,
+            });
+        } catch (error) {
+            response.status(500).json({ success: false });
+        }
+
+        // always return success for security
+        response.json({ success: true });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function resetPassword(
+    request: Request<{}, {}, ResetPassword>,
+    response: Response,
+    next: NextFunction,
+) {
+    try {
+        const test = await resetUserPassword(request.body);
+
+        console.log(test);
+
+        response.json({ success: true });
     } catch (error) {
         next(error);
     }

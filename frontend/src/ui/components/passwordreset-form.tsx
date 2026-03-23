@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { apiFetch, apiUrl, cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -10,25 +10,16 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "./ui/form";
 import { Mail, Lock, ArrowRight, Loader2, ShieldCheck, KeyRound, RefreshCw } from "lucide-react";
-import * as z from "zod";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { emailSchema, passwordSchema } from "@autocoderz/shared";
-
-const emailSchemaObject = z.object({
-    email: emailSchema,
-});
-
-const resetSchema = z
-    .object({
-        code: z.string().min(6, "Code must be 6 digits"),
-        password: passwordSchema,
-        confirmPassword: passwordSchema,
-    })
-    .refine((d) => d.password === d.confirmPassword, {
-        message: "Passwords don't match",
-        path: ["confirmPassword"],
-    });
+import {
+    authBase,
+    authRoutes,
+    forgotPasswordSchema,
+    resetPasswordFormSchema,
+    type ForgotPassword,
+    type ResetPasswordForm,
+} from "@autocoderz/shared";
 
 export function PasswordResetForm({ className, ...props }: React.ComponentProps<"div">) {
     const navigate = useNavigate();
@@ -41,64 +32,123 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
     const [canResend, setCanResend] = useState(false);
 
     const emailForm = useForm({
-        resolver: zodResolver(emailSchemaObject),
+        resolver: zodResolver(forgotPasswordSchema),
         defaultValues: { email: "" },
     });
 
     const resetForm = useForm({
-        resolver: zodResolver(resetSchema),
+        resolver: zodResolver(resetPasswordFormSchema),
         defaultValues: { code: "", password: "", confirmPassword: "" },
     });
 
     useEffect(() => {
         if (step !== 2) return;
 
-        if (count <= 0) {
-            setCanResend(true);
-            return;
-        }
+        const interval = setInterval(() => {
+            setCount((c) => {
+                if (c <= 1) {
+                    setCanResend(true);
+                    clearInterval(interval);
+                    return 0;
+                }
+                return c - 1;
+            });
+        }, 1000);
 
-        const t = setTimeout(() => setCount(count - 1), 1000);
-        return () => clearTimeout(t);
-    }, [count, step]);
+        return () => clearInterval(interval);
+    }, [step]);
 
-    const sendCode = async (data: any) => {
+    const sendCode = async (data: ForgotPassword) => {
         setLoading(true);
+
         try {
-            await new Promise((r) => setTimeout(r, 1200));
-            setEmail(data.email);
-            setStep(2);
-            setCount(30);
-            setCanResend(false);
-            toast.success("Code sent");
-        } catch {
-            toast.error("Couldn't send code");
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.forgotPassword}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: data.email }),
+            });
+
+            const json = await res.json();
+
+            if (json?.success) {
+                setEmail(data.email);
+                setStep(2);
+                setCount(30);
+                setCanResend(false);
+                toast.success("Code sent");
+            } else if (json?.error) {
+                toast.error(json.error.title, {
+                    description: json.error.description,
+                });
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Something went wrong");
         }
+
         setLoading(false);
     };
 
     const resend = async () => {
         setLoading(true);
+
         try {
-            await new Promise((r) => setTimeout(r, 1200));
-            setCount(30);
-            setCanResend(false);
-            toast.success("Code resent");
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.forgotPassword}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            const json = await res.json();
+
+            if (json?.success) {
+                setCount(30);
+                setCanResend(false);
+                toast.success("Code resent");
+            }
         } catch {
             toast.error("Try again");
         }
+
         setLoading(false);
     };
 
-    const doReset = async () => {
+    const doReset = async (data: ResetPasswordForm) => {
         setLoading(true);
+
         try {
-            await new Promise((r) => setTimeout(r, 1200));
-            toast.success("Password updated");
-            navigate("/login");
-        } catch {
+            const res = await apiFetch(`${apiUrl}${authBase}${authRoutes.resetPassword}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email,
+                    code: data.code,
+                    password: data.password,
+                    confirmPassword: data.confirmPassword,
+                }),
+            });
+
+            const json = await res.json();
+
+            if (json?.success) {
+                toast.success("Password updated");
+                navigate("/login");
+            } else if (json?.error) {
+                toast.error(json.error.title, {
+                    description: json.error.description,
+                });
+            }
+        } catch (err) {
+            console.error(err);
             toast.error("Reset failed");
         }
+
         setLoading(false);
     };
 
@@ -271,7 +321,10 @@ export function PasswordResetForm({ className, ...props }: React.ComponentProps<
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        onClick={() => setStep(1)}
+                                        onClick={() => {
+                                            setStep(1);
+                                            resetForm.reset();
+                                        }}
                                     >
                                         Back
                                     </Button>

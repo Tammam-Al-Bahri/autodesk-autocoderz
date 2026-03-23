@@ -81,3 +81,16 @@ export async function searchUsers(query: string) {
     });
     return users;
 }
+
+export async function updatePassword(email: string, newPassword: string) {
+    try {
+        const passwordHash = await hashPassword(newPassword);
+
+        await prisma.user.update({
+            where: { email },
+            data: { passwordHash },
+        });
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}
