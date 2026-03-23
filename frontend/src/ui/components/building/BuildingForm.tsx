@@ -206,6 +206,7 @@ export function BuildingForm({
                                         placeholder="e.g. Warehouse"
                                         value={customType}
                                         onChange={(e) => setCustomType(e.target.value)}
+                                        required
                                     />
                                 </div>
                             )}
