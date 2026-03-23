@@ -10,7 +10,7 @@ const PasswordResetPage = lazy(() => import("./passwordreset"));
 // const Receptionist = lazy(() => import("./Receptionist"));
 const SignupPage = lazy(() => import("./signup"));
 const Dashboard = lazy(() => import("./Dashboard"));
-const Applications = lazy(() => import("./Application"));
+
 const Tickets = lazy(() => import("./Tickets"));
 const MyBuildingGroups = lazy(() => import("./building-group/MyBuildingGroups"));
 const BuildingGroup = lazy(() => import("./building-group/BuildingGroup"));
@@ -71,7 +71,7 @@ const pages: Page[] = [
         title: "Building",
         component: StaffJobDashboard,
     },
-    // {
+        // {
     //     path: "/staff",
     //     title: "Staff Dashboard",
     //     component: StaffTasks,
@@ -91,21 +91,15 @@ const pages: Page[] = [
     },
     {
         path: "/dashboard",
-        title: "Manager Dashboard",
+        title: "Dashboard",
         component: Dashboard,
-        // navbarView: ["Manager"],
-    },
-    {
-        path: "/applications",
-        title: "Applications",
-        component: Applications,
-        // navbarView: ["Manager"],
+        navbarView: ["Manager"],
     },
     {
         path: "/tickets",
         title: "Tickets",
         component: Tickets,
-        // navbarView: ["Manager"],
+        navbarView: ["Manager"],
     },
     {
         path: "/building-groups/:buildingGroupId",

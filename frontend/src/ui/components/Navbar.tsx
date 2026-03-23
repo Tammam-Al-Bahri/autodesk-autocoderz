@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Menu, User, X } from "lucide-react";
+import { Menu, User, X, ChevronDown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Logo from "./Logo";
 import {
@@ -11,7 +11,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
 import { pagesLinks } from "@/pages";
 import { useManagerView } from "@/context/ManagerViewContext";
 
@@ -30,7 +29,7 @@ export default function Navbar() {
         }
 
         if (savedView === "Guest" || savedView === "Staff" || savedView === "Manager") {
-            return savedView;
+            return savedView as NavbarView;
         }
         return "Staff";
     });
@@ -45,10 +44,11 @@ export default function Navbar() {
     useEffect(() => {
         if (!user) {
             setCurrentView("Guest");
+            return;
         }
         const savedView = localStorage.getItem("selectedView");
         if (savedView === "Guest" || savedView === "Staff" || savedView === "Manager") {
-            setCurrentView(savedView);
+            setCurrentView(savedView as NavbarView);
         } else {
             setCurrentView("Manager");
             localStorage.setItem("selectedView", "Manager");
@@ -68,7 +68,7 @@ export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <nav className="border-b-2 relative flex items-center px-4 py-2 z-10 select-none">
+        <nav className="border-b-2 relative flex items-center px-4 py-2 z-10 select-none bg-background">
             <div className="flex items-center gap-4">
                 <button
                     className="md:hidden mr-2"
@@ -82,25 +82,27 @@ export default function Navbar() {
                 {user && managerViewEnabled ? (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <div className="font-semibold italic flex">
+                            <button className="font-semibold italic flex items-center gap-1 hover:opacity-80 transition-opacity outline-none">
                                 {currentView} view
-                                <ChevronDown className="scale-50" />
-                            </div>
+                                <ChevronDown className="w-4 h-4 opacity-50" />
+                            </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent align="start">
                             {views.map((view) => (
                                 <DropdownMenuItem
                                     key={view.value}
-                                    className="justify-center"
+                                    className="justify-center font-medium cursor-pointer"
                                     onClick={() => {
                                         setCurrentView(view.value);
+                                        localStorage.setItem("selectedView", view.value);
 
+                                        // Redirecting to the specific entry page for each view
                                         if (view.value === "Staff") {
                                             navigate("/jobs", { replace: true });
                                         } else if (view.value === "Manager") {
-                                            navigate("/building-groups", { replace: true });
+                                            // Redirects Manager to the Dashboard immediately
+                                            navigate("/dashboard", { replace: true });
                                         }
-                                        localStorage.setItem("selectedView", view.value);
                                     }}
                                 >
                                     {view.title}
@@ -111,9 +113,10 @@ export default function Navbar() {
                 ) : null}
             </div>
 
+            {/* Central Navigation Links */}
             <div className="absolute left-1/2 top-0 hidden md:flex h-full -translate-x-1/2 items-center gap-2">
                 {navLinks.map((link) => (
-                    <Button key={link.path} variant={"ghost"} asChild>
+                    <Button key={link.path} variant="ghost" asChild className="font-bold">
                         <Link to={link.path}>{link.title}</Link>
                     </Button>
                 ))}
@@ -121,13 +124,11 @@ export default function Navbar() {
 
             <div className="flex items-center gap-4 ml-auto z-10">
                 {user ? (
-                    <>
-                        <Button asChild variant="outline">
-                            <Link to="/profile">
-                                <User />
-                            </Link>
-                        </Button>
-                    </>
+                    <Button asChild variant="outline" size="icon">
+                        <Link to="/profile">
+                            <User className="w-5 h-5" />
+                        </Link>
+                    </Button>
                 ) : (
                     <Button asChild variant="outline">
                         <Link to="/login">Login</Link>
@@ -136,14 +137,15 @@ export default function Navbar() {
                 <ThemeToggle />
             </div>
 
+            {/* Mobile Navigation Menu */}
             {mobileMenuOpen && (
-                <div className="absolute top-full left-0 w-full border-b bg-background flex flex-col items-center gap-2 py-4 md:hidden">
+                <div className="absolute top-full left-0 w-full border-b bg-background flex flex-col items-center gap-2 py-4 md:hidden shadow-lg animate-in slide-in-from-top duration-300">
                     {navLinks.map((link) => (
                         <Button
                             key={link.path}
                             variant="ghost"
                             asChild
-                            className="w-full"
+                            className="w-full font-bold"
                             onClick={() => setMobileMenuOpen(false)}
                         >
                             <Link to={link.path}>{link.title}</Link>

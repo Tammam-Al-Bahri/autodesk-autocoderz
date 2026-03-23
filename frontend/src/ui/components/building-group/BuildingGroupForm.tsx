@@ -38,7 +38,7 @@ export function BuildingGroupForm({
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" },
             });
-            setIsUpdating(false);
+           
             const resData = await response.json();
             if (response.ok) {
                 const newGroup = resData.data;
@@ -51,6 +51,7 @@ export function BuildingGroupForm({
                 const { title, description } = resData.error;
                 toast.error(title, { description });
             }
+            setIsUpdating(false);
         } catch (error) {
             setIsUpdating(false);
             console.log(error);
