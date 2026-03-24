@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,9 @@ const statusColors: Record<RoomStatus, string> = {
 };
 
 export default function Receptionist() {
+  // Dynamically grab the building ID from the URL
+  const { buildingId } = useParams<{ buildingId: string }>();
+
   const [rooms, setRooms] = useState<Room[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [guestName, setGuestName] = useState("");
@@ -32,21 +36,31 @@ export default function Receptionist() {
   const activeRoom = rooms.find((r) => r.id === activeRoomId) || null;
 
   useEffect(() => {
-    const currentBuildingId = "cmn0kx9fq0006fgecxme3au4p";
+    if (!buildingId) return;
 
-    const dummyRooms: Room[] = [
-      { id: "test-room-1", number: "101", status: "Clean", buildingId: currentBuildingId },
-      { id: "test-room-2", number: "102", status: "Occupied", guest: "Mr Thompson", buildingId: currentBuildingId },
-      { id: "test-room-3", number: "103", status: "Dirty", buildingId: currentBuildingId },
-      { id: "test-room-4", number: "104", status: "Clean", buildingId: currentBuildingId },
-      { id: "test-room-5", number: "105", status: "Clean", buildingId: currentBuildingId },
-      { id: "test-room-6", number: "106", status: "Dirty", buildingId: currentBuildingId },
-      { id: "test-room-7", number: "107", status: "Occupied", guest: "A. Patel", buildingId: currentBuildingId },
-      { id: "test-room-8", number: "108", status: "Clean", buildingId: currentBuildingId },
-    ];
+    async function fetchRooms() {
+      try {
+        console.log("fetching rooms for building:", buildingId);
+        
+        const response = await apiFetch(`${apiUrl}/rooms?buildingId=${buildingId}`, {
+            method: "GET",
+            credentials: "include" 
+        });
+        
+        const json = await response.json();
 
-    setRooms(dummyRooms);
-  }, []);
+        if (response.ok && json.data) {
+          setRooms(json.data);
+        } else {
+          console.error("Failed to load rooms:", json);
+        }
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
+      }
+    }
+
+    fetchRooms();
+  }, [buildingId]);
 
   const checkInGuest = async () => {
     if (!activeRoom || !guestName.trim()) return;
@@ -56,6 +70,9 @@ export default function Receptionist() {
     try {
         const response = await apiFetch(`${apiUrl}/bookings`, {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 guestName: guestName,
                 buildingId: activeRoom.buildingId,
@@ -99,6 +116,14 @@ export default function Receptionist() {
     setMaintenanceNote("");
     toast.success("Maintenance team notified.");
   };
+
+  if (!buildingId) {
+      return (
+          <div className="flex justify-center items-center h-screen">
+              <p className="text-gray-500">Error: No building selected. Please navigate from the dashboard.</p>
+          </div>
+      );
+  }
 
   return (
     <div className="max-w-6xl mx-auto mt-10 px-4 mb-20">

@@ -28,6 +28,49 @@ export default function Building() {
     const [buildingName, setBuildingName] = useState("Loading Building...");
     const [groupId, setGroupId] = useState("");
 
+    const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false);
+    const [newRoomNumber, setNewRoomNumber] = useState("");
+    const [newRoomType, setNewRoomType] = useState("SINGLE");
+    const [roomError, setRoomError] = useState("");
+    const [submitLoading, setSubmitLoading] = useState(false);
+
+    const handleCreateRoom = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setRoomError("");
+        setSubmitLoading(true);
+
+        try {
+            const response = await apiFetch(`${apiUrl}/rooms`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    number: newRoomNumber,
+                    type: newRoomType,
+                    buildingId: buildingId
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error?.description || "Failed to create room");
+            }
+
+            setIsAddRoomModalOpen(false);
+            setNewRoomNumber("");
+            setNewRoomType("SINGLE");
+            
+            alert(`Room ${newRoomNumber} successfully added to the building!`);
+
+        } catch (err: any) {
+            setRoomError(err.message);
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (!buildingId) return;
 
@@ -135,7 +178,22 @@ export default function Building() {
 
             <CopyId label="Building ID" value={buildingId} />
 
-            <section className="space-y-2">
+            <section className="space-y-4 pt-4 border-t border-border">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className="text-lg font-bold">Rooms Configuration</h2>
+                        <p className="text-sm text-muted-foreground">Add rooms to this building so the receptionist can generate booking codes.</p>
+                    </div>
+                    <button 
+                        onClick={() => setIsAddRoomModalOpen(true)}
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                        + Add New Room
+                    </button>
+                </div>
+            </section>
+
+            <section className="space-y-2 pt-4 border-t border-border">
                 <h2 className="text-sm font-medium">Invite staff</h2>
                 <InviteBuidlingStaffForm buildingId={buildingId} setStaff={setStaff} />
             </section>
@@ -171,6 +229,63 @@ export default function Building() {
                         </CardContent>
                     </Card>
                 </section>
+            )}
+
+            {isAddRoomModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-background p-6 rounded-lg shadow-xl max-w-md w-full border border-border">
+                        <h2 className="text-xl font-bold mb-4">Add New Room</h2>
+                        
+                        {roomError && (
+                            <div className="bg-destructive/10 text-destructive p-3 rounded mb-4 text-sm font-medium">
+                                {roomError}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleCreateRoom}>
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium mb-1">Room Number</label>
+                                <input 
+                                    type="text" 
+                                    required
+                                    value={newRoomNumber}
+                                    onChange={(e) => setNewRoomNumber(e.target.value)}
+                                    className="w-full border border-input bg-background p-2 rounded-md"
+                                    placeholder="e.g. 101"
+                                />
+                            </div>
+
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium mb-1">Room Type</label>
+                                <select 
+                                    value={newRoomType}
+                                    onChange={(e) => setNewRoomType(e.target.value)}
+                                    className="w-full border border-input bg-background p-2 rounded-md"
+                                >
+                                    <option value="SINGLE">Single</option>
+                                    <option value="DOUBLE">Double</option>
+                                </select>
+                            </div>
+
+                            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-border">
+                                <button 
+                                    type="button"
+                                    onClick={() => setIsAddRoomModalOpen(false)}
+                                    className="px-4 py-2 border border-input rounded-md hover:bg-muted text-sm font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit"
+                                    disabled={submitLoading}
+                                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium disabled:opacity-50"
+                                >
+                                    {submitLoading ? "Saving..." : "Save Room"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </div>
     );
