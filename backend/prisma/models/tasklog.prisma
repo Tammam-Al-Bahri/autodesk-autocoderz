@@ -1,0 +1,11 @@
+model TaskLog {
+  id             String   @id @default(uuid())
+  roomId         String
+  roomNumber     String
+  staffId        String
+  staffName      String
+  assignedByName String
+  message        String?
+  assignedAt     DateTime
+  completedAt    DateTime @default(now())
+}

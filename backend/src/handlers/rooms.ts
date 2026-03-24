@@ -3,45 +3,33 @@ import { prisma } from "../lib/prisma";
 
 export const getRooms = async (req: Request, res: Response) => {
     try {
-        const buildingId = req.query.buildingId as string;
-        if (!buildingId) {
-            return res.status(400).json({ error: { title: "No building ID provided" } });
-        }
+        const buildingId = req.query.buildingId as string | undefined;
+        const whereClause = buildingId ? { buildingId: String(buildingId) } : {};
 
         const roomsData = await (prisma as any).room.findMany({
-            where: { buildingId },
-            include: { 
-                bookings: { orderBy: { id: 'desc' }, take: 1 } 
-            },
+            where: whereClause,
+            include: { bookings: { orderBy: { id: 'desc' }, take: 1 } },
             orderBy: { number: 'asc' }
         });
 
         const statusMap: Record<string, string> = {
-            "AVAILABLE": "Clean",
-            "OCCUPIED": "Occupied",
-            "DIRTY": "Dirty",
-            "MAINTENANCE": "Maintenance"
+            "AVAILABLE": "Clean", "OCCUPIED": "Occupied", "DIRTY": "Dirty", "MAINTENANCE": "Maintenance"
         };
 
-        const results = roomsData.map((room: any) => {
-            const latestGuest = room.bookings?.[0];
-            
-            return {
-                id: room.id,
-                number: room.number,
-                status: statusMap[room.status] || "Clean",
-                buildingId: room.buildingId,
-                guest: latestGuest?.guestName || null,
-                bookingId: latestGuest?.id || null, 
-                assignedToId: room.assignedToId || null,
-                assignedToName: room.assignedToName || null,
-                assignedByName: room.assignedByName || null
-            };
-        });
+        const results = roomsData.map((room: any) => ({
+            id: room.id,
+            number: room.number,
+            status: statusMap[room.status] || "Clean",
+            buildingId: room.buildingId,
+            guest: room.bookings?.[0]?.guestName || null,
+            bookingId: room.bookings?.[0]?.id || null, 
+            assignedToId: room.assignedToId || null,
+            assignedToName: room.assignedToName || null,
+            assignedByName: room.assignedByName || null
+        }));
 
         res.json({ data: results });
     } catch (err) {
-        console.error("Error fetching rooms:", err);
         res.status(500).json({ error: { title: "Could not load rooms" } });
     }
 };
@@ -49,9 +37,16 @@ export const getRooms = async (req: Request, res: Response) => {
 export const assignRoomTask = async (req: Request, res: Response) => {
     try {
         const { roomId, staffId, staffName } = req.body;
-        
-        const currentUser = (req as any).user;
-        const assignedBy = currentUser ? `${currentUser.firstName} ${currentUser.lastName}`.trim() : "Staff";
+        const userId = (req as any).session?.userId;
+        let assignedBy = "Receptionist";
+
+        if (userId) {
+            const user = await (prisma as any).user.findUnique({
+                where: { id: String(userId) },
+                select: { firstName: true, lastName: true }
+            });
+            if (user) assignedBy = `${user.firstName} ${user.lastName}`.trim();
+        }
 
         await (prisma as any).room.update({
             where: { id: roomId },
@@ -59,10 +54,11 @@ export const assignRoomTask = async (req: Request, res: Response) => {
                 status: "MAINTENANCE",
                 assignedToId: staffId,
                 assignedToName: staffName,
-                assignedByName: assignedBy
+                assignedByName: assignedBy,
+                taskAssignedAt: new Date()
             }
         });
-        res.json({ message: "Staff assigned successfully" });
+        res.json({ message: "Staff assigned" });
     } catch (e) { 
         res.status(500).json({ error: { title: "Failed to assign staff" } }); 
     }
@@ -70,16 +66,32 @@ export const assignRoomTask = async (req: Request, res: Response) => {
 
 export const markRoomAsClean = async (req: Request, res: Response) => {
     try {
-        const { roomId } = req.body;
+        const { roomId, message } = req.body;
+        const room = await (prisma as any).room.findUnique({ where: { id: roomId } });
+
+        if (room && room.assignedToId) {
+            await (prisma as any).taskLog.create({
+                data: {
+                    roomId: room.id,
+                    roomNumber: room.number,
+                    staffId: room.assignedToId,
+                    staffName: room.assignedToName || "Staff",
+                    assignedByName: room.assignedByName || "Receptionist",
+                    message: message || null,
+                    assignedAt: room.taskAssignedAt || new Date(),
+                    completedAt: new Date()
+                }
+            });
+        }
+
         await (prisma as any).room.update({
             where: { id: roomId },
             data: { 
-                status: "AVAILABLE",
-                assignedToId: null, 
-                assignedToName: null, 
-                assignedByName: null
+                status: "AVAILABLE", assignedToId: null, 
+                assignedToName: null, assignedByName: null, taskAssignedAt: null 
             }
         });
+
         res.json({ message: "Room marked as clean" });
     } catch (err) { 
         res.status(500).json({ error: { title: "Update failed" } }); 
@@ -88,30 +100,14 @@ export const markRoomAsClean = async (req: Request, res: Response) => {
 
 export const checkOutRoom = async (req: Request, res: Response) => {
     try {
-        const { roomId } = req.body;
-        await (prisma as any).room.update({
-            where: { id: roomId },
-            data: { status: "DIRTY" } 
-        });
-        res.json({ message: "Guest checked out" });
-    } catch (err) { 
-        res.status(500).json({ error: { title: "Checkout error" } }); 
-    }
+        await (prisma as any).room.update({ where: { id: req.body.roomId }, data: { status: "DIRTY" } });
+        res.json({ message: "Checked out" });
+    } catch (err) { res.status(500).json({ error: { title: "Error" } }); }
 };
 
 export const createRoom = async (req: Request, res: Response) => {
     try {
-        const { number, type, buildingId } = req.body;
-        const room = await (prisma as any).room.create({
-            data: { 
-                number: String(number), 
-                type: String(type), 
-                status: "AVAILABLE", 
-                buildingId: String(buildingId) 
-            }
-        });
+        const room = await (prisma as any).room.create({ data: { ...req.body, status: "AVAILABLE" } });
         res.status(201).json({ data: room });
-    } catch (error) { 
-        res.status(500).json({ error: { title: "Room creation failed" } }); 
-    }
+    } catch (error) { res.status(500).json({ error: { title: "Failed" } }); }
 };

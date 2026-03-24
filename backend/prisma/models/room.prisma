@@ -8,12 +8,12 @@ model Room {
   type   RoomType
   status RoomStatus
 
-  // Assignment Fields
   assignedToId   String?
   assignedToName String?
   assignedByName String?
+  taskAssignedAt DateTime?
 
-  tickets Ticket[]
+  tickets  Ticket[]
   bookings Booking[]
 }
 
