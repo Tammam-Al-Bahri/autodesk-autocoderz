@@ -20,6 +20,7 @@ import buildingsRouter from "./routes/buildings";
 import buildingStaffRouter from "./routes/buildingStaff";
 import ticketsRouter from "./routes/tickets";
 import bookingsRouter from "./routes/booking";
+import roomsRouter from "./routes/rooms";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -43,7 +44,6 @@ app.use(express.static(frontendPath));
 
 app.use(express.json());
 
-// Session authentication middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
     const auth = req.headers.authorization;
 
@@ -92,7 +92,8 @@ app.use(base, buildingGroupsRouter);
 app.use(base, buildingsRouter);
 app.use(base, buildingStaffRouter);
 app.use(base, ticketsRouter);
-app.use(base, bookingsRouter); // Mounted the new router here
+app.use(base, bookingsRouter);
+app.use(base, roomsRouter);
 
 // Error handling middleware
 app.use((error: unknown, request: Request, response: Response, next: NextFunction) => {
