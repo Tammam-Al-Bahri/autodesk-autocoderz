@@ -1,24 +1,22 @@
 import { Router } from "express";
-import { validate } from "../lib/validate";
 import { requireAuth } from "../middleware/auth";
-import { createRoomSchema } from "@autocoderz/shared";
-import { createRoom, getRooms } from "../handlers/rooms";
+import { 
+    createRoom, 
+    getRooms, 
+    checkOutRoom, 
+    markRoomAsClean, 
+    assignRoomTask 
+} from "../handlers/rooms";
 
 const router = Router();
 
-// Get all rooms for a specific building
-router.get(
-    "/rooms", 
-    requireAuth, 
-    getRooms
-);
+// Basic room management
+router.get("/rooms", requireAuth, getRooms);
+router.post("/rooms", requireAuth, createRoom);
 
-// Create a new room 
-router.post(
-    "/rooms", 
-    requireAuth, 
-    validate(createRoomSchema), 
-    createRoom
-);
+// Room lifecycle and maintenance actions
+router.post("/rooms/checkout", requireAuth, checkOutRoom);
+router.post("/rooms/assign", requireAuth, assignRoomTask); 
+router.post("/rooms/clean", requireAuth, markRoomAsClean);
 
 export default router;
