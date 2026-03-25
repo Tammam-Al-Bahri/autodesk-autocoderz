@@ -42,10 +42,10 @@ const formatType = (name: string, type: string) => {
 };
 
 const getStatusStyle = (status: string) => {
-    if (status === "ACTIVE") return { dot: "bg-emerald-500", bg: "bg-emerald-50" };
-    if (status === "INACTIVE") return { dot: "bg-rose-500", bg: "bg-rose-50" };
-    if (status === "DRAFT") return { dot: "bg-orange-500", bg: "bg-orange-50" };
-    return { dot: "bg-slate-400", bg: "bg-slate-50" };
+    if (status === "ACTIVE") return { dot: "bg-green-500", bg: "bg-green-500/10" };
+    if (status === "INACTIVE") return { dot: "bg-red-500", bg: "bg-red-500/10" };
+    if (status === "DRAFT") return { dot: "bg-orange-500", bg: "bg-orange-500/10" };
+    return { dot: "bg-muted-foreground", bg: "bg-muted" };
 };
 
 export default function Dashboard() {
@@ -138,16 +138,16 @@ export default function Dashboard() {
     const activeTickets = tickets.filter(t => t.status === "Open").length;
 
     return (
-        <div className="min-h-screen bg-slate-50/50 pb-16">
-            <div className="bg-white border-b border-slate-200 mb-8 pt-8 pb-6 px-4 sticky top-0 z-20">
+        <div className="min-h-screen bg-background pb-16">
+            <div className="bg-background border-b mb-8 pt-8 pb-6 px-4 sticky top-0 z-20">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
                     
                     <div className="space-y-1">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
-                            <LayoutDashboard className="text-blue-600 w-8 h-8" />
+                        <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+                            <LayoutDashboard className="text-primary w-8 h-8" />
                             Manager Dashboard
                         </h1>
-                        <p className="text-slate-500 font-medium">
+                        <p className="text-muted-foreground font-medium">
                             Real-time property asset management.
                         </p>
                     </div>
@@ -156,7 +156,7 @@ export default function Dashboard() {
                         
                         {/* Company */}
                         <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">
                                 Company
                             </label>
                             <div className="relative">
@@ -164,7 +164,7 @@ export default function Dashboard() {
                                     value={compId}
                                     onChange={(e) => setCompId(e.target.value)}
                                     disabled={loadingCompanies}
-                                    className="bg-slate-100 h-11 px-4 pr-10 rounded-xl font-bold min-w-[200px]"
+                                    className="bg-muted text-foreground h-11 px-4 pr-10 rounded-xl font-bold min-w-[200px]"
                                 >
                                     <option value="">
                                         {loadingCompanies ? "Loading..." : "Select Portfolio"}
@@ -175,14 +175,14 @@ export default function Dashboard() {
                                 </select>
 
                                 {loadingCompanies && (
-                                    <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-slate-400" />
+                                    <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-muted-foreground" />
                                 )}
                             </div>
                         </div>
 
                         {/* Building */}
                         <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase ml-1">
                                 Building
                             </label>
                             <div className="relative">
@@ -192,7 +192,7 @@ export default function Dashboard() {
                                     onChange={(e) => setBuildId(e.target.value)}
                                     className={cn(
                                         "h-11 px-4 pr-10 rounded-xl font-bold min-w-[200px]",
-                                        !compId ? "bg-slate-50 text-slate-300" : "bg-slate-100 text-slate-900"
+                                        !compId ? "bg-muted/50 text-muted-foreground" : "bg-muted text-foreground"
                                     )}
                                 >
                                     <option value="">
@@ -206,7 +206,7 @@ export default function Dashboard() {
                                 </select>
 
                                 {loadingBuildings && (
-                                    <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-slate-400" />
+                                    <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-muted-foreground" />
                                 )}
                             </div>
                         </div>
@@ -217,11 +217,11 @@ export default function Dashboard() {
             <div className="max-w-6xl mx-auto px-4">
                 {!selectedBuilding ? (
                     <div className="py-32 flex flex-col items-center text-center space-y-4">
-                        <Building2 className="w-10 h-10 text-slate-300" />
-                        <h3 className="text-xl font-black text-slate-900 uppercase">
+                        <Building2 className="w-10 h-10 text-muted-foreground/50" />
+                        <h3 className="text-xl font-black uppercase">
                             Initialise View
                         </h3>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                             Select a building to load data.
                         </p>
                     </div>
@@ -239,34 +239,34 @@ export default function Dashboard() {
                             <StatCard 
                                 title="Type"
                                 value={formatType(selectedBuilding.name, selectedBuilding.type)}
-                                icon={<Building2 className="w-5 h-5 text-blue-600" />}
+                                icon={<Building2 className="w-5 h-5 text-primary" />}
                             />
 
                             <StatCard 
                                 title="Address"
                                 value={selectedBuilding.address}
                                 isSmall
-                                icon={<Clock className="w-5 h-5 text-slate-400" />}
+                                icon={<Clock className="w-5 h-5 text-muted-foreground" />}
                             />
 
                             <StatCard 
                                 title="Tickets"
                                 value={loadingTickets ? "..." : `${activeTickets} Active`}
-                                icon={<AlertCircle className="w-5 h-5 text-rose-600" />}
-                                color="bg-rose-50"
+                                icon={<AlertCircle className="w-5 h-5 text-destructive" />}
+                                color="bg-destructive/10"
                             />
                         </div>
 
                         {/* Main */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             
-                            <Card className="lg:col-span-2 bg-slate-900 border-none rounded-3xl">
+                            <Card className="lg:col-span-2 bg-primary text-primary-foreground border-none rounded-3xl">
                                 <CardContent className="p-12 text-center">
-                                    <Building2 className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                                    <h4 className="text-white text-2xl font-black">
+                                    <Building2 className="w-12 h-12 text-primary-foreground/80 mx-auto mb-4" />
+                                    <h4 className="text-2xl font-black">
                                         {formatName(selectedBuilding.name, selectedBuilding.type)}
                                     </h4>
-                                    <Button className="mt-6 bg-blue-600 text-white">
+                                    <Button variant="secondary" className="mt-6 font-bold">
                                         Enter 3D Viewer <ArrowRight className="ml-2 w-4 h-4" />
                                     </Button>
                                 </CardContent>
@@ -275,7 +275,7 @@ export default function Dashboard() {
                             <Card className="rounded-3xl">
                                 <CardHeader>
                                     <CardTitle className="flex items-center font-black">
-                                        <ClipboardCheck className="mr-2 w-5 h-5" />
+                                        <ClipboardCheck className="mr-2 w-5 h-5 text-primary" />
                                         Maintenance
                                     </CardTitle>
                                 </CardHeader>
@@ -283,9 +283,9 @@ export default function Dashboard() {
                                 <CardContent>
                                     <div className="space-y-6">
                                         {loadingTickets ? (
-                                            <Loader2 className="animate-spin mx-auto" />
+                                            <Loader2 className="animate-spin mx-auto text-muted-foreground" />
                                         ) : tickets.length === 0 ? (
-                                            <p className="text-xs text-slate-400 text-center">
+                                            <p className="text-xs text-muted-foreground text-center">
                                                 No tickets
                                             </p>
                                         ) : (
@@ -317,21 +317,21 @@ export default function Dashboard() {
     );
 }
 
-function StatCard({ title, value, icon, color = "bg-slate-50", isSmall = false }: any) {
+function StatCard({ title, value, icon, color = "bg-muted", isSmall = false }: any) {
     return (
-        <Card className="rounded-2xl">
+        <Card className="rounded-2xl border-none shadow-sm bg-card">
             <CardContent className="p-6">
                 <div className="flex justify-between mb-4">
                     <div className={cn("p-2 rounded-xl", color)}>
                         {icon}
                     </div>
-                    <p className="text-[10px] text-slate-400 uppercase">
+                    <p className="text-[10px] text-muted-foreground uppercase">
                         {title}
                     </p>
                 </div>
 
                 <p className={cn(
-                    "font-black text-slate-900",
+                    "font-black",
                     isSmall ? "text-sm" : "text-2xl"
                 )}>
                     {value}
@@ -352,10 +352,10 @@ function TicketItem({ title, time, priority }: any) {
     return (
         <div className="flex justify-between items-start">
             <div>
-                <p className="text-sm font-bold text-slate-800">
+                <p className="text-sm font-bold">
                     {title}
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-muted-foreground">
                     {time}
                 </p>
             </div>

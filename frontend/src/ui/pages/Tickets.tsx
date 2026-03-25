@@ -77,10 +77,10 @@ export default function Tickets() {
       {/* Header */}
       <div className="flex justify-between items-center mb-10">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">
+          <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">
             Maintenance Feed
           </h1>
-          <p className="text-slate-500 text-sm">
+          <p className="text-muted-foreground text-sm">
             Real-time status of building repairs.
           </p>
         </div>
@@ -104,8 +104,8 @@ export default function Tickets() {
             variant={filter === f ? "default" : "secondary"}
             className={`rounded-full px-8 text-xs font-bold uppercase tracking-widest ${
               filter === f
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-500"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground"
             }`}
           >
             {f}
@@ -114,11 +114,11 @@ export default function Tickets() {
       </div>
 
       {loading ? (
-        <div className="py-20 text-center text-slate-400 animate-pulse font-mono text-xs">
+        <div className="py-20 text-center text-muted-foreground animate-pulse font-mono text-xs">
           INITIALISING_FEED...
         </div>
       ) : visibleTickets.length === 0 ? (
-        <div className="border-2 border-dashed rounded-3xl py-32 text-center text-slate-400 bg-slate-50/50">
+        <div className="border-2 border-dashed border-border rounded-3xl py-32 text-center text-muted-foreground bg-muted/30">
           <p className="font-medium">No maintenance tasks found.</p>
           <p className="text-[10px] mt-1 uppercase opacity-50">
             Database is current
@@ -129,9 +129,9 @@ export default function Tickets() {
           {visibleTickets.map((t) => (
             <Card
               key={t.id}
-              className="border-none shadow-sm hover:shadow-md transition-shadow duration-200"
+              className="border-none shadow-sm hover:shadow-md transition-shadow duration-200 bg-transparent"
             >
-              <CardContent className="p-0 overflow-hidden rounded-xl border border-slate-100 bg-white">
+              <CardContent className="p-0 overflow-hidden rounded-xl border border-border bg-card text-card-foreground">
                 
                 <div
                   className={`h-1.5 w-full ${
@@ -144,13 +144,13 @@ export default function Tickets() {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="font-bold text-lg text-slate-800">
+                      <h3 className="font-bold text-lg text-foreground">
                         {t.hotel}
-                        <span className="text-slate-300 px-1">/</span>
+                        <span className="text-muted-foreground/30 px-1">/</span>
                         {t.room}
                       </h3>
 
-                      <p className="text-[10px] text-slate-400 font-mono uppercase tracking-widest">
+                      <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest">
                         Ref: {t.id.slice(-8)}
                       </p>
                     </div>
@@ -163,26 +163,26 @@ export default function Tickets() {
                     </Badge>
                   </div>
 
-                  <div className="bg-slate-50 rounded-lg p-4 mb-5 border border-slate-100/50">
-                    <p className="text-sm text-slate-600 italic">
+                  <div className="bg-muted/50 rounded-lg p-4 mb-5 border border-border/50">
+                    <p className="text-sm text-muted-foreground italic">
                       "{t.issue}"
                     </p>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">
+                      <span className="text-[10px] text-muted-foreground font-bold uppercase">
                         Logged:{" "}
-                        <span className="text-slate-700">{t.time}</span>
+                        <span className="text-foreground">{t.time}</span>
                       </span>
 
                       <span
                         className={`text-[9px] px-2 py-1 rounded font-black uppercase ${
                           t.priority === "High"
-                            ? "bg-red-50 text-red-600"
+                            ? "bg-red-500/10 text-red-500"
                             : t.priority === "Med"
-                            ? "bg-amber-50 text-amber-600"
-                            : "bg-blue-50 text-blue-600"
+                            ? "bg-amber-500/10 text-amber-500"
+                            : "bg-blue-500/10 text-blue-500"
                         }`}
                       >
                         {t.priority}
