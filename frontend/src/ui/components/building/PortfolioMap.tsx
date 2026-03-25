@@ -71,16 +71,16 @@ export default function PortfolioMap({ buildings }: { buildings: Building[] }) {
 
   if (error) {
     return (
-      <Card className="w-full py-12 flex items-center justify-center border-red-200 bg-red-50">
-        <p className="text-red-600">Error loading map.</p>
+      <Card className="w-full py-12 flex items-center justify-center border-destructive/50 bg-destructive/10">
+        <p className="text-destructive font-medium">Error loading map.</p>
       </Card>
     );
   }
 
   if (loading) {
     return (
-      <Card className="w-full h-[400px] flex items-center justify-center">
-        <div className="flex flex-col items-center animate-pulse">
+      <Card className="w-full h-[400px] flex items-center justify-center bg-card">
+        <div className="flex flex-col items-center animate-pulse text-muted-foreground">
           <MapPin className="w-8 h-8 mb-2 opacity-50" />
           <p className="text-sm">Loading map...</p>
         </div>
@@ -90,7 +90,7 @@ export default function PortfolioMap({ buildings }: { buildings: Building[] }) {
 
   if (markers.length === 0) {
     return (
-      <Card className="w-full py-12 flex items-center justify-center">
+      <Card className="w-full py-12 flex items-center justify-center text-muted-foreground bg-card">
         <p>No locations found</p>
       </Card>
     );
@@ -102,10 +102,10 @@ export default function PortfolioMap({ buildings }: { buildings: Building[] }) {
     markers.reduce((sum, m) => sum + m.lon, 0) / markers.length;
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="py-3 border-b">
-        <CardTitle className="text-sm flex items-center">
-          <MapPin className="w-4 h-4 mr-2" />
+    <Card className="overflow-hidden bg-card border-border">
+      <CardHeader className="py-3 border-b border-border/50">
+        <CardTitle className="text-sm flex items-center text-foreground">
+          <MapPin className="w-4 h-4 mr-2 text-primary" />
           Portfolio Map
         </CardTitle>
       </CardHeader>
@@ -114,14 +114,14 @@ export default function PortfolioMap({ buildings }: { buildings: Building[] }) {
         <MapContainer
           center={[avgLat, avgLon]}
           zoom={5}
-          style={{ height: "100%", width: "100%" }}
+          style={{ height: "100%", width: "100%", zIndex: 0 }}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
           {markers.map((m) => (
             <Marker key={m.id} position={[m.lat, m.lon]} icon={icon}>
               <Popup>
-                <div>
+                <div className="text-foreground">
                   <strong>{m.name}</strong>
                   <br />
                   {m.address}
