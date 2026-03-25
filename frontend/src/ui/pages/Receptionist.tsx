@@ -37,12 +37,13 @@ export default function Receptionist() {
 
   const activeRoom = rooms.find((r) => r.id === activeRoomId) || null;
 
-  // Load everything when buildingId changes
   useEffect(() => {
     if (!buildingId) return;
 
-    const loadData = async () => {
+    const loadData = async (showLoadingScreen = true) => {
       try {
+        if (showLoadingScreen) setLoading(true);
+        
         const roomRes = await apiFetch(`${apiUrl}/rooms?buildingId=${buildingId}`, { credentials: "include" });
         const roomData = await roomRes.json();
         if (roomRes.ok) setRooms(roomData.data);
@@ -51,10 +52,19 @@ export default function Receptionist() {
         const staffData = await staffRes.json();
         if (staffRes.ok) setStaffList(staffData.data);
       } catch (err) {
-        toast.error("Error loading dashboard data");
+        console.error("Background sync failed");
+      } finally {
+        if (showLoadingScreen) setLoading(false);
       }
     };
-    loadData();
+
+    loadData(true);
+
+    const intervalId = setInterval(() => {
+      loadData(false);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, [buildingId]);
 
   const handleCheckIn = async () => {
@@ -164,6 +174,7 @@ export default function Receptionist() {
                       onChange={(e) => setGuestName(e.target.value)} 
                       placeholder="Guest Name..." 
                       className="h-12 border-2 font-bold"
+                      disabled={loading}
                     />
                     <Button onClick={handleCheckIn} disabled={loading} className="w-full h-12 bg-blue-600 font-bold">
                       Check-In Guest
@@ -195,6 +206,7 @@ export default function Receptionist() {
                       className="w-full h-12 border-2 rounded-xl px-3 font-bold bg-white"
                       onChange={(e) => handleAssignTask(e.target.value)}
                       value=""
+                      disabled={loading}
                     >
                       <option value="" disabled>Select Staff...</option>
                       {staffList.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -203,9 +215,28 @@ export default function Receptionist() {
                 )}
 
                 {activeRoom.status === "Maintenance" && (
-                  <div className="p-4 bg-amber-50 border-2 border-amber-100 rounded-xl text-center">
-                    <p className="text-[10px] font-bold text-amber-500 uppercase">Worker Assigned</p>
-                    <p className="text-lg font-black text-amber-700">{activeRoom.assignedToName}</p>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-amber-50 border-2 border-amber-100 rounded-xl text-center">
+                      <p className="text-[10px] font-bold text-amber-500 uppercase">Worker Assigned</p>
+                      <p className="text-lg font-black text-amber-700">{activeRoom.assignedToName}</p>
+                    </div>
+                    
+                    <div className="pt-2 border-t border-slate-100">
+                      <p className="text-xs font-bold text-slate-500 mb-2">Reassign to someone else?</p>
+                      <select 
+                        className="w-full h-12 border-2 rounded-xl px-3 font-bold bg-white"
+                        onChange={(e) => handleAssignTask(e.target.value)}
+                        value=""
+                        disabled={loading}
+                      >
+                        <option value="" disabled>Select New Staff...</option>
+                        {staffList
+                          .filter((s) => s.name !== activeRoom.assignedToName)
+                          .map((s) => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                      </select>
+                    </div>
                   </div>
                 )}
               </CardContent>
