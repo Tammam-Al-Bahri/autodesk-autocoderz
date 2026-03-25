@@ -128,9 +128,10 @@ export function BuildingForm({
                                 name="address"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Address</FormLabel>
+                                        <FormLabel>Address </FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Address" {...field} />
+                                            <Input placeholder="Address" {...field} 
+                                            required/>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
