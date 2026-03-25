@@ -111,3 +111,33 @@ export const createRoom = async (req: Request, res: Response) => {
         res.status(201).json({ data: room });
     } catch (error) { res.status(500).json({ error: { title: "Failed" } }); }
 };
+
+export const updateRoom = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { number, type } = req.body;
+    
+    const room = await (prisma as any).room.update({
+      where: { id },
+      data: { number: String(number), type: String(type) }
+    });
+    
+    res.json({ data: room });
+  } catch (err) {
+    res.status(500).json({ error: { title: "Could not update room details" } });
+  }
+};
+
+export const deleteRoom = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    await (prisma as any).room.delete({
+      where: { id }
+    });
+    
+    res.json({ message: "Room successfully removed" });
+  } catch (err) {
+    res.status(500).json({ error: { title: "Cannot delete this room. It might have active bookings." } });
+  }
+};
