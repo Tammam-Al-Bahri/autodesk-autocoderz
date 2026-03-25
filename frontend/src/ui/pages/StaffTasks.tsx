@@ -14,37 +14,43 @@ export default function StaffTasks() {
   const [taskMessages, setTaskMessages] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<"pending" | "history">("pending");
 
-  async function loadDashboard() {
+  async function loadDashboard(showLoadingScreen = true) {
     try {
-      setLoading(true);
+      if (showLoadingScreen) setLoading(true);
       
-      const userRes = await apiFetch(`${apiUrl}/users/me`, { credentials: "include" });
+      const userRes = await apiFetch(`${apiUrl}/users/me?_t=${Date.now()}`, { credentials: "include" });
       if (!userRes.ok) return;
       
       const userData = await userRes.json();
       setCurrentUser(userData.data);
 
-      const roomRes = await apiFetch(`${apiUrl}/rooms`, { credentials: "include" });
+      const roomRes = await apiFetch(`${apiUrl}/rooms?_t=${Date.now()}`, { credentials: "include" });
       const roomData = await roomRes.json();
       if (roomRes.ok) {
         const myTasks = roomData.data.filter((room: any) => room.assignedToId === userData.data.id);
         setTasks(myTasks);
       }
 
-      const historyRes = await apiFetch(`${apiUrl}/users/me/task-history`, { credentials: "include" });
+      const historyRes = await apiFetch(`${apiUrl}/users/me/task-history?_t=${Date.now()}`, { credentials: "include" });
       const historyData = await historyRes.json();
       if (historyRes.ok) {
         setCompletedTasks(historyData.data);
       }
     } catch (error) {
-      toast.error("Network error while loading tasks");
+      console.error("Background sync failed");
     } finally {
-      setLoading(false);
+      if (showLoadingScreen) setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadDashboard();
+    loadDashboard(true);
+
+    const intervalId = setInterval(() => {
+      loadDashboard(false);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   async function completeTask(task: any) {
@@ -60,7 +66,7 @@ export default function StaffTasks() {
       if (response.ok) {
         toast.success("Task completed and archived!");
         setTaskMessages({...taskMessages, [task.id]: ""});
-        loadDashboard(); 
+        loadDashboard(false); 
       }
     } catch (error) {
       toast.error("Failed to save completion");
