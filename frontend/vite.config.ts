@@ -24,7 +24,9 @@ export default defineConfig({
                 script-src 'self' 'unsafe-eval';
                 style-src 'self' 'unsafe-inline';
                 connect-src 'self' ws: wss:;
-            `.replace(/\s{2,}/g, ' ').trim()
+                frame-ancestors 'none';
+            `.replace(/\s{2,}/g, ' ').trim(),
+            'X-Frame-Options': 'DENY'
         }
     },
 });
