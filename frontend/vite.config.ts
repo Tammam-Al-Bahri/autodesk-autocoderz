@@ -18,5 +18,13 @@ export default defineConfig({
     server: {
         port: 5420,
         strictPort: true,
+        headers: {
+            'Content-Security-Policy': `
+                default-src 'self';
+                script-src 'self' 'unsafe-eval';
+                style-src 'self' 'unsafe-inline';
+                connect-src 'self' ws: wss:;
+            `.replace(/\s{2,}/g, ' ').trim()
+        }
     },
 });
