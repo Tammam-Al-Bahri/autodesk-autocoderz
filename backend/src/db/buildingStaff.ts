@@ -2,6 +2,7 @@ import { prisma } from "../lib/prisma";
 import { handlePrismaError } from "../lib/handlePrismaError";
 import { BuildingId, BuildingStaffId, CreateBuildingStaffInvite, UserId } from "@autocoderz/shared";
 import { BuildingStaffInviteStatus } from "../generated/prisma/enums";
+import { Prisma } from "../generated/prisma/client";
 
 export async function createBuildingStaffInvite(data: CreateBuildingStaffInvite) {
     try {
@@ -16,6 +17,17 @@ export async function createBuildingStaffInvite(data: CreateBuildingStaffInvite)
         });
         return buildlingStaff;
     } catch (error) {
+                        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                         // Unique constraint violation
+                        if (error.code === "P2002") {
+                            throw {
+                          error: {
+                        title: "user already invited to this building",
+                       
+                    },
+                };
+            }
+        }
         throw handlePrismaError(error);
     }
 }
