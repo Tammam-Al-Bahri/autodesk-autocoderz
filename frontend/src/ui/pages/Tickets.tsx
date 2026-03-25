@@ -1,210 +1,367 @@
+// importing ui components from shadcn and icons from lucide
+// need toast for the popups when stuff works or fails
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ticketsBase } from "@autocoderz/shared";
-import { apiFetch } from "@/lib/utils";
-
-interface Ticket {
-  id: string;
-  hotel: string;
-  room: string;
-  issue: string;
-  status: "Open" | "In Progress" | "Resolved";
-  time: string;
-  priority: "Low" | "Med" | "High";
-}
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, X, AlertCircle, RefreshCcw, Building2, CheckCircle2, Home, Send, Filter, Activity, ClipboardCheck, ChevronRight } from "lucide-react";
+import { ticketsBase, buildingsBase, buildingGroupsBase } from "@autocoderz/shared";
+import { apiUrl, cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function Tickets() {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [filter, setFilter] = useState("All");
-  const [loading, setLoading] = useState(true);
 
-  // load tickets
-  const loadTickets = async () => {
-    setLoading(true);
+    // keeping the fetched data in state so we can map over it later
+    const [ticketData, setTicketData] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeFilter, setActiveFilter] = useState("All");
 
-    try {
-      const res: any = await apiFetch(ticketsBase);
+    // dropdown states - took a bit to get the order right (company to building to room)
+    const [companyList, setCompanyList] = useState<any[]>([]);
+    const [buildingList, setBuildingList] = useState<any[]>([]);
+    const [roomList, setRoomList] = useState<any[]>([]);
 
-      if (res?.data) {
-        setTickets(res.data);
-      } else {
-        console.log("no tickets found");
-      }
-    } catch (err) {
-      console.error("failed to load tickets", err);
-    }
+    // form stuff to track what the user types in
+    const [formOpen, setFormOpen] = useState(false);
+    const [chosenCompany, setChosenCompany] = useState("");
+    const [chosenBuilding, setChosenBuilding] = useState("");
+    const [chosenRoom, setChosenRoom] = useState("");
+    const [issueDesc, setIssueDesc] = useState("");
+    const [ticketPriority, setTicketPriority] = useState("LOW");
+    const [isSending, setIsSending] = useState(false);
 
-    setLoading(false);
-  };
+    const loadTickets = async () => {
+        // grabs everything that we need on initial load
+        setIsLoading(true);
+        try {
+            // using include credentials so that the backend knows who is logged in
+            const res = await fetch(`${apiUrl}${ticketsBase}`, { credentials: "include" });
+            const data = await res.json();
+            if (res.ok) setTicketData(data.data || []);
 
-  useEffect(() => {
-    loadTickets();
-  }, []);
+            const res2 = await fetch(`${apiUrl}${buildingGroupsBase}`, { credentials: "include" });
+            const data2 = await res2.json();
+            if (res2.ok) setCompanyList(data2.data || []);
+        } catch(e) {
+            toast.error("Couldn't load tickets");
+        }
+        setIsLoading(false);
+    };
 
-  // mark as resolved
-  const handleResolve = async (id: string) => {
-    try {
-      await apiFetch(ticketsBase, {
-        method: "PATCH",
-        body: JSON.stringify({
-          id,
-          status: "Resolved",
-        }),
-      });
+    useEffect(() => {
+        loadTickets();
+    }, []);
 
-      // update locally
-      setTickets((prev) =>
-        prev.map((t) =>
-          t.id === id ? { ...t, status: "Resolved" } : t
-        )
-      );
-    } catch (err) {
-      console.log("update failed");
-    }
-  };
+    useEffect(() => {
+        // gotta clear buildings if they unselect company otherwise the dropdowns explode
+        if (!chosenCompany) {
+            setBuildingList([]);
+            setChosenBuilding("");
+            return;
+        }
 
-  // filter tickets
-  let visibleTickets = tickets;
-  if (filter !== "All") {
-    visibleTickets = tickets.filter((t) => t.status === filter);
-  }
+        const getBuildings = async () => {
+            // fetch buildings based on the company that they just picked
+            const res = await fetch(`${apiUrl}${buildingsBase}?buildingGroupId=${chosenCompany}`, { credentials: "include" });
+            const json = await res.json();
+            setBuildingList(json.data || []);
+        };
 
-  return (
-    <div className="max-w-4xl mx-auto mt-8 px-4 pb-20">
-      
-      {/* Header */}
-      <div className="flex justify-between items-center mb-10">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 uppercase">
-            Maintenance Feed
-          </h1>
-          <p className="text-slate-500 text-sm">
-            Real-time status of building repairs.
-          </p>
-        </div>
+        getBuildings();
+        // resetting these down here so that we don't accidentally submit wrong rooms or buildings
+        setChosenBuilding("");
+        setRoomList([]);
+    }, [chosenCompany]);
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={loadTickets}
-          className="rounded-full font-bold px-6 border-2"
-        >
-          {loading ? "Syncing..." : "Refresh"}
-        </Button>
-      </div>
+    useEffect(() => {
+        if (!chosenBuilding) {
+            setRoomList([]);
+            setChosenRoom("");
+            return;
+        }
 
-      {/* Filters */}
-      <div className="flex gap-2 mb-8">
-        {["All", "Open", "Resolved"].map((f) => (
-          <Button
-            key={f}
-            onClick={() => setFilter(f)}
-            variant={filter === f ? "default" : "secondary"}
-            className={`rounded-full px-8 text-xs font-bold uppercase tracking-widest ${
-              filter === f
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-500"
-            }`}
-          >
-            {f}
-          </Button>
-        ))}
-      </div>
+        const getRooms = async () => {
+            const res = await fetch(`${apiUrl}/rooms?buildingId=${chosenBuilding}`, { credentials: "include" });
+            const json = await res.json();
+            setRoomList(json.data || []);
+        };
 
-      {loading ? (
-        <div className="py-20 text-center text-slate-400 animate-pulse font-mono text-xs">
-          INITIALISING_FEED...
-        </div>
-      ) : visibleTickets.length === 0 ? (
-        <div className="border-2 border-dashed rounded-3xl py-32 text-center text-slate-400 bg-slate-50/50">
-          <p className="font-medium">No maintenance tasks found.</p>
-          <p className="text-[10px] mt-1 uppercase opacity-50">
-            Database is current
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {visibleTickets.map((t) => (
-            <Card
-              key={t.id}
-              className="border-none shadow-sm hover:shadow-md transition-shadow duration-200"
-            >
-              <CardContent className="p-0 overflow-hidden rounded-xl border border-slate-100 bg-white">
-                
-                <div
-                  className={`h-1.5 w-full ${
-                    t.status === "Open"
-                      ? "bg-red-500"
-                      : "bg-emerald-500"
-                  }`}
-                />
+        getRooms();
+        setChosenRoom("");
+    }, [chosenBuilding]);
 
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-bold text-lg text-slate-800">
-                        {t.hotel}
-                        <span className="text-slate-300 px-1">/</span>
-                        {t.room}
-                      </h3>
+    const shownTickets = activeFilter === "All" ? ticketData : ticketData.filter(t => t.status === activeFilter);
+    const numOpen = ticketData.filter(t => t.status === "Open").length;
 
-                      <p className="text-[10px] text-slate-400 font-mono uppercase tracking-widest">
-                        Ref: {t.id.slice(-8)}
-                      </p>
+    const submitTicket = async (e: React.FormEvent) => {
+        // stops the page from refreshing when hit submit
+        e.preventDefault();
+
+        if (!issueDesc.trim() || !chosenBuilding) {
+            // basic validation so users can't send blank forms to the db
+            toast.error("Please fill in building and issue");
+            return;
+        }
+
+        setIsSending(true);
+
+        try {
+            const res = await fetch(`${apiUrl}${ticketsBase}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({
+                    buildingId: chosenBuilding,
+                    roomId: chosenRoom || null,
+                    issue: issueDesc,
+                    priority: ticketPriority
+                })
+            });
+
+            if (res.ok) {
+                toast.success("Ticket submitted!");
+                // finally worked after soooooo looingngngngngn clear the text box, hide the form and reload the tickets
+                setIssueDesc("");
+                setFormOpen(false);
+                loadTickets();
+            } else if (res.status === 401) {
+                toast.error("Not logged in");
+            }
+        } catch(e) {
+            toast.error("Submit failed");
+        }
+
+        setIsSending(false);
+    };
+
+    const markResolved = async (id: string) => {
+        // backend only needs the id and the new status to patch it
+        try {
+            const res = await fetch(`${apiUrl}${ticketsBase}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ id, status: "Resolved" })
+            });
+
+            if (res.ok) {
+                // mapping through to update just the one ticket much faster than reloading everything
+                setTicketData(prev => prev.map(t => t.id === id ? {...t, status: "Resolved"} : t));
+                toast.success("Marked as resolved");
+            }
+        } catch(e) {
+            console.log("resolve failed", e);
+        }
+    };
+
+    {/* main wrapper using tailwind to centre it and give it some room to breathe before it chokes lol */}
+    return (
+        <div className="max-w-5xl mx-auto mt-8 px-6 pb-24 text-foreground">
+
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-border pb-8">
+                <div>
+                    <div className="flex items-center gap-2 text-primary mb-2">
+                        <Activity className="w-5 h-5" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">Operational Live Feed</span>
                     </div>
-
-                    <Badge
-                      variant={t.status === "Open" ? "destructive" : "secondary"}
-                      className="rounded-md font-bold px-3 py-1"
-                    >
-                      {t.status}
-                    </Badge>
-                  </div>
-
-                  <div className="bg-slate-50 rounded-lg p-4 mb-5 border border-slate-100/50">
-                    <p className="text-sm text-slate-600 italic">
-                      "{t.issue}"
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">
-                        Logged:{" "}
-                        <span className="text-slate-700">{t.time}</span>
-                      </span>
-
-                      <span
-                        className={`text-[9px] px-2 py-1 rounded font-black uppercase ${
-                          t.priority === "High"
-                            ? "bg-red-50 text-red-600"
-                            : t.priority === "Med"
-                            ? "bg-amber-50 text-amber-600"
-                            : "bg-blue-50 text-blue-600"
-                        }`}
-                      >
-                        {t.priority}
-                      </span>
-                    </div>
-
-                    {t.status === "Open" && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleResolve(t.id)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-black h-9 px-6 rounded-lg text-[10px] uppercase shadow-sm"
-                      >
-                        Resolve
-                      </Button>
-                    )}
-                  </div>
+                    <h1 className="text-4xl font-black uppercase tracking-tighter">Maintenance</h1>
+                    <p className="text-muted-foreground text-sm italic mt-1">Fiktional Estates Group Central Registry.</p>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                <div className="flex items-center gap-3">
+                    <div className="hidden sm:flex flex-col items-end mr-4">
+                        <span className="text-[10px] font-black text-muted-foreground uppercase">Current Backlog</span>
+                        <span className="text-2xl font-black text-rose-500">{numOpen} Issues</span>
+                    </div>
+                    {/* added a spin animation when it's loading so it looks more sigma */}
+                    <Button variant="outline" size="icon"
+                        onClick={loadTickets}
+                        className={cn("rounded-xl border-2 h-12 w-12", isLoading && "animate-spin")}>
+                        <RefreshCcw className="w-5 h-5" />
+                    </Button>
+                    <Button onClick={() => setFormOpen(!formOpen)} className="h-12 px-6 rounded-xl font-black uppercase text-[11px] tracking-widest">
+                        {formOpen
+                            ? <><X className="mr-2 w-4 h-4" />Close</>
+                            : <><Plus className="mr-2 w-4 h-4" />Raise Ticket</>}
+                    </Button>
+                </div>
+                {/* only show this whole card if they actually clicked the raise ticket button */}
+            </div>
+            {formOpen && (
+                <Card className="mb-10 border-none bg-card shadow-lg ring-1 ring-border">
+                    <div className="bg-primary h-1 w-full opacity-40" />
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-muted-foreground">
+                            <AlertCircle className="w-4 h-4" /> Dispatch Repair Schedule
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={submitTicket} className="space-y-5">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest block mb-1.5">Portfolio Group</label>
+                                    <select
+                                        value={chosenCompany}
+                                        onChange={e => setChosenCompany(e.target.value)}
+                                        className="w-full h-11 px-3 rounded-xl bg-muted text-foreground text-sm font-medium border-none outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer">
+                                        <option value="">Select Company...</option>
+                                        {companyList.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest block mb-1.5">Managed Asset</label>
+                                    {/* disabling this dropdown until they actually pick a company first */}
+                                    <select
+                                        value={chosenBuilding}
+                                        onChange={e => setChosenBuilding(e.target.value)}
+                                        disabled={!chosenCompany}
+                                        className="w-full h-11 px-3 rounded-xl bg-muted text-foreground text-sm font-medium border-none outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-40 appearance-none">
+                                        <option value="">Select Building...</option>
+                                        {buildingList.map(b => (
+                                            <option key={b.id} value={b.id}>{b.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest block mb-1.5">Internal Location</label>
+                                    <select
+                                        value={chosenRoom}
+                                        onChange={e => setChosenRoom(e.target.value)}
+                                        disabled={!chosenBuilding}
+                                        className="w-full h-11 px-3 rounded-xl bg-muted text-foreground text-sm font-medium border-none outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-40 appearance-none">
+                                        <option value="">General / Room...</option>
+                                        {roomList.map(r => (
+                                            <option key={r.id} value={r.id}>Room {r.number}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-[9px] font-black uppercase text-muted-foreground tracking-widest block mb-1.5">Technical Fault Description</label>
+                                <Textarea
+                                    placeholder="Describe the issue..."
+                                    value={issueDesc}
+                                    onChange={e => setIssueDesc(e.target.value)}
+                                    className="bg-muted border-none text-foreground min-h-[110px] rounded-xl text-sm focus:ring-2 focus:ring-primary/20" />
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-4 items-center pt-4 border-t border-border">
+                                <div className="flex items-center gap-3 flex-1 w-full">
+                                    <span className="text-[9px] font-black uppercase text-muted-foreground">Urgency:</span>
+                                    <select
+                                        value={ticketPriority}
+                                        onChange={e => setTicketPriority(e.target.value)}
+                                        className="h-10 px-3 rounded-lg bg-muted text-foreground text-[10px] font-black uppercase border-none outline-none ring-1 ring-border">
+                                        <option value="LOW">Low Priority</option>
+                                        <option value="MED">Medium</option>
+                                        <option value="HIGH">High Priority</option>
+                                    </select>
+                                </div>
+                                <Button type="submit" disabled={isSending} className="w-full sm:w-auto h-11 px-8 font-black uppercase text-[10px] tracking-widest rounded-xl">
+                                    {isSending ? "Sending..." : <><Send className="w-3 h-3 mr-2" />Submit Ticket</>}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+            )}
+
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex gap-1 bg-muted/60 p-1 rounded-xl border border-border">
+                {/* map through the buttons so I don't have to write the exact same html three times coz im lazyyy */}
+                    {["All", "Open", "Resolved"].map(f => (
+                        <button
+                            key={f}
+                            onClick={() => setActiveFilter(f)}
+                            className={cn(
+                                "px-5 py-2 text-[10px] font-black uppercase rounded-lg transition-all",
+                                activeFilter === f
+                                    ? "bg-background text-primary shadow-sm ring-1 ring-border"
+                                    : "text-muted-foreground hover:text-foreground"
+                            )}>
+                            {f}
+                        </button>
+                    ))}
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground opacity-50">
+                    <Filter className="w-3 h-3" /> Filters Used
+                </div>
+            </div>
+
+            <div className="grid gap-5">
+                {shownTickets.length === 0 ? (
+                    <div className="py-28 text-center border-2 border-dashed border-border rounded-3xl">
+                        <ClipboardCheck className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
+                        <p className="text-muted-foreground font-semibold text-sm">No tickets here.</p>
+                    </div>
+                    
+                ) : (   
+                    
+                    [...shownTickets].reverse().map(t => (  //{/* copying and reversing the array so that the new stuff sits at the top of the feed */}
+                        <Card key={t.id} className="border-none bg-card shadow-sm hover:shadow-md transition-shadow ring-1 ring-border/50 rounded-2xl overflow-hidden">
+                            <div className={cn("h-1.5 w-full", t.status === "Open" ? "bg-rose-500" : "bg-emerald-500")} />
+                            <CardContent className="p-6">
+                                <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-5">
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <div className="flex items-center gap-1.5 bg-muted px-3 py-1 rounded-full border border-border">
+                                                <Building2 className="w-3.5 h-3.5 text-primary" />
+                                                <span className="text-[10px] font-bold text-foreground">{t.hotel}</span>
+                                            </div>
+                                            <ChevronRight className="w-3 h-3 text-muted-foreground" />
+                                            <div className="flex items-center gap-1.5 bg-muted px-3 py-1 rounded-full border border-border">
+                                                <Home className="w-3.5 h-3.5 text-primary" />
+                                                <span className="text-[10px] font-bold text-foreground">{t.room}</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest">Ref: {t.id.slice(-8)}</p>
+                                    </div>
+                                    <Badge
+                                        variant={t.status === "Open" ? "destructive" : "secondary"}
+                                        className="uppercase text-[9px] font-black px-3 py-1 rounded-full">
+                                        {t.status}
+                                    </Badge>
+                                </div>
+
+                                <div className="bg-muted/40 p-5 rounded-xl border border-border/40 mb-5">
+                                    <p className="text-sm text-foreground/80 leading-relaxed italic">"{t.issue}"</p>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4 border-t border-border/30">
+                                    <div className="flex gap-5 items-center w-full sm:w-auto justify-between sm:justify-start">
+                                        <div>
+                                            <p className="text-[8px] font-black text-muted-foreground uppercase mb-0.5">Time Logged</p>
+                                            <p className="text-[11px] font-bold text-foreground">{t.time}</p>
+                                        </div>
+                                        <span className={cn(
+                                            "text-[9px] px-2.5 py-1 rounded-lg font-black uppercase border",
+                                            t.priority === "High" ? "bg-rose-500/10 text-rose-500 border-rose-500/20" :
+                                            t.priority === "Med" ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
+                                            "bg-sky-500/10 text-sky-500 border-sky-500/20"
+                                        )}>
+                                            {t.priority} Priority
+                                        </span>
+                                    </div>
+                                    {/* only show the resolve button if the ticket is still open who wants to resolve a closed one lol*/}
+                                    {t.status === "Open" && (
+                                        <Button
+                                            onClick={() => markResolved(t.id)}
+                                            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] uppercase h-10 px-6 rounded-xl">
+                                            <CheckCircle2 className="w-4 h-4 mr-2" /> Mark Resolved
+                                        </Button>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
+            </div>
         </div>
-      )}
-    </div>
-  );
+    );
 }
