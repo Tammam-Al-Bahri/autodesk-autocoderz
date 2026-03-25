@@ -13,6 +13,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
+// keeping everything as 'any' so typescript stops complaining lol
 export default function StaffTasks() {
   const [tasks, setTasks] = useState<any>([]);
   const [historyLogs, setHistoryLogs] = useState<any>([]);
@@ -24,17 +25,18 @@ export default function StaffTasks() {
   const [currentView, setCurrentView] = useState("pending"); // pending or history
 
   const fetchEverything = async (showLoading = true) => {
+    // only show the main spinner on the first load otherwise it's annoying
     if (showLoading) setIsLoading(true);
     
     try {
-      // get current logged in user
+      // fetching my details first so I actually know who is logged in
       let uRes = await apiFetch(apiUrl + `/users/me?_t=${Date.now()}`, { credentials: "include" });
       if (!uRes.ok) return;
       
       let uData = await uRes.json();
       setUser(uData.data);
 
-      // get rooms and filter for my tasks
+      // now get all rooms and just filter for the ones assigned to my ID
       let rRes = await apiFetch(apiUrl + `/rooms?_t=${Date.now()}`, { credentials: "include" });
       let rData = await rRes.json();
       if (rRes.ok) {
@@ -62,6 +64,7 @@ export default function StaffTasks() {
   }, []);
 
   const handleDone = async (t: any) => {
+    // grabbing the note from the state based on the room id
     let msg = notes[t.id] || "";
     // console.log("completing task", t.id, msg);
     
@@ -75,8 +78,8 @@ export default function StaffTasks() {
 
       if (res.ok) {
         toast.success("Task completed and synchronised!");
-        setNotes({...notes, [t.id]: ""}); // clear the input
-        fetchEverything(false); // reload but don't show spinner
+        setNotes({...notes, [t.id]: ""}); // clearing the input box after it's sent
+        fetchEverything(false);// refreshing the list in the background
       }
     } catch (e) {
       toast.error("Failed to save completion");
@@ -84,9 +87,10 @@ export default function StaffTasks() {
   }
 
   function calcTime(start: any, end: any) {
+    // turning the dates into numbers so I can do some quick maths on them
     let s = new Date(start).getTime();
     let e = new Date(end).getTime();
-    let diffInMins = Math.round((e - s) / 60000);
+    let diffInMins = Math.round((e - s) / 60000); // 60,000 ms in a minute
     
     if (diffInMins > 0) {
       return diffInMins + " mins";
@@ -95,6 +99,7 @@ export default function StaffTasks() {
   }
 
   const prettyTime = (d: any) => {
+    // just a quick helper to format the time so it's not a massive confusing string
     return new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
@@ -102,6 +107,7 @@ export default function StaffTasks() {
   if (isLoading && !user) {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] text-muted-foreground animate-pulse space-y-4">
+        {/* just a placeholder while the api is doing its thing */}
         <ClipboardList className="w-10 h-10 opacity-50 dark:opacity-40" />
         <p className="font-bold text-sm tracking-widest uppercase text-muted-foreground">Synchronising Dashboard...</p>
       </div>
@@ -112,7 +118,7 @@ export default function StaffTasks() {
     <div className="max-w-md mx-auto mt-8 px-4 pb-20 bg-background text-foreground animate-in fade-in duration-500">
       
       {/* Header section */}
-      <div className="mb-8 bg-card dark:bg-card/95 border border-border/50 dark:border-border/30 p-5 rounded-3xl shadow-sm flex items-center justify-between">
+      <div className="mb-8 bg-card dark:bg-card/95 border border-border/50 dark:border-border/30 p-5 rounded-xl shadow-sm flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-foreground">My Tasks</h1>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1 flex items-center gap-1.5">
@@ -125,6 +131,7 @@ export default function StaffTasks() {
       </div>
 
       {/* Tabs */}
+      {/* using that cn helper to toggle the tab styles based on which view is active */}
       <div className="flex gap-1 mb-6 bg-muted/50 dark:bg-muted/20 p-1.5 rounded-2xl border border-border/50 dark:border-border/20">
         <button 
           onClick={() => setCurrentView("pending")}
@@ -136,6 +143,7 @@ export default function StaffTasks() {
           )}
         >
           <ClipboardList className="w-3.5 h-3.5" /> 
+          {/* showing the count here so the user knows how much work is left */}
           Active ({tasks.length})
         </button>
         <button 
@@ -162,7 +170,7 @@ export default function StaffTasks() {
           ) : (
             tasks.map((t: any) => (
               <Card key={t.id} className="border-none shadow-md bg-card dark:bg-card/95 overflow-hidden ring-1 ring-border/50 dark:ring-border/30 rounded-3xl group">
-                <div className="h-1.5 w-full bg-rose-500 dark:bg-rose-600" />
+                <div className="h-1.5 w-full bg-rose-500 dark:bg-rose-600" /> {/* red strip at the top to make it look urgent */}
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-5">
                     <div>
@@ -203,7 +211,7 @@ export default function StaffTasks() {
         ) : (
           historyLogs.length === 0 ? (
             <div className="text-center p-14 border-2 border-dashed border-border/60 dark:border-border/30 rounded-[2rem] bg-muted/10 dark:bg-muted/5">
-              <History className="w-10 h-10 text-muted-foreground/30 dark:text-muted-foreground/20 mx-auto mb-3" />
+             {/* show this if they haven't actually finished any tasks yet */} <History className="w-10 h-10 text-muted-foreground/30 dark:text-muted-foreground/20 mx-auto mb-3" />
               <p className="text-muted-foreground font-bold tracking-tight text-sm">No archived history found.</p>
             </div>
           ) : (
@@ -211,6 +219,7 @@ export default function StaffTasks() {
               <Card key={item.id} className="border border-border/50 dark:border-border/30 shadow-sm bg-card/50 dark:bg-card/40 rounded-[2rem]">
                 <CardContent className="p-5">
                   <div className="flex justify-between items-center mb-4">
+                    {/* showing how long it took by calling that calcTime function from earlier */}
                     <span className="text-xl font-black text-foreground">Room {item.roomNumber}</span>
                     <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest text-emerald-500 dark:text-emerald-400 border-emerald-500/30 dark:border-emerald-500/20 bg-emerald-500/10 dark:bg-emerald-500/5 px-3 py-1">
                       {calcTime(item.assignedAt, item.completedAt)}
@@ -230,7 +239,7 @@ export default function StaffTasks() {
 
                   {item.message && (
                     <div className="bg-background dark:bg-zinc-900/40 p-3.5 rounded-2xl border border-border/80 dark:border-border/40 relative mt-2">
-                       <span className="absolute -top-2 left-3 bg-background dark:bg-zinc-900 px-1 text-[8px] font-black uppercase tracking-widest text-muted-foreground">Notes</span>
+                      {/* the absolute label here was a bit of a pain to align but looks good */} <span className="absolute -top-2 left-3 bg-background dark:bg-zinc-900 px-1 text-[8px] font-black uppercase tracking-widest text-muted-foreground">Notes</span>
                       <p className="text-xs font-medium text-foreground/90 dark:text-zinc-300 italic pt-1">
                         "{item.message}"
                       </p>
