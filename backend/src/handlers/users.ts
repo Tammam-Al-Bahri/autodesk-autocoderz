@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { CreateUser, safeUserSchema, UserId } from "@autocoderz/shared";
 import { createUser as createUserDB, searchUsers } from "../db/user";
+import { prisma } from "../lib/prisma"; 
 
 export async function getUsers(request: Request, response: Response, next: NextFunction) {
     try {
@@ -12,14 +13,49 @@ export async function getUsers(request: Request, response: Response, next: NextF
         }
 
         const users = await searchUsers(query);
-
+        
         const safeUsersSchema = safeUserSchema.omit({ email: true }).array();
         const safeUsers = safeUsersSchema.parse(users);
 
         response.send(safeUsers);
-        return;
     } catch (error) {
         next(error);
+    }
+}
+
+export async function getBuildingStaff(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { buildingId } = req.params;
+
+        if (!buildingId) {
+            return res.status(400).json({ error: { title: "Building ID is required" } });
+        }
+
+        const staffMembers = await (prisma as any).user.findMany({
+            where: {
+                staff: {
+                    some: {
+                        buildingId: String(buildingId),
+                        role: "MAINTENANCE",
+                        status: "ACCEPTED"
+                    }
+                }
+            },
+            select: { 
+                id: true, 
+                firstName: true, 
+                lastName: true 
+            }
+        });
+
+        const list = staffMembers.map((u: any) => ({
+            id: u.id,
+            name: `${u.firstName} ${u.lastName}`.trim()
+        }));
+
+        res.json({ data: list });
+    } catch (err) { 
+        next(err); 
     }
 }
 
@@ -34,8 +70,68 @@ export async function createUser(
         const user = await createUserDB(data);
         request.session.userId = user.id as UserId;
         response.status(201).json({ success: true });
-        return;
     } catch (error) {
         next(error);
     }
 }
+
+export const acceptStaffInvite = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { buildingId } = req.body;
+        const userId = (req as any).session?.userId;
+
+        if (!buildingId || !userId) {
+            return res.status(400).json({ error: { title: "Missing building or user ID" } });
+        }
+
+        await (prisma as any).buildingStaff.updateMany({
+            where: {
+                userId: String(userId),
+                buildingId: String(buildingId)
+            },
+            data: { status: "ACCEPTED" }
+        });
+
+        res.json({ success: true, message: "Invite accepted successfully!" });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = (req as any).session?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ error: { title: "Not authenticated" } });
+        }
+
+        const user = await (prisma as any).user.findUnique({
+            where: { id: String(userId) },
+            select: { id: true, firstName: true, lastName: true }
+        });
+
+        res.json({ data: user });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getMyTaskHistory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = (req as any).session?.userId;
+
+        if (!userId) {
+            return res.status(401).json({ error: { title: "Not authenticated" } });
+        }
+
+        const logs = await (prisma as any).taskLog.findMany({
+            where: { staffId: String(userId) },
+            orderBy: { completedAt: 'desc' }
+        });
+
+        res.json({ data: logs });
+    } catch (err) {
+        next(err);
+    }
+};

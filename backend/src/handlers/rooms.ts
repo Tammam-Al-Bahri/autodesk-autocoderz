@@ -1,75 +1,113 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 
-export const createRoom = async (req: Request, res: Response) => {
+export const getRooms = async (req: Request, res: Response) => {
     try {
-        console.log("--- New Room Creation Request ---");
-        const { number, type, buildingId } = req.body;
+        const buildingId = req.query.buildingId as string | undefined;
+        const whereClause = buildingId ? { buildingId: String(buildingId) } : {};
 
-        const existingRoom = await (prisma as any).room.findFirst({
-            where: {
-                number: String(number),
-                buildingId: String(buildingId)
-            }
+        const roomsData = await (prisma as any).room.findMany({
+            where: whereClause,
+            include: { bookings: { orderBy: { id: 'desc' }, take: 1 } },
+            orderBy: { number: 'asc' }
         });
 
-        if (existingRoom) {
-            console.log("Failed: Room number already exists in this building");
-            return res.status(400).json({
-                error: { 
-                    title: "Room already exists", 
-                    description: `Room ${number} is already registered in this building.` 
+        const statusMap: Record<string, string> = {
+            "AVAILABLE": "Clean", "OCCUPIED": "Occupied", "DIRTY": "Dirty", "MAINTENANCE": "Maintenance"
+        };
+
+        const results = roomsData.map((room: any) => ({
+            id: room.id,
+            number: room.number,
+            status: statusMap[room.status] || "Clean",
+            buildingId: room.buildingId,
+            guest: room.bookings?.[0]?.guestName || null,
+            bookingId: room.bookings?.[0]?.id || null, 
+            assignedToId: room.assignedToId || null,
+            assignedToName: room.assignedToName || null,
+            assignedByName: room.assignedByName || null
+        }));
+
+        res.json({ data: results });
+    } catch (err) {
+        res.status(500).json({ error: { title: "Could not load rooms" } });
+    }
+};
+
+export const assignRoomTask = async (req: Request, res: Response) => {
+    try {
+        const { roomId, staffId, staffName } = req.body;
+        const userId = (req as any).session?.userId;
+        let assignedBy = "Receptionist";
+
+        if (userId) {
+            const user = await (prisma as any).user.findUnique({
+                where: { id: String(userId) },
+                select: { firstName: true, lastName: true }
+            });
+            if (user) assignedBy = `${user.firstName} ${user.lastName}`.trim();
+        }
+
+        await (prisma as any).room.update({
+            where: { id: roomId },
+            data: { 
+                status: "MAINTENANCE",
+                assignedToId: staffId,
+                assignedToName: staffName,
+                assignedByName: assignedBy,
+                taskAssignedAt: new Date()
+            }
+        });
+        res.json({ message: "Staff assigned" });
+    } catch (e) { 
+        res.status(500).json({ error: { title: "Failed to assign staff" } }); 
+    }
+};
+
+export const markRoomAsClean = async (req: Request, res: Response) => {
+    try {
+        const { roomId, message } = req.body;
+        const room = await (prisma as any).room.findUnique({ where: { id: roomId } });
+
+        if (room && room.assignedToId) {
+            await (prisma as any).taskLog.create({
+                data: {
+                    roomId: room.id,
+                    roomNumber: room.number,
+                    staffId: room.assignedToId,
+                    staffName: room.assignedToName || "Staff",
+                    assignedByName: room.assignedByName || "Receptionist",
+                    message: message || null,
+                    assignedAt: room.taskAssignedAt || new Date(),
+                    completedAt: new Date()
                 }
             });
         }
 
-        const newRoom = await (prisma as any).room.create({
-            data: {
-                number: String(number),
-                type: String(type),
-                status: "AVAILABLE",
-                buildingId: String(buildingId)
+        await (prisma as any).room.update({
+            where: { id: roomId },
+            data: { 
+                status: "AVAILABLE", assignedToId: null, 
+                assignedToName: null, assignedByName: null, taskAssignedAt: null 
             }
         });
 
-        console.log(`Success! Room ${number} created.`);
-        res.status(201).json({ data: newRoom });
-
-    } catch (error: any) {
-        console.error("Room creation error:", error.message);
-        res.status(500).json({ error: { title: "Failed to create room" } });
+        res.json({ message: "Room marked as clean" });
+    } catch (err) { 
+        res.status(500).json({ error: { title: "Update failed" } }); 
     }
 };
 
-export const getRooms = async (req: Request, res: Response) => {
+export const checkOutRoom = async (req: Request, res: Response) => {
     try {
-        const { buildingId } = req.query;
-        
-        if (!buildingId) {
-            return res.status(400).json({ error: { title: "Building ID required" } });
-        }
+        await (prisma as any).room.update({ where: { id: req.body.roomId }, data: { status: "DIRTY" } });
+        res.json({ message: "Checked out" });
+    } catch (err) { res.status(500).json({ error: { title: "Error" } }); }
+};
 
-        const rooms = await (prisma as any).room.findMany({
-            where: { buildingId: String(buildingId) },
-            orderBy: { number: 'asc' }
-        });
-
-        const formattedRooms = rooms.map((room: any) => {
-            let frontendStatus = "Clean";
-            if (room.status === "OCCUPIED") frontendStatus = "Occupied";
-            if (room.status === "DIRTY" || room.status === "MAINTENANCE") frontendStatus = "Dirty";
-
-            return {
-                id: room.id,
-                number: room.number,
-                status: frontendStatus,
-                buildingId: room.buildingId,
-            };
-        });
-
-        res.json({ data: formattedRooms });
-    } catch (error) {
-        console.error("Error fetching rooms:", error);
-        res.status(500).json({ error: { title: "Could not retrieve rooms" } });
-    }
+export const createRoom = async (req: Request, res: Response) => {
+    try {
+        const room = await (prisma as any).room.create({ data: { ...req.body, status: "AVAILABLE" } });
+        res.status(201).json({ data: room });
+    } catch (error) { res.status(500).json({ error: { title: "Failed" } }); }
 };

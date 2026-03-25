@@ -1,5 +1,5 @@
 model Booking {
-  id String @id 
+  id String @id @default(cuid())
 
   guestName String
 

@@ -1,245 +1,213 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { apiFetch, apiUrl } from "@/lib/utils";
 import { toast } from "sonner";
 
-type RoomStatus = "Clean" | "Dirty" | "Occupied";
+type RoomStatus = "Clean" | "Dirty" | "Occupied" | "Maintenance";
 
 interface Room {
   id: string;
   number: string;
   status: RoomStatus;
   guest?: string;
+  bookingId?: string;
   buildingId: string;
+  assignedToName?: string;
 }
 
 const statusColors: Record<RoomStatus, string> = {
   Clean: "bg-green-500",
   Dirty: "bg-red-500",
-  Occupied: "bg-blue-500",
+  Occupied: "bg-blue-600",
+  Maintenance: "bg-amber-500",
 };
 
 export default function Receptionist() {
-  // Dynamically grab the building ID from the URL
   const { buildingId } = useParams<{ buildingId: string }>();
-
+  
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [staffList, setStaffList] = useState<{ id: string; name: string }[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [guestName, setGuestName] = useState("");
-  const [maintenanceNote, setMaintenanceNote] = useState("");
   const [loading, setLoading] = useState(false);
 
   const activeRoom = rooms.find((r) => r.id === activeRoomId) || null;
 
+  // Load everything when buildingId changes
   useEffect(() => {
     if (!buildingId) return;
 
-    async function fetchRooms() {
+    const loadData = async () => {
       try {
-        console.log("fetching rooms for building:", buildingId);
-        
-        const response = await apiFetch(`${apiUrl}/rooms?buildingId=${buildingId}`, {
-            method: "GET",
-            credentials: "include" 
-        });
-        
-        const json = await response.json();
+        const roomRes = await apiFetch(`${apiUrl}/rooms?buildingId=${buildingId}`, { credentials: "include" });
+        const roomData = await roomRes.json();
+        if (roomRes.ok) setRooms(roomData.data);
 
-        if (response.ok && json.data) {
-          setRooms(json.data);
-        } else {
-          console.error("Failed to load rooms:", json);
-        }
-      } catch (error) {
-        console.error("Error fetching rooms:", error);
+        const staffRes = await apiFetch(`${apiUrl}/users/buildings/${buildingId}/staff`, { credentials: "include" });
+        const staffData = await staffRes.json();
+        if (staffRes.ok) setStaffList(staffData.data);
+      } catch (err) {
+        toast.error("Error loading dashboard data");
       }
-    }
-
-    fetchRooms();
+    };
+    loadData();
   }, [buildingId]);
 
-  const checkInGuest = async () => {
-    if (!activeRoom || !guestName.trim()) return;
+  const handleCheckIn = async () => {
+    if (!activeRoom || !guestName.trim()) return toast.error("Guest name is required");
 
     setLoading(true);
+    const res = await apiFetch(`${apiUrl}/bookings`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ guestName, roomId: activeRoom.id, buildingId: activeRoom.buildingId }),
+    });
 
-    try {
-        const response = await apiFetch(`${apiUrl}/bookings`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                guestName: guestName,
-                buildingId: activeRoom.buildingId,
-                roomId: activeRoom.id
-            }),
-        });
-
-        const json = await response.json();
-
-        if (response.ok) {
-            const newBookingCode = json.data.id;
-            
-            setRooms((prev) =>
-              prev.map((room) =>
-                room.id === activeRoom.id
-                  ? { ...room, status: "Occupied", guest: guestName }
-                  : room
-              )
-            );
-
-            setGuestName("");
-            toast.success("Check-in Complete", {
-                description: `Give the guest this code: ${newBookingCode}`
-            });
-            
-            alert(`CHECK-IN SUCCESS\n\nPlease provide the guest with their portal access code:\n\n${newBookingCode}`);
-            
-        } else {
-            toast.error("Check-in Failed", { description: json.error?.title });
-        }
-    } catch (error) {
-        toast.error("Network Error", { description: "Could not reach the server." });
+    const data = await res.json();
+    if (res.ok) {
+      setRooms((prev) => prev.map((r) => 
+        r.id === activeRoom.id ? { ...r, status: "Occupied", guest: guestName, bookingId: data.data.id } : r
+      ));
+      setGuestName("");
+      toast.success("Check-in complete!");
+    } else {
+      toast.error("Could not complete booking");
     }
-    
     setLoading(false);
   };
 
-  const logMaintenance = () => {
-    if (!activeRoom || !maintenanceNote.trim()) return;
-    console.log(`Maintenance request for ${activeRoom.number}: ${maintenanceNote}`);
-    setMaintenanceNote("");
-    toast.success("Maintenance team notified.");
+  const handleCheckOut = async () => {
+    if (!activeRoom) return;
+    setLoading(true);
+    const res = await apiFetch(`${apiUrl}/rooms/checkout`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roomId: activeRoom.id }),
+    });
+
+    if (res.ok) {
+      setRooms((prev) => prev.map((r) => 
+        r.id === activeRoom.id ? { ...r, status: "Dirty", guest: undefined, bookingId: undefined } : r
+      ));
+      toast.success("Guest checked out");
+    }
+    setLoading(false);
   };
 
-  if (!buildingId) {
-      return (
-          <div className="flex justify-center items-center h-screen">
-              <p className="text-gray-500">Error: No building selected. Please navigate from the dashboard.</p>
-          </div>
-      );
-  }
+  const handleAssignTask = async (staffId: string) => {
+    const staff = staffList.find(s => s.id === staffId);
+    if (!activeRoom || !staff) return;
+
+    setLoading(true);
+    const res = await apiFetch(`${apiUrl}/rooms/assign`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roomId: activeRoom.id, staffId: staff.id, staffName: staff.name }),
+    });
+
+    if (res.ok) {
+      setRooms((prev) => prev.map((r) => 
+        r.id === activeRoom.id ? { ...r, status: "Maintenance", assignedToName: staff.name } : r
+      ));
+      toast.success(`Assigned to ${staff.name}`);
+    }
+    setLoading(false);
+  };
+
+  if (!buildingId) return <div className="p-10 text-center">No building selected.</div>;
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 px-4 mb-20">
-      <div className="mb-8 border-b pb-4">
-        <h1 className="text-3xl font-black tracking-tight">
-          Front Desk – Room Status
-        </h1>
-        <p className="text-gray-500 mt-2 text-sm">
-          Click a room to manage check-ins or report maintenance.
-        </p>
-      </div>
-
+    <div className="max-w-6xl mx-auto mt-10 px-4 pb-20">
+      <h1 className="text-3xl font-black mb-8 border-b pb-4">Receptionist Desk</h1>
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <Card className="bg-slate-50 border-dashed border-2">
-            <CardHeader>
-              <CardTitle className="text-slate-500">
-                Floor Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {rooms.map((room) => {
-                  const isActive = room.id === activeRoomId;
-
-                  return (
-                    <div
-                      key={room.id}
-                      onClick={() => setActiveRoomId(room.id)}
-                      className={`
-                        h-24 rounded-lg flex flex-col items-center justify-center
-                        text-white cursor-pointer transition shadow-sm hover:opacity-90
-                        ${statusColors[room.status]}
-                        ${isActive ? "ring-4 ring-slate-900 scale-105 z-10 shadow-lg" : ""}
-                      `}
-                    >
-                      <span className="text-xl font-bold">
-                        {room.number}
-                      </span>
-                      <span className="text-xs uppercase tracking-wider opacity-90 font-semibold">
-                        {room.status}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {rooms.map((room) => (
+            <div
+              key={room.id}
+              onClick={() => setActiveRoomId(room.id)}
+              className={`h-28 rounded-xl flex flex-col items-center justify-center text-white cursor-pointer transition shadow-md ${statusColors[room.status]} ${room.id === activeRoomId ? "ring-4 ring-black scale-105" : ""}`}
+            >
+              <span className="text-2xl font-black">{room.number}</span>
+              <span className="text-[10px] uppercase font-bold">{room.status}</span>
+              {room.status === "Occupied" && <span className="mt-1 text-[10px] bg-black/20 px-2 rounded truncate max-w-[90%]">{room.guest}</span>}
+            </div>
+          ))}
         </div>
 
-        <div>
+        <div className="space-y-4">
           {!activeRoom ? (
-            <Card className="h-full flex items-center justify-center border-dashed text-slate-400 font-semibold min-h-[400px]">
-              Select a room to begin.
+            <Card className="h-48 flex items-center justify-center text-slate-400 border-dashed border-2 font-bold">
+              Select a room to view details
             </Card>
           ) : (
-            <Card className="h-full flex flex-col">
-              <CardHeader className="border-b bg-slate-50">
+            <Card className="border-2 shadow-sm">
+              <CardHeader className="border-b p-6">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl font-bold">
-                    Room {activeRoom.number}
-                  </CardTitle>
-                  <Badge className={statusColors[activeRoom.status]}>
-                    {activeRoom.status}
-                  </Badge>
+                  <span className="text-2xl font-black">Room {activeRoom.number}</span>
+                  <Badge className={statusColors[activeRoom.status]}>{activeRoom.status}</Badge>
                 </div>
-                {activeRoom.guest && (
-                  <p className="text-sm text-gray-500 mt-1 font-medium">
-                    Guest: <span className="text-slate-900">{activeRoom.guest}</span>
-                  </p>
-                )}
               </CardHeader>
-
-              <CardContent className="p-6 flex flex-col gap-8 h-full">
-                {activeRoom.status === "Clean" ? (
-                  <div className="space-y-3">
-                    <h3 className="font-bold border-b pb-2 text-slate-700">
-                      Check-in Guest
-                    </h3>
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-400 uppercase">Guest Name</label>
-                        <Input
-                        value={guestName}
-                        onChange={(e) => setGuestName(e.target.value)}
-                        placeholder="e.g. Jane Doe"
-                        className="bg-slate-50"
-                        />
-                    </div>
-                    <Button 
-                        onClick={checkInGuest} 
-                        disabled={loading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 font-bold mt-2 text-white"
-                    >
-                      {loading ? "Generating Code..." : "Generate Access Code"}
+              
+              <CardContent className="p-6">
+                {activeRoom.status === "Clean" && (
+                  <div className="space-y-4">
+                    <Input 
+                      value={guestName} 
+                      onChange={(e) => setGuestName(e.target.value)} 
+                      placeholder="Guest Name..." 
+                      className="h-12 border-2 font-bold"
+                    />
+                    <Button onClick={handleCheckIn} disabled={loading} className="w-full h-12 bg-blue-600 font-bold">
+                      Check-In Guest
                     </Button>
                   </div>
-                ) : (
-                  <div className="bg-slate-100 p-4 rounded-lg text-center text-sm font-medium text-slate-500">
-                    Room must be marked clean before assigning a guest.
+                )}
+
+                {activeRoom.status === "Occupied" && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-blue-50 border-2 border-blue-100 rounded-xl">
+                      <p className="text-[10px] font-bold text-blue-400 uppercase">Guest</p>
+                      <p className="text-lg font-bold">{activeRoom.guest}</p>
+                      {activeRoom.bookingId && (
+                        <div className="mt-2">
+                          <p className="text-[10px] font-bold text-blue-400 uppercase">Code</p>
+                          <p className="font-mono font-bold text-blue-600">{activeRoom.bookingId.slice(-6).toUpperCase()}</p>
+                        </div>
+                      )}
+                    </div>
+                    <Button onClick={handleCheckOut} disabled={loading} className="w-full h-12 bg-rose-600 font-bold">
+                      Check-Out
+                    </Button>
                   </div>
                 )}
 
-                <div className="space-y-3 mt-auto">
-                  <h3 className="font-bold border-b pb-2 text-rose-500">
-                    Maintenance
-                  </h3>
-                  <Input
-                    value={maintenanceNote}
-                    onChange={(e) => setMaintenanceNote(e.target.value)}
-                    placeholder="Describe the issue..."
-                    className="bg-slate-50"
-                  />
-                  <Button variant="outline" className="w-full font-bold" onClick={logMaintenance}>
-                    Submit Ticket
-                  </Button>
-                </div>
+                {activeRoom.status === "Dirty" && (
+                  <div className="space-y-4">
+                    <select 
+                      className="w-full h-12 border-2 rounded-xl px-3 font-bold bg-white"
+                      onChange={(e) => handleAssignTask(e.target.value)}
+                      value=""
+                    >
+                      <option value="" disabled>Select Staff...</option>
+                      {staffList.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
+                  </div>
+                )}
+
+                {activeRoom.status === "Maintenance" && (
+                  <div className="p-4 bg-amber-50 border-2 border-amber-100 rounded-xl text-center">
+                    <p className="text-[10px] font-bold text-amber-500 uppercase">Worker Assigned</p>
+                    <p className="text-lg font-black text-amber-700">{activeRoom.assignedToName}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
