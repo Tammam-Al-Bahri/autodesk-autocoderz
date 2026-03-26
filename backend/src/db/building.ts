@@ -138,7 +138,7 @@ export async function updateBuildingFromId(
             if (error.code === "P2002") {
                 throw {
                     error: {
-                        title: "Buidling already exists for this company",
+                        title: "Building already exists for this company",
                         description: "Please use a different building name.",
                     },
                 };

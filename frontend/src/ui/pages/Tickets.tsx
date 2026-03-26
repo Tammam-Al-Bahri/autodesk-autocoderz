@@ -259,7 +259,7 @@ export default function Tickets() {
                                         onChange={e => setTicketPriority(e.target.value)}
                                         className="h-10 px-3 rounded-lg bg-muted text-foreground text-[10px] font-black uppercase border-none outline-none ring-1 ring-border">
                                         <option value="LOW">Low Priority</option>
-                                        <option value="MED">Medium</option>
+                                        <option value="MED">Medium Priority</option>
                                         <option value="HIGH">High Priority</option>
                                     </select>
                                 </div>
