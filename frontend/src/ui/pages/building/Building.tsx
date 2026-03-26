@@ -297,7 +297,7 @@ export default function Building() {
             <div className="text-center p-6 text-muted-foreground text-sm font-bold">Loading rooms...</div>
           ) : rooms.length === 0 ? (
             <div className="text-center p-8 border-2 border-dashed border-border/50 dark:border-border/30 bg-muted/20 dark:bg-muted/5 rounded-xl text-muted-foreground font-bold text-sm">
-              No rooms added yet. Click "+ Add New Room" to get started.
+              No rooms added yet. Click "++ Add New Room" to get started.
             </div>
           ) : (
             rooms.map((room: any) => (
