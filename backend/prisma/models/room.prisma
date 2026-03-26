@@ -5,7 +5,7 @@ model Room {
   buildingId String
 
   number String
-  type   RoomType
+  type   String
   status RoomStatus
 
   assignedToId   String?
@@ -15,11 +15,6 @@ model Room {
 
   tickets  Ticket[]
   bookings Booking[]
-}
-
-enum RoomType {
-  SINGLE
-  DOUBLE
 }
 
 enum RoomStatus {

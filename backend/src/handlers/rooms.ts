@@ -20,6 +20,7 @@ export const getRooms = async (req: Request, res: Response) => {
         const results = roomsData.map((room: any) => ({
             id: room.id,
             number: room.number,
+            type: room.type,
             status: statusMap[room.status] || "Clean",
             buildingId: room.buildingId,
             guest: room.bookings?.[0]?.guestName || null,

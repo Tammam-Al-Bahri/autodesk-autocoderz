@@ -40,11 +40,14 @@ export default function Building() {
   const [submitLoading, setSubmitLoading] = useState(false);
 
   // rooms state
+  
   const [rooms, setRooms] = useState<any>([]);
   const [roomsLoading, setRoomsLoading] = useState(true);
   const [editingRoomId, setEditingRoomId] = useState<any>(null);
   const [editRoomNumber, setEditRoomNumber] = useState("");
   const [editRoomType, setEditRoomType] = useState("SINGLE");
+  const [customRoomType, setCustomRoomType] = useState("");
+  const [editCustomRoomType, setEditCustomRoomType] = useState("");
 
   const fetchRooms = async (showLoad = true) => {
     if (!buildingId) return;
@@ -87,7 +90,8 @@ export default function Building() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           number: newRoomNumber,
-          type: newRoomType,
+          // If they selected OTHER send the custom text Otherwise send the dropdown choice.
+          type: newRoomType === "OTHER" ? customRoomType : newRoomType,
           buildingId: buildingId
         }),
       });
@@ -130,7 +134,18 @@ export default function Building() {
   const startEditingRoom = (r: any) => {
     setEditingRoomId(r.id);
     setEditRoomNumber(r.number);
-    setEditRoomType(r.type || "SINGLE");
+    // Check if it's one of the standard options
+    const standardTypes = ["SINGLE", "DOUBLE", "STUDIO", "CONFERENCE"];
+    
+    if (standardTypes.includes(r.type)) {
+      // It's a standard room
+      setEditRoomType(r.type);
+      setEditCustomRoomType("");
+    } else {
+      // It's a custom room so select OTHER in the dropdown and fill the text box
+      setEditRoomType("OTHER");
+      setEditCustomRoomType(r.type || "");
+    }
   };
 
   const handleUpdateRoom = async (roomId: string) => {
@@ -145,7 +160,7 @@ export default function Building() {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ number: editRoomNumber, type: editRoomType })
+        body: JSON.stringify({ number: editRoomNumber, type: editRoomType === "OTHER" ? editCustomRoomType : editRoomType })
       });
 
       if (res.ok) {
@@ -298,14 +313,30 @@ export default function Building() {
                         placeholder="Room Number" 
                         className="font-bold w-32 bg-background dark:bg-zinc-950 border-input dark:border-border/40 text-foreground"
                       />
-                      <select 
-                        className="h-10 border border-input dark:border-border/40 rounded-md px-3 font-bold bg-background dark:bg-zinc-950 text-foreground outline-none focus:ring-2 focus:ring-primary/50"
-                        value={editRoomType}
-                        onChange={(e) => setEditRoomType(e.target.value)}
-                      >
-                        <option value="SINGLE">Single</option>
-                        <option value="DOUBLE">Double</option>
-                      </select>
+                      <div className="flex flex-col gap-1">
+                        <select 
+                          className="h-10 border border-input dark:border-border/40 rounded-md px-3 font-bold bg-background dark:bg-zinc-950 text-foreground outline-none focus:ring-2 focus:ring-primary/50"
+                          value={editRoomType}
+                          onChange={(e) => setEditRoomType(e.target.value)}
+                        >
+                          <option value="SINGLE">Single</option>
+                          <option value="DOUBLE">Double</option>
+                          <option value="STUDIO">Studio</option>
+                          <option value="CONFERENCE">Conference Room</option>
+                          <option value="OTHER">Other...</option>
+                        </select>
+                        
+                        {editRoomType === "OTHER" && (
+                          <input 
+                            type="text" 
+                            required
+                            value={editCustomRoomType}
+                            onChange={(e) => setEditCustomRoomType(e.target.value)}
+                            className="h-8 text-sm border border-input dark:border-border/40 bg-background dark:bg-zinc-950 text-foreground px-2 rounded-md font-bold outline-none focus:ring-2 focus:ring-primary/50"
+                            placeholder="Custom type..."
+                          />
+                        )}
+                      </div>
                       <div className="flex gap-2 ml-auto">
                         <Button 
                           onClick={() => handleUpdateRoom(room.id)} 
@@ -414,7 +445,21 @@ export default function Building() {
                 >
                   <option value="SINGLE">Single</option>
                   <option value="DOUBLE">Double</option>
+                  <option value="STUDIO">Studio</option>
+                  <option value="CONFERENCE">Conference Room</option>
+                  <option value="OTHER">Other (Custom)...</option>
                 </select>
+                
+                {newRoomType === "OTHER" && (
+                  <input 
+                    type="text" 
+                    required
+                    value={customRoomType}
+                    onChange={(e) => setCustomRoomType(e.target.value)}
+                    className="w-full mt-2 border border-input dark:border-border/40 bg-background dark:bg-zinc-950 text-foreground p-2 rounded-md font-bold outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    placeholder="Enter custom room type..."
+                  />
+                )}
               </div>
 
               <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-border/50 dark:border-border/20">
