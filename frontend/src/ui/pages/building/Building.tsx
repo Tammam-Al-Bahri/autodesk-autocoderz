@@ -241,7 +241,7 @@ export default function Building() {
     fetchData();
   }, [buildingId]);
 
-  if (!buildingId) return <div>No building found</div>;
+  if (!buildingId) return <div>Noo building found</div>;
 
   return (
     <div className="max-w-5xl mx-auto w-full p-6 space-y-6">
