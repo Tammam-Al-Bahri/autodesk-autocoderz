@@ -1,3 +1,4 @@
+// extract all these session.userId checks into an auth middleware, copying and pasting this is getting annoying
 import type { NextFunction, Request, Response } from "express";
 import { BuildingGroupId, buildingGroupId, CreateBuildingGroup, UserId } from "@autocoderz/shared";
 import {
@@ -26,6 +27,7 @@ export async function createBuildingGroup(
     }
 
     try {
+        // console.log("Creating new building group for user:", userId);
         const buildingGroup = await createBuildingGroupDB(userId, data);
         response.status(201).json({ success: true, data: buildingGroup });
         return;
@@ -91,7 +93,7 @@ export async function deleteBuildingGroup(
             response.status(500).json({
                 error: {
                     title: "Could not delete",
-                    description: "",
+                    description: "Database refused to delete it", // probably a foreign key issue again
                 },
             });
             return;
@@ -109,7 +111,7 @@ export async function updateBuildingGroup(
     next: NextFunction,
 ) {
     const data = request.body;
-    const userId = request.session.userId as UserId;
+    const userId = request.session.userId as UserId; // forcing type here because session types are still broken
 
     if (!userId) {
         response.status(401).json({
@@ -133,7 +135,7 @@ export async function updateBuildingGroup(
     }
     try {
         const buildingGroup = await updateBuildingGroupFromId(userId, buildingGroupId, data);
-        response.status(201).json({ success: true, data: buildingGroup });
+        response.status(201).json({ success: true, data: buildingGroup }); // returning 201 for an update fix it later
         return;
     } catch (error) {
         next(error);

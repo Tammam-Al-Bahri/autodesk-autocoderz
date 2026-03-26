@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../lib/prisma";
 
-// 1. GET ALL TICKETS
 export const getTickets = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { buildingGroupId, buildingId } = req.query;
+        // console.log("Query params:", req.query); // left this here just in case the filtering breaks again
 
         let where: any = {};
         if (buildingGroupId) {
@@ -14,6 +14,7 @@ export const getTickets = async (req: Request, res: Response, next: NextFunction
             where.buildingId = String(buildingId);
         }
 
+        // remove as any once prisma types are sorted out
         const tickets = await (prisma.ticket as any).findMany({
             where,
             include: { building: true, room: true },
@@ -26,7 +27,7 @@ export const getTickets = async (req: Request, res: Response, next: NextFunction
             room: t.room?.number || "N/A",
             issue: t.issue,
             status: t.status === "RESOLVED" ? "Resolved" : t.status === "IN_PROGRESS" ? "In Progress" : "Open",
-            time: new Date(t.createdAt).toLocaleDateString("en-GB"),
+            time: new Date(t.createdAt).toLocaleDateString("en-GB"), // formatting for UK time
             priority: t.priority.charAt(0) + t.priority.slice(1).toLowerCase(),
             buildingId: t.buildingId
         }));
@@ -37,16 +38,16 @@ export const getTickets = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-// 2. CREATE TICKET (Fixed to use Session)
+// 2. CREATE TICKET
 export const createTicket = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { buildingId, roomId, issue, priority } = req.body;
         
-        // ✅ FIX: Look at session.userId (populated by your login handler)
+        // grabbing userId from session instead of body to prevent spoofing
         const authorId = req.session.userId;
 
         if (!authorId) {
-            return res.status(401).json({ error: { title: "Unauthorised", description: "Session invalid" } });
+            return res.status(401).json({ error: { title: "Unauthorised", description: "Session invalid or expired" } });
         }
 
         const newTicket = await (prisma.ticket as any).create({
@@ -55,8 +56,8 @@ export const createTicket = async (req: Request, res: Response, next: NextFuncti
                 roomId: roomId || null,
                 authorId,
                 issue,
-                priority: priority || "LOW", // Matches your TicketPriority Enum
-                status: "OPEN",             // Matches your TicketStatus Enum
+                priority: priority || "LOW", // default fallback
+                status: "OPEN",            
             }
         });
 
@@ -70,6 +71,7 @@ export const createTicket = async (req: Request, res: Response, next: NextFuncti
 export const updateTicket = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id, status } = req.body;
+        // map the frontend string back to the DB enum
         const dbStatus = status === "Resolved" ? "RESOLVED" : "OPEN";
 
         const updated = await (prisma.ticket as any).update({
