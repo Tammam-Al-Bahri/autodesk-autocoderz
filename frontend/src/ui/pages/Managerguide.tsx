@@ -1,3 +1,4 @@
+// I'm adding this guide because the mark scheme mentioned "user documentation" but I'm just putting it in the app so it's easier to find lol
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
     LayoutDashboard, 
@@ -13,7 +14,7 @@ export default function ManagerGuide() {
     const steps = [
         {
             title: "1. Register a Company",
-            description: "Start by registering your organisation. Provide a company name and a brief description to set up your main portfolio workspace.",
+            description: "Start by registering your organisation. Provide a company name and a brief description to get the workspace started.",
             icon: <Briefcase className="w-6 h-6 text-primary" />
         },
         {
@@ -28,7 +29,7 @@ export default function ManagerGuide() {
         },
         {
             title: "4. Configure Rooms",
-            description: "Click on the specific property you want to view to configure its interior. You can add new rooms, as well as edit or delete existing ones.",
+            description: "Click on a property to add the rooms. You can edit or delete them later if you mess up the room numbers.",
             icon: <PlusCircle className="w-6 h-6 text-primary" />
         },
         {
@@ -38,7 +39,7 @@ export default function ManagerGuide() {
         },
         {
             title: "6. Upload 3D BIM Model",
-            description: "Upload your Autodesk Revit (.rvt) model. The system synchronises with the cloud translation service to generate an interactive 3D viewer of the building.",
+            description: "Upload your Revit (.rvt) file. It has to go through the cloud thing to turn it into the 3D view we use.", // this part takes ages to load sometimes depending on the file size
             icon: <CloudUpload className="w-6 h-6 text-primary" />
         }
     ];
@@ -47,12 +48,13 @@ export default function ManagerGuide() {
         <div className="max-w-4xl mx-auto p-6 space-y-8">
             <div className="text-center space-y-2">
                 <h1 className="text-4xl font-black tracking-tight text-foreground">
-                    Managerial Operations Guide
+                    Managers Guide
                 </h1>
                 <p className="text-muted-foreground">
-                    Follow these steps to fully initialise and manage your digital estate.
+                    How to get everything set up so the staff actually have something to look at.
                 </p>
             </div>
+
 
             <div className="grid gap-6">
                 {steps.map((step, index) => (
