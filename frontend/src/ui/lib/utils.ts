@@ -13,8 +13,10 @@ export const isElectron = import.meta.env.VITE_BUILD_TARGET === "electron";
 export async function apiFetch(url: string, options: RequestInit = {}) {
     const sid = isElectron ? localStorage.getItem("sid") : undefined;
 
+    const isFormData = options.body instanceof FormData;
+
     const headers = {
-        "Content-Type": "application/json", 
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(options.headers ?? {}),
         ...(sid ? { Authorization: `Session ${sid}` } : {}),
     };
