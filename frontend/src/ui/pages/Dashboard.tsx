@@ -12,7 +12,7 @@ import {
   Loader2
 } from "lucide-react";
 import { cn, apiFetch, apiUrl } from "@/lib/utils";
-import { buildingsBase, buildingGroupsBase, ticketsBase, type Building } from "@autocoderz/shared";
+import { buildingsBase, buildingGroupsBase, ticketsBase } from "@autocoderz/shared";
 import { toast } from "sonner";
 
 // formatting helpers
