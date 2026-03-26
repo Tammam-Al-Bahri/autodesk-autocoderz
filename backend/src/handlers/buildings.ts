@@ -70,13 +70,14 @@ export async function getBuildings(request: Request, response: Response, next: N
     }
 }
 
+// TODO: standardise these error messages across all files
 export async function uploadBuildingModel(
     request: Request,
     response: Response,
     next: NextFunction,
 ) {
     try {
-        const jobId = randomUUID();
+        const jobId = randomUUID(); // console.log("Starting APS upload job:", jobId);
         const createdAt = Date.now();
 
         request.session.activeUploads = {
@@ -112,7 +113,7 @@ export async function uploadBuildingModel(
         // respond immediately
         response.status(200).json({ jobId });
 
-        // then upload
+        // then upload in the background so the user doesn't have to wait
         void processApsUpload({
             jobId,
             createdAt,
@@ -135,6 +136,7 @@ export async function createBuildingStaffInvite(
     const data = request.body;
     if (data.userId === request.session.userId) {
         response.status(400).json({ error: { title: "Can not invite yourself", description: "" } });
+        return; // added return here because I kept getting the 'headers already sent' crash
     }
     const userId = request.session.userId;
 
@@ -143,7 +145,7 @@ export async function createBuildingStaffInvite(
         if (!canInvite) {
             response.status(403).json({
                 error: {
-                    title: "Unauthorized",
+                    title: "Unauthorised",
                     description: "You do not have permission to invite staff to this building",
                 },
             });
@@ -170,10 +172,10 @@ export async function createBuildingStaffInvite(
 export async function getBuildingStaff(request: Request, response: Response, next: NextFunction) {
     try {
         const { buildingId } = request.query;
-        const parsedId = buildingIdSchema.parse(buildingId);
+        const parsedId = buildingIdSchema.parse(buildingId); // using .parse instead of .safeParse here so it just throws straight to the catch block if it fails. Less code to write coz im a bit lazy lol.
 
         const buildingStaff = await getBuildingStaffFromBuildingId(parsedId);
-        response.status(201).json({ success: true, data: buildingStaff });
+        response.status(201).json({ success: true, data: buildingStaff }); // another 201 for a GET request, need to do a pass over these status codes later
         return;
     } catch (error) {
         next(error);
@@ -229,7 +231,7 @@ export async function updateBuilding(
     next: NextFunction,
 ) {
     const data = request.body;
-    const userId = request.session.userId as UserId;
+    const userId = request.session.userId as UserId; // casting as UserId because session types are still a bit messy
 
     if (!userId) {
         response.status(401).json({

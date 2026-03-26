@@ -14,7 +14,7 @@ export async function getUsers(request: Request, response: Response, next: NextF
 
         const users = await searchUsers(query);
         
-        const safeUsersSchema = safeUserSchema.omit({ email: true }).array();
+        const safeUsersSchema = safeUserSchema.omit({ email: true }).array(); // stripping emails here so we don't leak them to the frontend search
         const safeUsers = safeUsersSchema.parse(users);
 
         response.send(safeUsers);
@@ -25,6 +25,7 @@ export async function getUsers(request: Request, response: Response, next: NextF
 
 export async function getBuildingStaff(req: Request, res: Response, next: NextFunction) {
     try {
+        // I need to stop switching between req, res and request, response in this file
         const { buildingId } = req.params;
 
         if (!buildingId) {
@@ -36,7 +37,7 @@ export async function getBuildingStaff(req: Request, res: Response, next: NextFu
                 staff: {
                     some: {
                         buildingId: String(buildingId),
-                        role: "MAINTENANCE",
+                        role: "MAINTENANCE", // hardcoding this for now need to pass this in as a param later if we add receptionists
                         status: "ACCEPTED"
                     }
                 }
@@ -68,7 +69,7 @@ export async function createUser(
 
     try {
         const user = await createUserDB(data);
-        request.session.userId = user.id as UserId;
+        request.session.userId = user.id as UserId; // auto login the user immediately after registering
         response.status(201).json({ success: true });
     } catch (error) {
         next(error);
@@ -84,7 +85,7 @@ export const acceptStaffInvite = async (req: Request, res: Response, next: NextF
             return res.status(400).json({ error: { title: "Missing building or user ID" } });
         }
 
-        await (prisma as any).buildingStaff.updateMany({
+        await (prisma as any).buildingStaff.updateMany({ // using updatemany instead of update just in case the staff accidentally got invited twice
             where: {
                 userId: String(userId),
                 buildingId: String(buildingId)
@@ -127,7 +128,7 @@ export const getMyTaskHistory = async (req: Request, res: Response, next: NextFu
 
         const logs = await (prisma as any).taskLog.findMany({
             where: { staffId: String(userId) },
-            orderBy: { completedAt: 'desc' }
+            orderBy: { completedAt: 'desc' } // probably need to paginate this eventually before it crashes the app
         });
 
         res.json({ data: logs });

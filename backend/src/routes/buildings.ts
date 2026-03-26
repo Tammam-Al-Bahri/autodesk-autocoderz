@@ -26,9 +26,12 @@ router.post(`${buildingsBase}`, requireAuth, validate(createBuildingSchema), cre
 router.post(
     `${buildingsBase}${buildingsRoutes.upload}`,
     requireAuth,
-    upload.single("file"),
+    upload.single("file"), // // hopefully it doesn't crash the server if someone uploads a like a very big file something like 10gb lol
     uploadBuildingModel,
 );
+
+// probably should have made invites its own router file but whatever it's fine here
+
 router.post(
     `${buildingsBase}${buildingsRoutes.invite}`,
     requireAuth,
@@ -36,6 +39,6 @@ router.post(
     createBuildingStaffInvite,
 );
 router.delete(`${buildingsBase}`, requireAuth, deleteBuilding);
-router.patch(`${buildingsBase}`, requireAuth, validate(createBuildingSchema), updateBuilding);
+router.patch(`${buildingsBase}`, requireAuth, validate(createBuildingSchema), updateBuilding); // doing the lazy schema reuse thing again here
 
 export default router;
