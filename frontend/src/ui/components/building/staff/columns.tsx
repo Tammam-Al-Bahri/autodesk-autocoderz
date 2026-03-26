@@ -1,8 +1,12 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { type BuildingStaffTable } from "@autocoderz/shared";
 import { formatEnum } from "@/lib/utils";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export const columns: ColumnDef<BuildingStaffTable>[] = [
+export const getColumns = (
+    onRemove: (staffId: string) => void
+): ColumnDef<BuildingStaffTable>[] => [
     {
         accessorKey: "name",
         header: "Name",
@@ -38,4 +42,24 @@ export const columns: ColumnDef<BuildingStaffTable>[] = [
             return <div>{formatEnum(row.getValue("status"))}</div>;
         },
     },
+    {
+        id: "actions",
+        header: "",
+        cell: ({ row }) => {
+            return (
+                <div className="text-right">
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => onRemove(row.original.id)}
+                        className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </Button>
+                </div>
+            );
+        },
+    },
 ];
+
+

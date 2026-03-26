@@ -1,16 +1,18 @@
-import { columns } from "./columns";
+import { getColumns } from "./columns";
 import { type BuildingStaffTable } from "@autocoderz/shared";
 import { DataTable } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
+
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Props = {
     data: BuildingStaffTable[];
     loading: boolean;
+    onRemove: (staffId: string) => void;
 };
 
-export default function BuildingStaffTable({ data, loading }: Props) {
+export default function BuildingStaffTable({ data, loading, onRemove }: Props) {
     if (loading) {
         return (
             <Card className="p-6">
@@ -31,7 +33,7 @@ export default function BuildingStaffTable({ data, loading }: Props) {
                 {data.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No staff added yet.</p>
                 ) : (
-                    <DataTable columns={columns} data={data} />
+                    <DataTable columns={getColumns(onRemove)} data={data} />
                 )}
             </CardContent>
         </Card>

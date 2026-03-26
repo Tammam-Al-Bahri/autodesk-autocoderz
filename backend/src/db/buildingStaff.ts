@@ -99,3 +99,16 @@ export async function updateBuildingStaffStatus(
         throw handlePrismaError(error);
     }
 }
+
+export async function deleteBuildingStaff(id: BuildingStaffId) {
+    try {
+        const deletedStaff = await prisma.buildingStaff.delete({
+            where: {
+                id,
+            },
+        });
+        return deletedStaff;
+    } catch (error) {
+        throw handlePrismaError(error);
+    }
+}

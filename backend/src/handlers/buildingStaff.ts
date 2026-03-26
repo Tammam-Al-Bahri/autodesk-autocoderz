@@ -1,9 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
-import { getBuildingsWhereStaffFromUserId, updateBuildingStaffStatus } from "../db/buildingStaff";
+import { getBuildingsWhereStaffFromUserId, updateBuildingStaffStatus, deleteBuildingStaff } from "../db/buildingStaff";
 import {
     buildingId as buildingIdSchema,
     buildingStaffIdSchema,
-    UpdateBuildingStaffStatus,
+    UpdateBuildingStaffStatus
 } from "@autocoderz/shared";
 
 export async function getStaffBuildings(request: Request, response: Response, next: NextFunction) {
@@ -52,6 +52,32 @@ export async function manageInvite(
         return response.json({
             data: { success: true },
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// just throwing this at the bottom to handle the trash can clicks
+export async function removeStaffMember(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) {
+    try {
+        const { id } = request.params;
+
+        // Pass the raw string through your Zod schema to turn it into a BuildingStaffId
+        const parsedId = buildingStaffIdSchema.safeParse(id);
+
+        if (!parsedId.success) {
+            response.status(400).json({ error: "Invalid staff ID format" });
+            return;
+        }
+
+        // Now TypeScript knows parsedId.data is the exact VIP string it needs
+        await deleteBuildingStaff(parsedId.data);
+
+        return response.status(200).json({ success: true });
     } catch (error) {
         next(error);
     }
