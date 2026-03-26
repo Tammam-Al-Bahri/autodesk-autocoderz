@@ -18,7 +18,7 @@ import {
 } from "@autocoderz/shared";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Building2, ChevronRight } from "lucide-react";
+import { Building2, ChevronRight, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Building() {
@@ -157,6 +157,26 @@ export default function Building() {
       }
     } catch (err) {
       toast.error("Network error");
+    }
+  };
+
+  const removeStaff = async (id: string) => {
+    if (!window.confirm("Are you sure you want to remove this staff member?")) return;
+
+    try {
+      let res = await apiFetch(apiUrl + "/staff/" + id, { 
+        method: "DELETE", 
+        credentials: "include" 
+      });
+
+      if (res.ok) {
+        toast.success("Staff member removed and synchronised!");
+        setStaff((prev: any) => prev.filter((s: any) => s.id !== id));
+      } else {
+        toast.error("Could not remove staff. Check your permissions.");
+      }
+    } catch (err) {
+      toast.error("Network error - is the server down?");
     }
   };
 
@@ -330,7 +350,7 @@ export default function Building() {
 
       <section className="space-y-2">
         <h2 className="text-sm font-medium text-foreground">Staff</h2>
-        <BuildingStaffTable data={staff} loading={staffLoading} />
+        <BuildingStaffTable data={staff} loading={staffLoading} onRemove={removeStaff} />
       </section>
 
       {/* Model Section */}
