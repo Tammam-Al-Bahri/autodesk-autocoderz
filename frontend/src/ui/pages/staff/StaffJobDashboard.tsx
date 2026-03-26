@@ -55,28 +55,13 @@ export default function StaffJobDashboard() {
     // }
 
     if (data[0].role === "RECEPTIONIST") {
-        return (
-            <>
-                <div className="flex-col">
-                    <div>staff role: {data[0].role}</div>
-                    <div>staff status: {data[0].status}</div>
-                    <div>buidling id: {buildingId}</div>
-                    <div>buidling company id: {data[0].building.buildingGroupId}</div>
-                    <div>buidling name: {data[0].building.name}</div>
-                    <div>buidling address: {data[0].building.address}</div>
-                    <div>buidling type: {data[0].building.type}</div>
-                    <div>buidling status: {data[0].building.status}</div>
-                    <div>urn: {data[0].building.urn}</div>
-                </div>
-                <Receptionist />
-            </>
-        );
+        return <Receptionist buildingName={data[0].building.name} />;
     }
 
     if (data[0].role === "MAINTENANCE") {
         return (
             <>
-                <div className="flex-col">
+                {/* <div className="flex-col">
                     <div>staff role: {data[0].role}</div>
                     <div>staff status: {data[0].status}</div>
                     <div>buidling id: {buildingId}</div>
@@ -85,8 +70,8 @@ export default function StaffJobDashboard() {
                     <div>buidling address: {data[0].building.address}</div>
                     <div>buidling type: {data[0].building.type}</div>
                     <div>buidling status: {data[0].building.status}</div>
-                </div>
-                <StaffTasks />
+                </div> */}
+                <StaffTasks buildingName={data[0].building.name} />
             </>
         );
     }
