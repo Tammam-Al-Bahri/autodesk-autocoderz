@@ -94,6 +94,7 @@ export default function Tickets() {
     const shownTickets = activeFilter === "All" ? ticketData : ticketData.filter(t => t.status === activeFilter);
     const numOpen = ticketData.filter(t => t.status === "Open").length;
 
+    // I should probably add a character limit to the textarea but whatever
     const submitTicket = async (e: React.FormEvent) => {
         // stops the page from refreshing when hit submit
         e.preventDefault();
@@ -129,8 +130,9 @@ export default function Tickets() {
                 toast.error("Not logged in");
             }
         } catch(e) {
-            toast.error("Submit failed");
-        }
+            console.error("fetch failed big time", e);
+    toast.error("Couldn't load tickets - check if server is actually up");
+}
 
         setIsSending(false);
     };
@@ -163,10 +165,10 @@ export default function Tickets() {
                 <div>
                     <div className="flex items-center gap-2 text-primary mb-2">
                         <Activity className="w-5 h-5" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em]">Operational Live Feed</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-blue-600">Tickets</span>
                     </div>
-                    <h1 className="text-4xl font-black uppercase tracking-tighter">Maintenance</h1>
-                    <p className="text-muted-foreground text-sm italic mt-1">Fiktional Estates Group Central Registry.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Maintenance Dashboard</h1>
+                    <p className="text-muted-foreground text-sm mt-1">Tickets.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -180,7 +182,7 @@ export default function Tickets() {
                         className={cn("rounded-xl border-2 h-12 w-12", isLoading && "animate-spin")}>
                         <RefreshCcw className="w-5 h-5" />
                     </Button>
-                    <Button onClick={() => setFormOpen(!formOpen)} className="h-12 px-6 rounded-xl font-black uppercase text-[11px] tracking-widest">
+                    <Button onClick={() => setFormOpen(!formOpen)} className="h-10 px-4 rounded-md font-bold bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800">
                         {formOpen
                             ? <><X className="mr-2 w-4 h-4" />Close</>
                             : <><Plus className="mr-2 w-4 h-4" />Raise Ticket</>}
@@ -204,7 +206,7 @@ export default function Tickets() {
                                     <select
                                         value={chosenCompany}
                                         onChange={e => setChosenCompany(e.target.value)}
-                                        className="w-full h-11 px-3 rounded-xl bg-muted text-foreground text-sm font-medium border-none outline-none focus:ring-2 focus:ring-primary/30 appearance-none cursor-pointer">
+                                        className="w-full h-10 px-2 rounded-md border border-input bg-background text-sm focus:ring-1 focus:ring-ring outline-none dark:bg-zinc-950">
                                         <option value="">Select Company...</option>
                                         {companyList.map(c => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
@@ -219,7 +221,7 @@ export default function Tickets() {
                                         value={chosenBuilding}
                                         onChange={e => setChosenBuilding(e.target.value)}
                                         disabled={!chosenCompany}
-                                        className="w-full h-11 px-3 rounded-xl bg-muted text-foreground text-sm font-medium border-none outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-40 appearance-none">
+                                        className="w-full h-11 px-3 rounded-xl bg-muted text-foreground text-sm font-medium border-none outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-40">
                                         <option value="">Select Building...</option>
                                         {buildingList.map(b => (
                                             <option key={b.id} value={b.id}>{b.name}</option>
@@ -233,7 +235,7 @@ export default function Tickets() {
                                         value={chosenRoom}
                                         onChange={e => setChosenRoom(e.target.value)}
                                         disabled={!chosenBuilding}
-                                        className="w-full h-11 px-3 rounded-xl bg-muted text-foreground text-sm font-medium border-none outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-40 appearance-none">
+                                        className="w-full h-11 px-3 rounded-xl bg-muted text-foreground text-sm font-medium border-none outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-40">
                                         <option value="">General / Room...</option>
                                         {roomList.map(r => (
                                             <option key={r.id} value={r.id}>Room {r.number}</option>
@@ -296,7 +298,7 @@ export default function Tickets() {
 
             <div className="grid gap-5">
                 {shownTickets.length === 0 ? (
-                    <div className="py-28 text-center border-2 border-dashed border-border rounded-3xl">
+                    <div className="py-20 text-center border-2 border-dashed border-muted rounded-2xl">
                         <ClipboardCheck className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
                         <p className="text-muted-foreground font-semibold text-sm">No tickets here.</p>
                     </div>
@@ -305,7 +307,7 @@ export default function Tickets() {
                     
                     [...shownTickets].reverse().map(t => (  //{/* copying and reversing the array so that the new stuff sits at the top of the feed */}
                         <Card key={t.id} className="border-none bg-card shadow-sm hover:shadow-md transition-shadow ring-1 ring-border/50 rounded-2xl overflow-hidden">
-                            <div className={cn("h-1.5 w-full", t.status === "Open" ? "bg-rose-500" : "bg-emerald-500")} />
+                            <div className={cn("h-1.5 w-full", t.status === "Open" ? "bg-red-500" : "bg-green-600")} />
                             <CardContent className="p-6">
                                 <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-5">
                                     <div className="space-y-1.5">
@@ -329,7 +331,7 @@ export default function Tickets() {
                                     </Badge>
                                 </div>
 
-                                <div className="bg-muted/40 p-5 rounded-xl border border-border/40 mb-5">
+                                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-border mb-4">
                                     <p className="text-sm text-foreground/80 leading-relaxed italic">"{t.issue}"</p>
                                 </div>
 

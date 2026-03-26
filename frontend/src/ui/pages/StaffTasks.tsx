@@ -30,7 +30,8 @@ export default function StaffTasks() {
     
     try {
       // fetching my details first so I actually know who is logged in
-      let uRes = await apiFetch(apiUrl + `/users/me?_t=${Date.now()}`, { credentials: "include" });
+      
+      let uRes = await apiFetch(apiUrl + `/users/me?_t=${Date.now()}`, { credentials: "include" }); // adding the timestamp here because the browser was caching the old user data and it was driving me mad lol
       if (!uRes.ok) return;
       
       let uData = await uRes.json();
@@ -40,7 +41,7 @@ export default function StaffTasks() {
       let rRes = await apiFetch(apiUrl + `/rooms?_t=${Date.now()}`, { credentials: "include" });
       let rData = await rRes.json();
       if (rRes.ok) {
-        let mine = rData.data.filter((r: any) => r.assignedToId === uData.data.id);
+        let mine = rData.data.filter((r: any) => r.assignedToId === uData.data.id); // I know I should probably filter this on the server but it's just easier to do it here for now
         setTasks(mine);
       }
 
@@ -100,7 +101,7 @@ export default function StaffTasks() {
 
   const prettyTime = (d: any) => {
     // just a quick helper to format the time so it's not a massive confusing string
-    return new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // I hope this works on the lab computers because it looks fine on my laptop lol
   };
 
   // show loading screen if we dont have user yet
@@ -118,10 +119,10 @@ export default function StaffTasks() {
     <div className="max-w-md mx-auto mt-8 px-4 pb-20 bg-background text-foreground animate-in fade-in duration-500">
       
       {/* Header section */}
-      <div className="mb-8 bg-card dark:bg-card/95 border border-border/50 dark:border-border/30 p-5 rounded-xl shadow-sm flex items-center justify-between">
+      <div className="mb-8 bg-card dark:bg-card/95 border border-border/50 dark:border-border/30 p-5 rounded-lg shadow-sm flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-foreground">My Tasks</h1>
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1 flex items-center gap-1.5">
+          <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mt-1 flex items-center gap-1.5">
             <User className="w-3 h-3" /> {user?.firstName} {user?.lastName}
           </p>
         </div>
@@ -131,6 +132,7 @@ export default function StaffTasks() {
       </div>
 
       {/* Tabs */}
+      {/* toggling views so hopefully this looks okay on mobile because that's what staff will actually use */}
       {/* using that cn helper to toggle the tab styles based on which view is active */}
       <div className="flex gap-1 mb-6 bg-muted/50 dark:bg-muted/20 p-1.5 rounded-2xl border border-border/50 dark:border-border/20">
         <button 
@@ -170,14 +172,14 @@ export default function StaffTasks() {
           ) : (
             tasks.map((t: any) => (
               <Card key={t.id} className="border-none shadow-md bg-card dark:bg-card/95 overflow-hidden ring-1 ring-border/50 dark:ring-border/30 rounded-3xl group">
-                <div className="h-1.5 w-full bg-rose-500 dark:bg-rose-600" /> {/* red strip at the top to make it look urgent */}
+                <div className="h-1.5 w-full bg-red-600 dark:bg-rose-600" /> {/* red strip at the top to make it look urgent */}
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-5">
                     <div>
                       <span className="text-sm font-black text-muted-foreground uppercase tracking-widest mb-1 block">Location</span>
                       <span className="text-3xl font-black leading-none block text-foreground">Room {t.number}</span>
                     </div>
-                    <Badge variant="destructive" className="uppercase text-[9px] font-black tracking-widest px-3 py-1 flex items-center gap-1 shadow-sm dark:bg-red-900 dark:text-red-100">
+                    <Badge variant="destructive" className="uppercase text-[9px] font-black tracking-widest px-3 py-1 flex items-center gap-1 shadow-sm dark:bg-red-900 dark:text-red-100"> 
                       <AlertTriangle className="w-3 h-3" /> Urgent
                     </Badge>
                   </div>
