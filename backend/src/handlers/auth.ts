@@ -26,6 +26,8 @@ if (!EMAIL_FROM) {
 console.log(`EMAIL_FROM: ${EMAIL_FROM}`);
 console.log(`RESEND_API_KEY: ${RESEND_API_KEY}`);
 
+
+// switch to using zod or t3-env for env validation instead of these ugly if statements
 const resend = new Resend(RESEND_API_KEY);
 
 export async function login(request: Request, response: Response, next: NextFunction) {
@@ -60,7 +62,7 @@ export async function logout(request: Request, response: Response, next: NextFun
     try {
         request.session.destroy((error) => {
             if (error) next(error);
-            response.clearCookie("sid");
+            response.clearCookie("sid"); // hopefully this actually clears the cookie sometimes express session is weird with it
             response.status(200).json({ message: "Logged out" });
         });
     } catch (error) {
@@ -71,7 +73,7 @@ export async function logout(request: Request, response: Response, next: NextFun
 export async function me(request: Request, response: Response, next: NextFunction) {
     try {
         const userId = request.session.userId;
-        console.log(userId);
+        console.log("debug userId:", userId);
         if (!userId) {
             response.status(401).json({ error: { title: "Not logged in", description: "" } });
             return;
@@ -108,6 +110,7 @@ export async function getUploadProgress(request: Request, response: Response, ne
 
         // Clean up finished or very old jobs
         for (const jobId in request.session.activeUploads) {
+            // sweeping away the old jobs so the session object doesn't get massive (like the ninja meme)
             const job = request.session.activeUploads[jobId];
 
             const isFinished = job.percent >= 100 && now - job.createdAt > FINISHED_GRACE_PERIOD_MS;
@@ -165,8 +168,9 @@ export async function forgotPassword(
                 html: `<p>Your code is <b>${code}</b></p>`,
             });
         } catch (error) {
-            response.status(500).json({ success: false });
-        }
+           console.error("Failed to send Resend email:", error); // probably hit the free tier limit again
+    response.status(500).json({ success: false });
+}
 
         // always return success for security
         response.json({ success: true });
@@ -183,7 +187,7 @@ export async function resetPassword(
     try {
         const test = await resetUserPassword(request.body);
 
-        console.log(test);
+        console.log("reset user password response", test);
 
         response.json({ success: true });
     } catch (error) {

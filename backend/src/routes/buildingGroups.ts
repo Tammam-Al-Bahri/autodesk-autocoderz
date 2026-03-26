@@ -18,11 +18,13 @@ router.post(
     createBuildingGroup,
 );
 router.get(`${buildingGroupsBase}`, requireAuth, getBuildingGroups);
+
+// change these to use something like /:id in the path instead of query params later dont want lose marks for not being proper rest lol
 router.delete(`${buildingGroupsBase}`, requireAuth, deleteBuildingGroup);
 router.patch(
     `${buildingGroupsBase}`,
     requireAuth,
-    validate(createBuildingGroupSchema),
+    validate(createBuildingGroupSchema), // using the create schema here cos we haven't made an update schema yet
     updateBuildingGroup,
 );
 

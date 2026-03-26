@@ -7,6 +7,7 @@ export const getRooms = async (req: Request, res: Response) => {
         const whereClause = buildingId ? { buildingId: String(buildingId) } : {};
 
         const roomsData = await (prisma as any).room.findMany({
+            // console.log("Found rooms:", roomsData.length);
             where: whereClause,
             include: { bookings: { orderBy: { id: 'desc' }, take: 1 } },
             orderBy: { number: 'asc' }
@@ -30,14 +31,16 @@ export const getRooms = async (req: Request, res: Response) => {
 
         res.json({ data: results });
     } catch (err) {
-        res.status(500).json({ error: { title: "Could not load rooms" } });
-    }
+    console.error("Error fetching rooms:", err); // actually log the error so that I know why it's breaking
+    res.status(500).json({ error: { title: "Could not load rooms" } });
+}
 };
 
 export const assignRoomTask = async (req: Request, res: Response) => {
     try {
         const { roomId, staffId, staffName } = req.body;
         const userId = (req as any).session?.userId;
+        // properly type the session object on the express Request
         let assignedBy = "Receptionist";
 
         if (userId) {
@@ -60,8 +63,9 @@ export const assignRoomTask = async (req: Request, res: Response) => {
         });
         res.json({ message: "Staff assigned" });
     } catch (e) { 
-        res.status(500).json({ error: { title: "Failed to assign staff" } }); 
-    }
+    console.error(e);
+    res.status(500).json({ error: { title: "Failed to assign staff" } }); 
+}
 };
 
 export const markRoomAsClean = async (req: Request, res: Response) => {
@@ -79,7 +83,7 @@ export const markRoomAsClean = async (req: Request, res: Response) => {
                     assignedByName: room.assignedByName || "Receptionist",
                     message: message || null,
                     assignedAt: room.taskAssignedAt || new Date(),
-                    completedAt: new Date()
+                    completedAt: new Date() // logging exactly when they finished their task
                 }
             });
         }
@@ -102,11 +106,15 @@ export const checkOutRoom = async (req: Request, res: Response) => {
     try {
         await (prisma as any).room.update({ where: { id: req.body.roomId }, data: { status: "DIRTY" } });
         res.json({ message: "Checked out" });
-    } catch (err) { res.status(500).json({ error: { title: "Error" } }); }
+    } catch (err) { 
+    console.error("Checkout error", err);
+    res.status(500).json({ error: { title: "Error during checkout" } }); 
+}
 };
 
 export const createRoom = async (req: Request, res: Response) => {
     try {
+        // blindly trusting req.body here for now, maybe add zod validation later?
         const room = await (prisma as any).room.create({ data: { ...req.body, status: "AVAILABLE" } });
         res.status(201).json({ data: room });
     } catch (error) { res.status(500).json({ error: { title: "Failed" } }); }
@@ -138,6 +146,8 @@ export const deleteRoom = async (req: Request, res: Response) => {
     
     res.json({ message: "Room successfully removed" });
   } catch (err) {
+    console.error("Failed to delete room:", err);
+    // Usually fails due to foreign key constraints if there are active bookings
     res.status(500).json({ error: { title: "Cannot delete this room. It might have active bookings." } });
-  }
+}
 };
